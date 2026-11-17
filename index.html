@@ -240,7 +240,8 @@
     .camera-viewport-card { background: #000; border: 2px solid var(--gold-accent); border-radius: 20px; position: relative; overflow: hidden; aspect-ratio: 4 / 3; display: flex; align-items: center; justify-content: center; }
     #camera-video, #camera-overlay { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
     #camera-overlay { pointer-events: none; }
-    .guide-a4-frame { position: absolute; top: 5%; bottom: 5%; left: 50%; aspect-ratio: 210 / 297; transform: translateX(-50%); border: 2px dashed rgba(245,184,0,.7); border-radius: 6px; pointer-events: none; }
+    .guide-a4-frame { position: absolute; left: 7%; top: 5%; width: 86%; height: 90%; border: 2px dashed rgba(245,184,0,.7); border-radius: 6px; pointer-events: none; }
+    #camera-box { max-height: 80vh; }
     .camera-live-feedback { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); background: rgba(10,31,107,.9); border: 1px solid var(--gold-accent); border-radius: 20px; padding: 6px 16px; font-size: .78rem; font-weight: 600; display: flex; align-items: center; gap: 8px; z-index: 10; max-width: 94%; text-align: center; }
     .camera-live-feedback.ok { border-color: var(--success); }
     .scanner-controls-bar { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
@@ -492,6 +493,10 @@
             <div class="stat-card purple"><div class="stat-icon-wrap"><i class="fa-solid fa-file-circle-check"></i></div><div class="stat-content"><div class="stat-number" id="stat-nilai-count">0</div><div class="stat-label">Mata Pelajaran Anda</div></div></div>
             <div class="stat-card orange"><div class="stat-icon-wrap"><i class="fa-solid fa-chalkboard-user"></i></div><div class="stat-content"><div class="stat-number" id="stat-kelas-label">-</div><div class="stat-label">Kelas Aktif</div></div></div>
           </div>
+          <div class="glass-panel-box" id="head-monitor" style="display:none;margin-bottom:22px;">
+            <div class="panel-header-flex"><div class="panel-header-title"><i class="fa-solid fa-binoculars"></i><span>Monitoring Seluruh Kelas</span></div><span style="font-size:.78rem;color:var(--text-sub);">Klik baris untuk membuka kelas tersebut</span></div>
+            <div class="table-responsive"><table class="custom-table" style="min-width:820px;"><thead><tr><th>Kelas</th><th>Wali Kelas</th><th style="text-align:center;">Siswa</th><th style="text-align:center;">Data Siswa Lengkap</th><th style="text-align:center;">Kunci Terisi</th><th style="text-align:center;">Nilai Terisi</th><th style="text-align:center;">Rata-rata</th></tr></thead><tbody id="head-monitor-body"></tbody></table></div>
+          </div>
           <div class="dashboard-bottom-grid">
             <div class="glass-panel-box">
               <div class="panel-header-flex"><div class="panel-header-title"><i class="fa-solid fa-bars-progress"></i><span>Progres Penilaian</span></div></div>
@@ -633,6 +638,7 @@
                 <div class="scan-opt-row">
                   <label><input type="checkbox" id="opt-auto" checked> Pindai otomatis saat 4 penanda stabil</label>
                   <label><input type="checkbox" id="opt-autosave"> Simpan otomatis</label>
+                  <label><input type="checkbox" id="opt-sound" checked> Efek suara</label>
                   <label>Sensitivitas pensil <input type="range" id="opt-sens" min="1" max="10" value="6" style="width:110px;"> <b id="opt-sens-val">6</b></label>
                 </div>
                 <div class="info-box" style="margin-top:14px;margin-bottom:0;"><i class="fa-solid fa-lightbulb"></i> Tips: letakkan LJK rata, pastikan keempat kotak hitam di sudut terlihat utuh, cahaya merata tanpa bayangan tangan, jarak sampai kertas memenuhi layar. Kamera butuh HTTPS; jika tidak muncul gunakan tombol <b>Foto HP</b>.</div>
@@ -931,10 +937,34 @@
         var pen = quadPenalty(q, [top[i].a, top[j].a, top[k].a, top[l].a]);
         if (pen < bp) { bp = pen; best = q; }
       }
-      if (!best || bp > 0.9) return { quad: null, count: 4 };
+      if (!best || bp > 0.9) {
+        var t3 = triFallback(top);
+        if (t3) return { quad: t3, count: 3, est: true };
+        return { quad: null, count: 4 };
+      }
       return { quad: best, count: 4, pen: bp };
     }
 
+    // Cadangan: bila hanya 3 kotak penanda terlihat (satu terpotong di tepi bingkai), taksir yang ke-4 (jajargenjang)
+    function triFallback(top) {
+      var n = Math.min(top.length, 7), best = null, bs = 1e9, i, j, k, perm, a, b, c, ux, uy, vx, vy, lu, lv, ratio, cs, sc, ar, amax, amin;
+      if (n < 3) return null;
+      for (i = 0; i < n; i++) for (j = i + 1; j < n; j++) for (k = j + 1; k < n; k++) {
+        var T = [top[i], top[j], top[k]];
+        amax = Math.max(T[0].a, T[1].a, T[2].a); amin = Math.min(T[0].a, T[1].a, T[2].a);
+        if (amax / amin > 2.2) continue;
+        for (perm = 0; perm < 3; perm++) {
+          b = T[perm].p; a = T[(perm + 1) % 3].p; c = T[(perm + 2) % 3].p;
+          ux = a[0] - b[0]; uy = a[1] - b[1]; vx = c[0] - b[0]; vy = c[1] - b[1];
+          lu = Math.hypot(ux, uy); lv = Math.hypot(vx, vy); if (lu < 1 || lv < 1) continue;
+          ratio = Math.max(lu, lv) / Math.min(lu, lv); if (ratio < 1.2 || ratio > 1.85) continue;
+          cs = Math.abs((ux * vx + uy * vy) / (lu * lv)); if (cs > 0.35) continue;
+          sc = Math.abs(Math.log(ratio / 1.478)) + 2 * cs + 0.5 * Math.log(amax / amin);
+          if (sc < bs) { bs = sc; best = [a, b, c, [a[0] + c[0] - b[0], a[1] + c[1] - b[1]]]; }
+        }
+      }
+      return best && bs < 0.5 ? orderQuad(best) : null;
+    }
     // skor kesejajaran: kontras cincin bulatan vs kertas di sekitarnya
     function alignScore(g, W, Hh, H, nq) {
       var tot = 0, n = 0, q, o, k, r, a, xy;
@@ -960,12 +990,12 @@
         if (!best || sc > best.score) best = { H: H, score: sc, k: k };
       }
       if (!best) return { ok: false, count: 4 };
-      return { ok: true, H: best.H, quality: best.score, quad: mk.quad, count: 4 };
+      return { ok: true, H: best.H, quality: best.score, quad: mk.quad, count: mk.count, est: !!mk.est };
     }
 
     function bubbleMeasure(g, W, Hh, H, cx, cy) {
       var bx = cx, by = cy, best = 1e9, ox, oy, k, s, p;
-      for (oy = -0.6; oy <= 0.601; oy += 0.3) for (ox = -0.6; ox <= 0.601; ox += 0.3) {
+      for (oy = -0.75; oy <= 0.751; oy += 0.25) for (ox = -0.75; ox <= 0.751; ox += 0.25) {
         s = 0;
         for (k = 0; k < RINGP.length; k++) s += sm(g, W, Hh, H, cx + ox + RINGP[k][0], cy + oy + RINGP[k][1]);
         s = s / RINGP.length + 8 * (ox * ox + oy * oy);
@@ -986,13 +1016,28 @@
       for (i = 0; i < 4; i++) if (i !== mi && f[i] >= thr && f[i] >= 0.6 * max) return '*';
       return 'ABCD'.charAt(mi);
     }
+    // kurangi "lantai" bayangan/kertas keabuan: median semua bulatan (mayoritas bulatan kosong)
+    function normFills(fills) {
+      var all = [], i, o;
+      for (i = 0; i < fills.length; i++) for (o = 0; o < 4; o++) all.push(fills[i][o]);
+      all.sort(function (a, b) { return a - b; });
+      var base = Math.min(all.length ? all[all.length >> 1] : 0, 0.1);
+      return fills.map(function (f) { return f.map(function (v) { return Math.max(0, v - base); }); });
+    }
     function readAll(g, W, Hh, H, q, thr) {
-      var fills = [], ans = [], i, o, f;
+      var fills = [], i, o, f;
       for (i = 0; i < q; i++) {
         f = []; for (o = 0; o < 4; o++) { var xy = bubbleXY(i, o); f.push(bubbleMeasure(g, W, Hh, H, xy[0], xy[1])); }
-        fills.push(f); ans.push(decideRow(f, thr));
+        fills.push(f);
       }
-      return { fills: fills, ans: ans };
+      fills = normFills(fills);
+      return { fills: fills, ans: fills.map(function (r) { return decideRow(r, thr); }) };
+    }
+    // rata-rata beberapa bingkai (mengurangi derau/blur sesaat), lalu putuskan
+    function mergeReads(list, thr) {
+      var q = list[0].fills.length, fills = [], i, o, n;
+      for (i = 0; i < q; i++) { var f = [0, 0, 0, 0]; for (n = 0; n < list.length; n++) for (o = 0; o < 4; o++) f[o] += list[n].fills[i][o] / list.length; fills.push(f); }
+      return { fills: fills, ans: fills.map(function (r) { return decideRow(r, thr); }) };
     }
 
     // ---------- Simulasi LJK sintetis (untuk uji akurasi) ----------
@@ -1051,7 +1096,7 @@
        =================================================================== -->
   <script>
     /* ===== KONFIGURASI CLOUD (isi setelah deploy Code.gs agar semua perangkat otomatis terhubung) ===== */
-    var DEFAULT_CLOUD_URL = 'https://script.google.com/macros/s/AKfycbzu6DPEY-oBivnHGmznNVZpYjYhSfDIsGHR2Wir45AQlh1VVAhuE999fbG19neq5oAC9g/exec';
+    var DEFAULT_CLOUD_URL = 'https://script.google.com/macros/s/AKfycbyqXd9dQURvgZ5th9ZWMypUq8mJ0U4tTUFDzxU1rLMwzfz1Xm9ClGQk1a5IRKC-Wljbcg/exec';
     var DEFAULT_CLOUD_TOKEN = 'SIPINTAR-SDN3-2026-Bungas'; // HARUS sama persis dengan TOKEN di Code.gs
 
     var $ = function (id) { return document.getElementById(id); };
@@ -1069,9 +1114,10 @@
     function classRange(a, b) { return ALL_CLASSES.filter(function (c) { return +c[0] >= a && +c[0] <= b; }); }
 
     // homeroom: kelas yang diampu sebagai guru kelas; pai: guru PAI (semua kelas); english/coding: kelas khusus mapel
-    function U(name, type, nip, o) { o = o || {}; return { name: name, type: type, nip: nip, admin: !!o.admin, homeroom: o.h || [], pai: !!o.pai, english: o.en || [], coding: o.cd || [] }; }
+    function U(name, type, nip, o) { o = o || {}; return { name: name, type: type, nip: nip, admin: !!o.admin, head: !!o.head, homeroom: o.h || [], pai: !!o.pai, english: o.en || [], coding: o.cd || [] }; }
     var USERS = [
       U('Admin Sekolah', 'Admin', 'admin', { admin: true }),
+      U('Patmasari, S.Pd', 'NIP', '196801042007012026', { head: true }),
       U('Khairil Anwar, S.Pd', 'NIP', '196809281989111003', { h: ['5D'] }),
       U('H. Zulkipli, S.Pd.SD', 'NIP', '196806121989111004', { h: ['4B'] }),
       U('Sri Yuhita, S.Pd.SD', 'NIP', '197001031992032009', { h: ['2B'] }),
@@ -1123,28 +1169,32 @@
     }
     function isHomeroom(u, cls) { return u.admin || u.homeroom.indexOf(cls) >= 0; }
     function allowedClasses(u) {
-      if (u.admin || u.pai) return ALL_CLASSES.slice();
+      if (u.admin || u.pai || u.head) return ALL_CLASSES.slice();
       return ALL_CLASSES.filter(function (c) { return u.homeroom.indexOf(c) >= 0 || u.english.indexOf(c) >= 0 || u.coding.indexOf(c) >= 0; });
     }
     function getSubjectsFor(u, cls) {
       var out = [], g = +cls[0];
-      if (isHomeroom(u, cls)) out = out.concat(HOMEROOM_SUBJECTS);
-      if (u.pai || u.admin) out.push(PAI_SUBJECT);
-      if (u.english.indexOf(cls) >= 0 || (u.admin && g >= 4)) out.push(ENGLISH_SUBJECT);
-      if (u.coding.indexOf(cls) >= 0 || (u.admin && g >= 5)) out.push(CODING_SUBJECT);
+      var all = u.admin || u.head;
+      if (isHomeroom(u, cls) || u.head) out = out.concat(HOMEROOM_SUBJECTS);
+      if (u.pai || all) out.push(PAI_SUBJECT);
+      if (u.english.indexOf(cls) >= 0 || (all && g >= 4)) out.push(ENGLISH_SUBJECT);
+      if (u.coding.indexOf(cls) >= 0 || (all && g >= 5)) out.push(CODING_SUBJECT);
       return out;
     }
+    // Kepala sekolah: hanya melihat (tidak boleh mengubah nilai, kunci, siswa)
+    function isReadOnly() { return !!currentUser && !!currentUser.head; }
     function canEditStudents(cls) { return !!currentUser && isHomeroom(currentUser, cls); }
     // PAI-saja: hanya siswa beragama Islam
     function studentScope(cls) {
       var u = currentUser;
-      if (u.admin || isHomeroom(u, cls) || u.english.indexOf(cls) >= 0 || u.coding.indexOf(cls) >= 0) return 'all';
+      if (u.admin || u.head || isHomeroom(u, cls) || u.english.indexOf(cls) >= 0 || u.coding.indexOf(cls) >= 0) return 'all';
       return u.pai ? 'islam' : 'all';
     }
     function isMuslim(s) { return String(s.religion || '').toLowerCase() === 'islam'; }
     function roleText(u, cls) {
       var r = [];
       if (u.admin) r.push('Administrator');
+      if (u.head) r.push('Kepala Sekolah');
       if (u.homeroom.indexOf(cls) >= 0) r.push('Wali Kelas ' + cls);
       if (u.pai) r.push('Guru PAI');
       if (u.english.length) r.push('Guru B. Inggris');
@@ -1243,8 +1293,8 @@
     function studentsForSubject(cls, code) { var all = getStudents(cls); return code === 'PAI' ? all.filter(isMuslim) : all; }
     function gKey(c, s) { return 'grades:' + c + ':' + s; }
     function getGrades(c, s) { var m = dbGet(gKey(c, s), {}), o = {}; for (var n in m) if (!m[n].deleted) o[n] = m[n]; return o; }
-    function putGrade(c, s, nisn, rec) { var m = dbGet(gKey(c, s), {}); rec.ts = Date.now(); m[nisn] = rec; dbSet(gKey(c, s), m, 'map'); }
-    function clearGrades(c, s) { var m = dbGet(gKey(c, s), {}), ts = Date.now(); for (var n in m) m[n] = { deleted: true, ts: ts }; dbSet(gKey(c, s), m, 'map'); }
+    function putGrade(c, s, nisn, rec) { if (isReadOnly()) return; var m = dbGet(gKey(c, s), {}); rec.ts = Date.now(); m[nisn] = rec; dbSet(gKey(c, s), m, 'map'); }
+    function clearGrades(c, s) { if (isReadOnly()) return; var m = dbGet(gKey(c, s), {}), ts = Date.now(); for (var n in m) m[n] = { deleted: true, ts: ts }; dbSet(gKey(c, s), m, 'map'); }
     function getKey(c, s) { return dbGet('keys:' + c + ':' + s, null); }
     function getQ(c, s) { var k = getKey(c, s); return k && k.q ? k.q : 40; }
     function calcFinal(pg, isi, ess) {
@@ -1355,6 +1405,11 @@
       var subs = getSubjectsFor(currentUser, activeClass); activeSubject = subs.length ? subs[0].code : '';
       loadSchoolForm(); fillCloudForm(); refreshAll(); startClock(); startSyncLoop(); setSyncUI(); syncNow();
       $('print-ljk-date').value = new Date().toISOString().slice(0, 10);
+      if (currentUser.head) {
+        ['tab-ljk', 'tab-reset'].forEach(function (t) { var li = document.querySelector('.sidebar-menu li[data-tab="' + t + '"]'); if (li) li.style.display = 'none'; });
+        document.querySelectorAll('#tab-nilai .module-title-bar .btn-act.primary').forEach(function (b) { b.style.display = 'none'; });
+        $('stat-nilai-count').parentElement.querySelector('.stat-label').innerText = 'Mata Pelajaran Kelas Ini';
+      }
     }
     function switchActiveClass(c) {
       activeClass = c; var s = lsGet('session', {}); s.cls = c; lsSet('session', s);
@@ -1397,8 +1452,28 @@
     /* ==========================================================================
        F. DASHBOARD
        ========================================================================== */
+    function pctBadge(p) { var c = p >= 100 ? 'badge-done' : p > 0 ? 'badge-process' : 'badge-idle'; return '<span class="status-badge ' + c + '">' + p + '%</span>'; }
+    function renderHeadMonitor() {
+      var box = $('head-monitor'); if (!box) return;
+      if (!currentUser || !currentUser.head) { box.style.display = 'none'; return; }
+      box.style.display = '';
+      var wali = {}; USERS.forEach(function (u) { u.homeroom.forEach(function (c) { wali[c] = u.name; }); });
+      $('head-monitor-body').innerHTML = ALL_CLASSES.map(function (cls) {
+        var all = getStudents(cls), subs = getSubjectsFor(currentUser, cls);
+        var comp = all.filter(function (s) { return s.name && s.nisn && s.gender && s.religion; }).length;
+        var pSis = all.length ? Math.round(comp / all.length * 100) : 0;
+        var keyed = subs.filter(function (sj) { var k = getKey(cls, sj.code); return k && k.a && k.a.filter(Boolean).length >= k.q; }).length;
+        var pKey = subs.length ? Math.round(keyed / subs.length * 100) : 0;
+        var cells = 0, filled = 0, tot = 0;
+        subs.forEach(function (sj) { var g = getGrades(cls, sj.code); studentsForSubject(cls, sj.code).forEach(function (st) { cells++; var x = g[st.nisn]; if (x && x.finalScore > 0) { filled++; tot += x.finalScore; } }); });
+        var pNil = cells ? Math.round(filled / cells * 100) : 0, avg = filled ? (tot / filled).toFixed(1) : '-';
+        return '<tr style="cursor:pointer;" onclick="openClassFromMonitor(\'' + cls + '\')"><td style="font-weight:700;color:#fff;">' + cls + '</td><td>' + esc(wali[cls] || '-') + '</td><td style="text-align:center;">' + all.length + '</td><td style="text-align:center;">' + (all.length ? pctBadge(pSis) : '-') + '</td><td style="text-align:center;">' + pctBadge(pKey) + ' <small>(' + keyed + '/' + subs.length + ')</small></td><td style="text-align:center;">' + pctBadge(pNil) + '</td><td style="text-align:center;font-weight:700;color:var(--gold-light);">' + avg + '</td></tr>';
+      }).join('');
+    }
+    function openClassFromMonitor(cls) { $('class-switcher').value = cls; switchActiveClass(cls); switchTab('tab-nilai'); }
     function updateDashboard() {
       if (!currentUser) return;
+      renderHeadMonitor();
       var cls = activeClass, subs = getSubjectsFor(currentUser, cls), scope = studentScope(cls);
       var all = getStudents(cls), vis = scope === 'islam' ? all.filter(isMuslim) : all;
       $('stat-siswa-count').innerText = vis.length;
@@ -1528,11 +1603,12 @@
       $('nilai-banner').innerHTML = subj === 'PAI' ? '<div class="info-box"><i class="fa-solid fa-link"></i> Siswa diambil otomatis dari data Wali Kelas ' + cls + ', hanya yang beragama Islam (' + list.length + ' siswa).</div>' : (!canEditStudents(cls) ? '<div class="info-box"><i class="fa-solid fa-link"></i> Siswa diambil otomatis dari data Wali Kelas ' + cls + '.</div>' : '');
       $('tbody-grades').innerHTML = list.map(function (s, i) {
         var r = g[s.nisn] || { correct: 0, wrong: 0, empty: q, pgScore: 0, isianScore: 0, essayScore: 0, finalScore: 0, time: '' };
-        function inp(f, mx) { return '<td style="text-align:center;"><input type="number" min="0" max="' + mx + '" value="' + (r[f] || 0) + '" onchange="updateRowGrade(\'' + s.nisn + '\',\'' + f + '\',this.value)"></td>'; }
+        function inp(f, mx) { return '<td style="text-align:center;"><input type="number" min="0" max="' + mx + '" value="' + (r[f] || 0) + '"' + (isReadOnly() ? ' disabled' : '') + ' onchange="updateRowGrade(\'' + s.nisn + '\',\'' + f + '\',this.value)"></td>'; }
         return '<tr><td>' + (i + 1) + '</td><td style="font-weight:600;color:#fff;">' + esc(s.name) + '</td><td><code>' + s.nisn + '</code></td>' + inp('correct', 40) + inp('wrong', 40) + inp('empty', 40) + '<td style="text-align:center;font-weight:700;" id="pg-' + s.nisn + '">' + (r.pgScore || 0) + '</td>' + inp('isianScore', 100) + inp('essayScore', 100) + '<td style="text-align:center;font-weight:800;color:var(--gold-light);" id="fin-' + s.nisn + '">' + (r.finalScore || 0) + '</td><td style="font-size:.74rem;">' + esc(r.time || '-') + '</td></tr>';
       }).join('') || '<tr><td colspan="11" style="text-align:center;padding:24px;">Belum ada siswa. Data siswa diisi oleh Wali Kelas.</td></tr>';
     }
     function updateRowGrade(nisn, field, value) {
+      if (isReadOnly()) return;
       var cls = activeClass, subj = activeSubject, g = getGrades(cls, subj), q = getQ(cls, subj);
       var r = g[nisn] || { correct: 0, wrong: 0, empty: q, total: q, pgScore: 0, isianScore: 0, essayScore: 0, finalScore: 0, time: '' };
       r[field] = Math.max(0, parseFloat(value) || 0); var total = r.total || q; r.total = total;
@@ -1548,7 +1624,7 @@
     /* ==========================================================================
        J. REKAP
        ========================================================================== */
-    function hasHomeroomSubjects() { return isHomeroom(currentUser, activeClass); }
+    function hasHomeroomSubjects() { return isHomeroom(currentUser, activeClass) || currentUser.head; }
     function renderRecapScopes() {
       var sel = $('rekap-scope'), prev = sel.value, opts = [];
       if (hasHomeroomSubjects()) opts.push('<option value="HOMEROOM">Semua Mapel Kelas (' + HOMEROOM_SUBJECTS.length + ' mapel)</option>');
@@ -1602,7 +1678,7 @@
       var k = getKey(activeClass, s); keyDraft = { q: k && k.q ? k.q : 40, a: k && k.a ? k.a.slice() : [] };
       $('key-q-count').value = keyDraft.q; renderKeypad();
     }
-    function persistKey() { dbSet('keys:' + activeClass + ':' + $('key-subject-select').value, { q: keyDraft.q, a: keyDraft.a.slice(0, keyDraft.q) }, 'lww'); }
+    function persistKey() { if (isReadOnly()) return; dbSet('keys:' + activeClass + ':' + $('key-subject-select').value, { q: keyDraft.q, a: keyDraft.a.slice(0, keyDraft.q) }, 'lww'); }
     function onKeyCountChange() { var n = Math.max(5, Math.min(40, parseInt($('key-q-count').value) || 40)); $('key-q-count').value = n; keyDraft.q = n; keyDraft.a = keyDraft.a.slice(0, n); persistKey(); renderKeypad(); updateDashboard(); }
     function renderKeypad() {
       var h = '';
@@ -1698,7 +1774,7 @@
       var res = jsQR(data, w, h, { inversionAttempts: 'dontInvert' }); return res ? res.data : null;
     }
     function parsePayload(t) { if (!t) return null; var p = t.split('|'); if (p.length < 4) return null; return { nisn: p[0], subject: p[1], q: parseInt(p[2]) || 0, cls: p[3] }; }
-    function canGrade(cls, code) { return allowedClasses(currentUser).indexOf(cls) >= 0 && getSubjectsFor(currentUser, cls).some(function (s) { return s.code === code; }); }
+    function canGrade(cls, code) { return !isReadOnly() && allowedClasses(currentUser).indexOf(cls) >= 0 && getSubjectsFor(currentUser, cls).some(function (s) { return s.code === code; }); }
     function sensThr() { return sensToThr(parseInt($('opt-sens').value) || 6); }
     $('opt-sens').addEventListener('input', function () { $('opt-sens-val').innerText = this.value; });
 
@@ -1721,9 +1797,10 @@
     // Jalankan pemindaian pada sumber gambar. return state atau null
     function scanSource(src, opt) {
       opt = opt || {};
-      var gr = grabGray(src, 1600), qHint = opt.qHint || (getKey(activeClass, $('scan-subject-select').value) || {}).q || 40;
+      var gr = grabGray(src, 1800), qHint = opt.qHint || (getKey(activeClass, $('scan-subject-select').value) || {}).q || 40;
       var loc = omrLocate(gr.g, gr.w, gr.h, qHint);
       if (!loc.ok) return { error: 'Penanda sudut tidak lengkap (' + loc.count + '/4 terdeteksi)' };
+      if (loc.est && loc.quality < 0.07) return { error: 'Hanya 3 penanda terlihat dan penyelarasan kurang yakin — mundurkan kamera agar 4 kotak hitam terlihat' };
       var payload = parsePayload(qrFromGray(gr, loc.H));
       var cls = payload ? payload.cls : activeClass, subject = payload ? payload.subject : $('scan-subject-select').value;
       if (!canGrade(cls, subject)) return { error: 'Anda tidak punya akses menilai ' + subjectByCode(subject).name + ' kelas ' + cls };
@@ -1732,7 +1809,7 @@
       var student = null;
       if (payload && payload.nisn !== '0000000000') student = getStudents(cls).filter(function (s) { return s.nisn === payload.nisn; })[0] || null;
       if (!student && !payload) { var sv = $('scan-student-select').value; if (sv) student = getStudents(cls).filter(function (s) { return s.nisn === sv; })[0] || null; }
-      return { cls: cls, subject: subject, q: q, key: key, student: student, answers: rd.ans, fills: rd.fills, quality: loc.quality, qr: !!payload, gr: gr, H: loc.H, isian: 0, essay: 0 };
+      return { cls: cls, subject: subject, q: q, key: key, student: student, answers: rd.ans, fills: rd.fills, quality: loc.quality, est: loc.est, qr: !!payload, gr: gr, H: loc.H, isian: 0, essay: 0 };
     }
     function recomputeScan() {
       var st = scanState; if (!st) return;
@@ -1768,13 +1845,14 @@
       recomputeScan();
     }
     function saveScanResultToGradebook(silent) {
+      if (isReadOnly()) { toast('Kepala sekolah hanya dapat melihat data.', 'err'); return false; }
       var st = scanState; if (!st) { toast('Belum ada LJK yang dipindai.', 'err'); return false; }
       if (!st.student) { toast('Pilih siswa terlebih dahulu.', 'err'); return false; }
       if (!st.key || !st.key.a || !st.key.a.length) { toast('Isi kunci jawaban mapel ini dahulu.', 'err'); return false; }
       putGrade(st.cls, st.subject, st.student.nisn, { correct: st.correct, wrong: st.wrong, empty: st.empty, total: st.q, pgScore: st.pgScore, isianScore: st.isian, essayScore: st.essay, finalScore: st.finalScore, time: new Date().toLocaleString('id-ID', { hour12: false }), answers: st.answers.join('') });
       if (st.cls === activeClass) { renderGrades(); renderRecapTable(); }
       updateDashboard();
-      if (!silent) toast(st.student.name + ': nilai akhir ' + st.finalScore + ' tersimpan.', 'ok');
+      if (!silent) { toast(st.student.name + ': nilai akhir ' + st.finalScore + ' tersimpan.', 'ok'); playSound('save'); }
       return true;
     }
     function resetCurrentScan() {
@@ -1805,12 +1883,55 @@
       for (var i = 0; i < canvases.length; i++) {
         await sleep(20);
         var r = scanSource(canvases[i], {});
-        if (r.error) { bad.push(i + 1); if (!batch) toast(r.error + '. Pastikan 4 kotak hitam sudut terlihat utuh.', 'err'); continue; }
-        ok++; showScan(r);
+        if (r.error) { bad.push(i + 1); if (!batch) { toast(r.error + '. Pastikan 4 kotak hitam sudut terlihat utuh.', 'err'); playSound('err'); } continue; }
+        ok++; showScan(r); if (!batch) playSound('ok');
         if (batch && r.student && r.qr && r.quality >= 0.08 && r.key && r.key.a && r.key.a.length) { if (saveScanResultToGradebook(true)) saved++; else bad.push(i + 1); } else if (batch) bad.push(i + 1);
       }
+      if (batch) playSound(bad.length ? 'warn' : 'ok');
       if (batch) toast(ok + ' halaman terbaca, ' + saved + ' tersimpan otomatis' + (bad.length ? '; perlu cek manual: halaman ' + bad.join(', ') : '') + '.', bad.length ? 'err' : 'ok');
       e.target.value = '';
+    }
+
+    /* ===== Efek suara (WebAudio, tanpa file) ===== */
+    var audioCtx = null;
+    function ensureAudio() {
+      try {
+        if (!audioCtx) { var AC = window.AudioContext || window.webkitAudioContext; if (AC) audioCtx = new AC(); }
+        if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+      } catch (e) { }
+    }
+    function tone(freq, t0, dur, type, vol) {
+      var o = audioCtx.createOscillator(), g = audioCtx.createGain(), t = audioCtx.currentTime + t0;
+      o.type = type || 'sine'; o.frequency.setValueAtTime(freq, t);
+      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol || 0.25, t + 0.015); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      o.connect(g); g.connect(audioCtx.destination); o.start(t); o.stop(t + dur + 0.03);
+    }
+    function playSound(kind) {
+      var cb = $('opt-sound'); if (cb && !cb.checked) return;
+      ensureAudio(); if (!audioCtx) return;
+      try {
+        if (kind === 'ok') { tone(988, 0, 0.11, 'sine', 0.3); tone(1319, 0.11, 0.2, 'sine', 0.3); }       // terbaca: ting-ting naik
+        else if (kind === 'save') { tone(1175, 0, 0.09, 'triangle', 0.25); tone(1568, 0.09, 0.16, 'triangle', 0.25); }
+        else if (kind === 'warn') { tone(440, 0, 0.14, 'square', 0.12); tone(440, 0.2, 0.14, 'square', 0.12); } // perlu dicek
+        else if (kind === 'err') { tone(220, 0, 0.28, 'sawtooth', 0.14); }
+      } catch (e) { }
+    }
+    document.addEventListener('pointerdown', ensureAudio, { once: true });
+    (function () { var v = lsGet('opt-sound', true); window.addEventListener('DOMContentLoaded', function () { var c = $('opt-sound'); if (c) { c.checked = v !== false; c.addEventListener('change', function () { lsSet('opt-sound', c.checked); if (c.checked) playSound('ok'); }); } }); })();
+
+    // Ambil beberapa bingkai berurutan lalu rata-ratakan isian tiap bulatan (lebih tahan blur/derau/bayangan sesaat)
+    async function captureBest(v, n) {
+      var runs = [], first = null, i, r;
+      for (i = 0; i < n; i++) {
+        r = scanSource(v, {});
+        if (r.error) { if (!first) first = r; } else runs.push(r);
+        if (i < n - 1) await sleep(110);
+      }
+      if (!runs.length) return first;
+      runs.sort(function (a, b) { return b.quality - a.quality; });
+      var base = runs[0], use = runs.filter(function (x) { return x.q === base.q && x.quality >= base.quality * 0.6; });
+      if (use.length > 1) { var m = mergeReads(use, sensThr()); base.fills = m.fills; base.answers = m.ans; }
+      base.frames = use.length; return base;
     }
 
     /* ==========================================================================
@@ -1821,11 +1942,20 @@
     async function startCamera() {
       if (cam.stream) return;
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { toast('Kamera tidak tersedia (butuh HTTPS). Gunakan tombol "Foto HP" atau "Unggah".', 'err'); return; }
-      var st;
-      try { st = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: cam.facing }, width: { ideal: 1920 }, height: { ideal: 1080 }, frameRate: { ideal: 30 } }, audio: false }); }
-      catch (e1) { try { st = await navigator.mediaDevices.getUserMedia({ video: true, audio: false }); } catch (e2) { toast('Gagal membuka kamera: ' + e2.message, 'err'); return; } }
+      ensureAudio();
+      var st, portrait = window.innerHeight > window.innerWidth;
+      // resolusi mengikuti orientasi layar agar tidak terpotong/ter-zoom di mode potret
+      var dims = portrait ? { width: { ideal: 1080 }, height: { ideal: 1920 } } : { width: { ideal: 1920 }, height: { ideal: 1080 } };
+      var tries = [
+        { video: Object.assign({ facingMode: { ideal: cam.facing }, frameRate: { ideal: 30 } }, dims), audio: false },
+        { video: { facingMode: { ideal: cam.facing } }, audio: false },
+        { video: true, audio: false }
+      ], lastErr = null;
+      for (var ti = 0; ti < tries.length && !st; ti++) { try { st = await navigator.mediaDevices.getUserMedia(tries[ti]); } catch (e1) { lastErr = e1; } }
+      if (!st) { toast('Gagal membuka kamera: ' + (lastErr ? lastErr.message : 'tidak diketahui'), 'err'); return; }
       cam.stream = st; var v = $('camera-video'); v.srcObject = st;
       try { await v.play(); } catch (e) { }
+      fitCameraBox();
       try { var tr = st.getVideoTracks()[0], caps = tr.getCapabilities ? tr.getCapabilities() : {}; if (caps.focusMode && caps.focusMode.indexOf('continuous') >= 0) tr.applyConstraints({ advanced: [{ focusMode: 'continuous' }] }).catch(function () { }); } catch (e) { }
       $('btn-camera-text').innerText = 'Matikan Kamera'; cam.stable = 0; cam.prev = null; cam.locked = false; cam.lost = 0; cam.busy = false;
       setCamMsg('Arahkan kamera sampai 4 kotak hitam di sudut LJK terlihat.');
@@ -1836,8 +1966,25 @@
       if (cam.stream) { cam.stream.getTracks().forEach(function (t) { t.stop(); }); cam.stream = null; }
       var v = $('camera-video'); if (v) v.srcObject = null;
       var bt = $('btn-camera-text'); if (bt) bt.innerText = 'Nyalakan Kamera';
+      var cb0 = $('camera-box'); if (cb0) { cb0.style.aspectRatio = ''; layoutGuide(); }
       var ov = $('camera-overlay'); if (ov) ov.getContext('2d').clearRect(0, 0, ov.width, ov.height);
     }
+    // Samakan rasio kotak kamera dengan video (potret/lanskap) dan gambar bingkai panduan A4 yang pasti muat di layar
+    function layoutGuide() {
+      var b = $('camera-box'), g = document.querySelector('.guide-a4-frame'); if (!b || !g) return;
+      var w = b.clientWidth, h = b.clientHeight, gw, gh; if (!w || !h) return;
+      gw = Math.min(w * 0.84, h * 0.88 * 210 / 297); gh = gw * 297 / 210;
+      g.style.left = ((w - gw) / 2) + 'px'; g.style.top = ((h - gh) / 2) + 'px'; g.style.width = gw + 'px'; g.style.height = gh + 'px';
+    }
+    function fitCameraBox() {
+      var v = $('camera-video'), b = $('camera-box'), n = 0;
+      (function wait() {
+        if (v.videoWidth && v.videoHeight) { b.style.aspectRatio = v.videoWidth + ' / ' + v.videoHeight; layoutGuide(); }
+        else if (n++ < 40 && cam.stream) setTimeout(wait, 100);
+      })();
+    }
+    window.addEventListener('resize', function () { if (cam.stream) fitCameraBox(); else layoutGuide(); });
+    window.addEventListener('orientationchange', function () { setTimeout(function () { if (cam.stream) fitCameraBox(); }, 300); });
     function toggleCameraStream() { if (cam.stream) stopCamera(); else startCamera(); }
     async function switchCameraFacing() { cam.facing = cam.facing === 'environment' ? 'user' : 'environment'; if (cam.stream) { stopCamera(); await sleep(150); startCamera(); } }
     function drawOverlay(quad, w, h, color) {
@@ -1846,6 +1993,7 @@
       c.strokeStyle = color; c.lineWidth = Math.max(2, w / 160); c.beginPath(); quad.forEach(function (p, i) { if (i) c.lineTo(p[0], p[1]); else c.moveTo(p[0], p[1]); }); c.closePath(); c.stroke();
       c.fillStyle = color; quad.forEach(function (p) { c.beginPath(); c.arc(p[0], p[1], Math.max(3, w / 90), 0, 6.283); c.fill(); });
     }
+    function camMsg(t, ok) { if (Date.now() < (cam.hold || 0)) return; setCamMsg(t, ok); }
     function camTick() {
       cam.timer = null; if (!cam.stream) return;
       var t0 = performance.now(), v = $('camera-video'), wait = 150;
@@ -1856,33 +2004,42 @@
           var cx = 0, cy = 0; mk.quad.forEach(function (p) { cx += p[0]; cy += p[1]; });
           var moved = cam.prev ? Math.hypot(cx / 4 - cam.prev[0], cy / 4 - cam.prev[1]) : 99; cam.prev = [cx / 4, cy / 4];
           if (moved < gr.w * 0.012) cam.stable++; else cam.stable = 0;
-          if (cam.locked) setCamMsg('Selesai. Ganti kertas LJK berikutnya...', true);
-          else if (cam.stable >= 4 && $('opt-auto').checked) { cam.busy = true; setCamMsg('Memindai...', true); requestAnimationFrame(function () { setTimeout(function () { autoCapture(v); }, 30); }); }
-          else setCamMsg(cam.stable >= 1 ? 'Tahan stabil... ' + Math.min(cam.stable, 4) + '/4' : '4 penanda terdeteksi — tahan kamera diam', true);
+          if (cam.locked) camMsg('Selesai. Ganti kertas LJK berikutnya...', true);
+          else if (cam.stable >= (mk.est ? 5 : 3) && $('opt-auto').checked) { cam.busy = true; camMsg('Memindai... tahan diam', true); requestAnimationFrame(function () { setTimeout(function () { autoCapture(v); }, 30); }); }
+          else if (mk.est) camMsg('3 penanda terlihat — mundurkan sedikit agar keempat kotak hitam masuk bingkai', false);
+          else camMsg(cam.stable >= 1 ? 'Tahan stabil... ' + Math.min(cam.stable, 3) + '/3' : '4 penanda terdeteksi — tahan kamera diam', true);
         } else {
           drawOverlay(null); cam.stable = 0; cam.prev = null; cam.lost++;
           if (cam.lost >= 5) cam.locked = false;
-          setCamMsg(mk.count > 0 ? 'Penanda terlihat ' + Math.min(mk.count, 3) + '/4 — mundurkan kamera / ratakan kertas' : 'Arahkan kamera ke 4 kotak hitam di sudut LJK');
+          camMsg(mk.count > 0 ? 'Penanda belum lengkap — mundurkan kamera sedikit, ratakan kertas, cahaya merata' : 'Arahkan kamera ke 4 kotak hitam di sudut LJK');
         }
       }
       wait = Math.max(60, 150 - (performance.now() - t0));
       cam.timer = setTimeout(camTick, wait);
     }
-    function autoCapture(v) {
-      var r = scanSource(v, {});
+    async function autoCapture(v) {
+      var r;
+      try { r = await captureBest(v, 3); } catch (e) { r = { error: 'galat pemindaian' }; }
       cam.busy = false;
-      if (r.error) { setCamMsg(r.error); cam.stable = 0; return; }
+      if (!cam.stream) return;
+      if (r.error) { setCamMsg(r.error); cam.hold = Date.now() + 3000; cam.stable = 0; return; }
+      if (r.quality < 0.05) { setCamMsg('Penyelarasan kurang baik, tahan lebih stabil / cahaya lebih merata'); cam.hold = Date.now() + 3000; cam.stable = 0; return; }
       showScan(r);
-      if (r.quality < 0.05) { setCamMsg('Penyelarasan kurang baik, tahan lebih stabil / cahaya lebih merata'); cam.stable = 0; return; }
       cam.locked = true; cam.stable = 0;
       var saved = false;
       if ($('opt-autosave').checked && r.student && r.qr && r.key && r.key.a && r.key.a.length) saved = saveScanResultToGradebook(true);
-      setCamMsg((r.student ? r.student.name : 'Siswa belum dikenali') + ' — nilai ' + r.finalScore + (saved ? ' ✓ tersimpan' : ''), true);
-      if (navigator.vibrate) navigator.vibrate(60);
+      var ambiguous = r.answers.filter(function (a) { return a === '*'; }).length;
+      setCamMsg((r.student ? r.student.name : 'Siswa belum dikenali') + ' — nilai ' + r.finalScore + (saved ? ' ✓ tersimpan' : '') + (ambiguous ? ' • ' + ambiguous + ' nomor ganda, cek' : ''), true);
+      playSound(ambiguous || !r.student ? 'warn' : 'ok');
+      if (navigator.vibrate) navigator.vibrate(ambiguous ? [60, 60, 60] : 60);
     }
     function triggerManualCapture() {
       var v = $('camera-video'); if (!cam.stream || !v.videoWidth) { toast('Nyalakan kamera dahulu.', 'err'); return; }
-      var r = scanSource(v, {}); if (r.error) { toast(r.error, 'err'); return; } showScan(r); cam.locked = true;
+      toast('Memindai...');
+      captureBest(v, 3).then(function (r) {
+        if (r.error) { toast(r.error, 'err'); playSound('err'); return; }
+        showScan(r); cam.locked = true; playSound('ok');
+      });
     }
 
     /* ==========================================================================
@@ -1895,6 +2052,7 @@
       XLSX.writeFile(wb, 'Cadangan_SIPINTAR_' + cls + '_' + Date.now() + '.xlsx');
     }
     function executeGranularReset() {
+      if (isReadOnly()) { toast('Kepala sekolah tidak memiliki akses reset.', 'err'); return; }
       var scope = $('reset-scope-select').value, cls = activeClass, subs = getSubjectsFor(currentUser, cls);
       if ($('reset-confirm-input').value.trim() !== 'RESET') { toast('Ketik RESET (huruf kapital) untuk konfirmasi.', 'err'); return; }
       if (scope === 'single_subject') { clearGrades(cls, activeSubject); toast('Nilai ' + subjectByCode(activeSubject).name + ' direset.', 'ok'); }
