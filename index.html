@@ -2420,10 +2420,26 @@
           
           <div class="module-card">
             <div class="module-title-bar">
+              <h2><i class="fa-solid fa-cloud-arrow-up" style="color: var(--gold-accent);"></i> Server Sinkronisasi Lintas Perangkat (Laptop ↔ HP)</h2>
+              <div class="action-btn-group">
+                <button class="btn-act success" onclick="pullAllFromGasCloud(true)">
+                  <i class="fa-solid fa-cloud-arrow-down"></i> Tarik Data Cloud Sekarang
+                </button>
+              </div>
+            </div>
+
+            <div class="info-sync-banner" id="cfg-gas-status-label" style="margin-bottom: 0;">
+              <i class="fa-solid fa-circle-check" style="color: var(--success);"></i>
+              <span>Status Server Cloud: Terhubung Otomatis ke Server Pusat SIPINTAR (Sinkronisasi Lintas HP & Laptop Aktif)</span>
+            </div>
+          </div>
+
+          <div class="module-card">
+            <div class="module-title-bar">
               <h2><i class="fa-solid fa-table" style="color: var(--success);"></i> Integrasi Google Spreadsheet Guru</h2>
               <div class="action-btn-group">
                 <button class="btn-act success" onclick="testSpreadsheetConnection()">
-                  <i class="fa-solid fa-plug"></i> Tes Koneksi Cloud
+                  <i class="fa-solid fa-plug"></i> Tes Koneksi Spreadsheet
                 </button>
                 <button class="btn-act primary" onclick="saveSpreadsheetConfig()">
                   <i class="fa-solid fa-floppy-disk"></i> Simpan URL
@@ -2993,25 +3009,119 @@
       actionsEl.innerHTML = `
         <button class="btn-act glass" style="min-width: 95px; justify-content: center;" onclick="document.getElementById('custom-dialog-overlay').style.display='none'">Batal</button>
         <button id="btn-confirm-yes" class="btn-act primary" style="min-width: 95px; justify-content: center;">Ya, Lanjutkan</button>
-      `;
-      overlay.style.display = 'flex';
-      document.getElementById('btn-confirm-yes').onclick = () => {
-        overlay.style.display = 'none';
-        if (typeof onConfirmCallback === 'function') onConfirmCallback();
-      };
+    // =========================================================================
+    // TEMPELKAN URL WEB APP GOOGLE APPS SCRIPT ANDA DI BAWAH INI SATU KALI SAJA
+    // Contoh: "https://script.google.com/macros/s/AKfycbx.../exec"
+    // Setelah diisi, seluruh guru (Laptop & HP) otomatis terhubung tanpa input!
+    // =========================================================================
+    const DEFAULT_GAS_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbzTD0yhxdghjKHMAD7Gd_hl7xkM0KdSlXM8zrNavyPGOUqBMyhfVIxMr7R9zV4RgfMuUQ/exec";
+
+    function getGasWebAppUrl() {
+      const builtIn = (DEFAULT_GAS_WEBAPP_URL || "").trim();
+      if (builtIn && builtIn.startsWith("https://script.google.com/")) {
+        return builtIn;
+      }
+      return (localStorage.getItem('sipintar_gas_webapp_url') || "").trim();
     }
 
-    // Wrapper penyimpanan lokal + dorongan instan ke Cloud agar sinkron lintas HP & Laptop
+    async function callGasBackend(payloadObj) {
+      const url = getGasWebAppUrl();
+      if (!url) return null;
+      try {
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payloadObj)
+        });
+        return await res.json();
+      } catch (err) {
+        console.warn("GAS Sync Error:", err.message);
+        return null;
+      }
+    }
+
+    // Tarik seluruh data terbaru dari server GAS Cloud ke HP/Laptop saat login atau saat tombol diklik
+    async function pullAllFromGasCloud(showNotif = false) {
+      const url = getGasWebAppUrl();
+      const pill = document.getElementById('sync-indicator');
+      const text = document.getElementById('sync-text');
+
+      if (!url) {
+        if (showNotif) {
+          showAppNotice("Silakan tempelkan URL Web App Google Apps Script (berakhiran /exec) pada kolom di atas terlebih dahulu agar data di Laptop dan HP saling terhubung.", "URL Web App Belum Diisi", "info");
+        }
+        return false;
+      }
+
+      if (pill && text) {
+        pill.className = "sync-status-pill syncing";
+        text.innerText = "Menarik Data...";
+      }
+
+      const resp = await callGasBackend({ action: 'cloud_pull_all' });
+      if (resp && resp.status === 'success' && resp.store) {
+        let updatedCount = 0;
+        for (const k in resp.store) {
+          if (Object.prototype.hasOwnProperty.call(resp.store, k)) {
+            const incomingVal = resp.store[k];
+            if (localStorage.getItem(k) !== incomingVal) {
+              localStorage.setItem(k, incomingVal);
+              updatedCount++;
+            }
+          }
+        }
+        if (pill && text) {
+          pill.className = "sync-status-pill";
+          text.innerText = "Tersinkron Cloud";
+        }
+        if (updatedCount > 0 && typeof window.onCloudDataUpdated === 'function') {
+          window.onCloudDataUpdated();
+        }
+        if (showNotif) {
+          showAppNotice(`Sinkronisasi Selesai! ${updatedCount} paket data terbaru dari perangkat lain berhasil dimuat ke perangkat ini.`, "Tersinkron", "success");
+        }
+        return true;
+      } else {
+        if (pill && text) {
+          pill.className = "sync-status-pill syncing";
+          text.innerText = "Gagal Tarik Cloud";
+        }
+        if (showNotif) {
+          showAppNotice("Gagal terhubung ke Web App Google Apps Script. Pastikan URL benar dan akses deployment disetel ke 'Anyone'.", "Koneksi Gagal", "error");
+        }
+        return false;
+      }
+    }
+
+    // Wrapper penyimpanan lokal + dorongan instan ke Cloud (GAS Web App & Firebase) agar sinkron lintas HP & Laptop
     function saveSyncedData(key, valueObj) {
-      localStorage.setItem(key, JSON.stringify(valueObj));
+      const serialized = JSON.stringify(valueObj);
+      localStorage.setItem(key, serialized);
       const pill = document.getElementById('sync-indicator');
       const text = document.getElementById('sync-text');
       if (pill && text) {
         pill.className = "sync-status-pill syncing";
         text.innerText = "Menyinkronkan...";
       }
+
+      const promises = [];
+
+      // 1. Kirim ke Google Apps Script Cloud Store (agar langsung terbaca di HP lain)
+      if (getGasWebAppUrl()) {
+        promises.push(callGasBackend({
+          action: 'cloud_push',
+          key: key,
+          payload: serialized
+        }));
+      }
+
+      // 2. Kirim ke Firebase Bridge jika aktif
       if (window.__cloudBridge && window.__cloudBridge.ready) {
-        window.__cloudBridge.pushDoc(key, valueObj).then(() => {
+        promises.push(window.__cloudBridge.pushDoc(key, valueObj));
+      }
+
+      if (promises.length > 0) {
+        Promise.allSettled(promises).then(() => {
           if (pill && text) {
             pill.className = "sync-status-pill";
             text.innerText = "Tersinkron Cloud";
@@ -3021,7 +3131,7 @@
         setTimeout(() => {
           if (pill && text) {
             pill.className = "sync-status-pill";
-            text.innerText = "Tersinkron";
+            text.innerText = "Tersimpan Lokal";
           }
         }, 400);
       }
@@ -3072,11 +3182,31 @@
       document.getElementById('stat-kelas-label').innerText = activeClass;
       document.getElementById('siswa-active-class-title').innerText = `Kelas ${activeClass}`;
 
+      // Isi input pengaturan URL Web App & Spreadsheet yang tersimpan
+      const savedGasUrl = getGasWebAppUrl();
+      const gasStatus = document.getElementById('cfg-gas-status-label');
+      if (gasStatus) {
+        gasStatus.innerHTML = savedGasUrl
+          ? `<i class="fa-solid fa-circle-check" style="color: var(--success);"></i> <span>Status Server Cloud: <strong>Terhubung Otomatis</strong> ke Server Pusat SIPINTAR (Sinkronisasi Lintas HP & Laptop Aktif)</span>`
+          : `<i class="fa-solid fa-triangle-exclamation" style="color: var(--warning);"></i> <span>Status Server Cloud: URL Web App belum ditanamkan oleh Admin pada konstanta <code>DEFAULT_GAS_WEBAPP_URL</code>.</span>`;
+      }
+
+      const savedSheetId = localStorage.getItem(`sipintar_sheet_id_${currentUser.nip}`);
+      if (savedSheetId) {
+        const sheetInput = document.getElementById('cfg-sheet-url');
+        const sheetLabel = document.getElementById('cfg-sheet-id-label');
+        if (sheetInput) sheetInput.value = `https://docs.google.com/spreadsheets/d/${savedSheetId}/edit`;
+        if (sheetLabel) sheetLabel.innerText = `ID Spreadsheet Terdeteksi: ${savedSheetId}`;
+      }
+
       loadSchoolProfile();
       setupUserRoleInterface();
       loadStudentsForClass(activeClass);
       updateDashboardAnalytics();
       startLiveClock();
+
+      // Tarik pembaruan data terbaru dari Cloud saat membuka aplikasi di HP atau Laptop
+      pullAllFromGasCloud(false);
     }
 
     function setupUserRoleInterface() {
@@ -4614,6 +4744,19 @@
     /* ==========================================================================
        M. SINKRONISASI CLOUD, RESET & UBAH PASSWORD
        ========================================================================== */
+    function saveGasWebAppConfig() {
+      const url = document.getElementById('cfg-gas-webapp-url').value.trim();
+      if (!url || !url.includes('script.google.com')) {
+        showAppNotice("Masukkan URL Web App Google Apps Script yang valid (contoh: https://script.google.com/macros/s/.../exec).", "Validasi URL", "error");
+        return;
+      }
+      localStorage.setItem('sipintar_gas_webapp_url', url);
+      document.getElementById('cfg-gas-status-label').innerText = "Status Server Cloud: Terhubung ke Web App GAS (Menarik data...)";
+      
+      // Dorong data lokal saat ini ke cloud lalu tarik data dari perangkat lain
+      pullAllFromGasCloud(true);
+    }
+
     function saveSpreadsheetConfig() {
       const url = document.getElementById('cfg-sheet-url').value.trim();
       const match = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
@@ -4621,16 +4764,24 @@
         const id = match[1];
         saveSyncedData(`sipintar_sheet_id_${currentUser.nip}`, id);
         document.getElementById('cfg-sheet-id-label').innerText = `ID Spreadsheet Terdeteksi: ${id}`;
-        showAppNotice("Konfigurasi URL Spreadsheet berhasil disimpan!", "Tersimpan", "success");
+        showAppNotice("Konfigurasi URL Spreadsheet berhasil disimpan & disinkronkan!", "Tersimpan", "success");
       } else {
         showAppNotice("Tautan Google Spreadsheet tidak valid.", "Validasi", "error");
       }
     }
 
-    function testSpreadsheetConnection() {
+    async function testSpreadsheetConnection() {
       const id = localStorage.getItem(`sipintar_sheet_id_${currentUser.nip}`);
       if (!id) { showAppNotice("Simpan URL Spreadsheet terlebih dahulu.", "Info", "info"); return; }
-      showAppNotice(`Koneksi Berhasil! ID: [${id}] terhubung ke akun ${currentUser.name}.`, "Terhubung", "success");
+      const gasUrl = getGasWebAppUrl();
+      if (gasUrl) {
+        const res = await callGasBackend({ action: 'ping', spreadsheetId: id });
+        if (res && res.status === 'success') {
+          showAppNotice(res.message, "Terhubung ke Cloud & Spreadsheet", "success");
+          return;
+        }
+      }
+      showAppNotice(`ID Spreadsheet [${id}] tersimpan. Pastikan URL Web App GAS juga sudah diisi untuk sinkronisasi otomatis.`, "Info Koneksi", "info");
     }
 
     function enqueueSync(action, payload) {
@@ -4638,21 +4789,40 @@
       q.push({ id: 'sync_' + Date.now(), action: action, payload: payload, timestamp: Date.now() });
       localStorage.setItem('sipintar_sync_queue', JSON.stringify(q));
       updateSyncStatusUI();
+
+      // Kirim juga ke spreadsheet pribadi guru jika URL Web App & Spreadsheet ID sudah diatur
+      const sheetId = currentUser ? localStorage.getItem(`sipintar_sheet_id_${currentUser.nip}`) : null;
+      if (sheetId && getGasWebAppUrl()) {
+        if (action === 'save_students') {
+          callGasBackend({ action: 'save_students', spreadsheetId: sheetId, kelas: payload.class, students: payload.students });
+        } else if (action === 'save_grades') {
+          callGasBackend({ action: 'save_grades', spreadsheetId: sheetId, kelas: payload.class, mapel: payload.subject, grades: payload.grades });
+        } else if (action === 'save_keys') {
+          callGasBackend({ action: 'save_keys', spreadsheetId: sheetId, mapel: payload.subject, keys: payload.keys });
+        } else if (action === 'save_school') {
+          callGasBackend({ action: 'save_school_data', spreadsheetId: sheetId, schoolData: payload.data });
+        }
+      }
     }
 
-    function triggerManualSync() {
+    async function triggerManualSync() {
       const pill = document.getElementById('sync-indicator');
       const text = document.getElementById('sync-text');
 
       pill.className = "sync-status-pill syncing";
       text.innerText = "Menyinkronkan...";
 
-      setTimeout(() => {
-        localStorage.setItem('sipintar_sync_queue', '[]');
-        pill.className = "sync-status-pill";
-        text.innerText = window.__cloudBridge && window.__cloudBridge.ready ? "Tersinkron Cloud" : "Tersinkron";
-        showAppNotice("Sinkronisasi Berhasil: Seluruh data terbaru telah disinkronkan antar perangkat.", "Tersinkron", "success");
-      }, 600);
+      const pulled = await pullAllFromGasCloud(false);
+      localStorage.setItem('sipintar_sync_queue', '[]');
+      pill.className = "sync-status-pill";
+      text.innerText = (pulled || (window.__cloudBridge && window.__cloudBridge.ready)) ? "Tersinkron Cloud" : "Tersinkron";
+      showAppNotice(
+        pulled
+          ? "Sinkronisasi Cloud Berhasil: Seluruh data siswa, kunci jawaban, dan nilai terbaru telah ditarik & diselaraskan antar perangkat (Laptop & HP)."
+          : "Data lokal tersimpan. Isi URL Web App GAS di menu Pengaturan agar data sinkron otomatis ke HP lain.",
+        "Status Sinkronisasi",
+        "success"
+      );
     }
 
     function updateSyncStatusUI() {
@@ -4746,7 +4916,15 @@
     window.addEventListener('DOMContentLoaded', async () => {
       await initAccountHashes();
       initAllClassStudents();
+      await pullAllFromGasCloud(false);
       checkPersistedSession();
+
+      // Sinkronisasi otomatis setiap 20 detik saat aplikasi terbuka di Laptop atau HP
+      setInterval(() => {
+        if (currentUser && getGasWebAppUrl()) {
+          pullAllFromGasCloud(false);
+        }
+      }, 20000);
     });
   </script>
 </body>
