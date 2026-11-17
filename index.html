@@ -791,6 +791,17 @@
 
           <div class="module-card">
             <div class="module-title-bar">
+              <h2><i class="fa-solid fa-key" style="color:var(--gold-accent);"></i> Reset Password Pengguna — Admin</h2>
+            </div>
+            <div class="info-box"><i class="fa-solid fa-circle-info"></i> Untuk guru yang lupa password. Password dikembalikan ke password bawaan, lalu guru bisa login dan menggantinya lewat menu Ganti Password. Perubahan tersimpan di database cloud, jadi berlaku di semua perangkat setelah perangkat guru terhubung internet.</div>
+            <div class="form-grid-2">
+              <div class="form-control-box"><label>Pilih Pengguna</label><select id="reset-pw-user"></select></div>
+              <div class="form-control-box"><label>&nbsp;</label><button class="btn-act danger" onclick="resetUserPassword()"><i class="fa-solid fa-key"></i> Reset ke Password Bawaan</button></div>
+            </div>
+          </div>
+
+          <div class="module-card">
+            <div class="module-title-bar">
               <h2><i class="fa-solid fa-code" style="color:var(--gold-accent);"></i> Kode Apps Script (Code.gs)</h2>
               <div class="action-btn-group"><button class="btn-act gold" onclick="copyGasCode()"><i class="fa-solid fa-copy"></i> Salin Kode</button></div>
             </div>
@@ -2416,7 +2427,14 @@ function actExport_(req) {
       toast('Password diperbarui.', 'ok'); ['pass-old', 'pass-new', 'pass-confirm'].forEach(function (i) { $(i).value = ''; });
     }
     /* ---- Database cloud (khusus admin) ---- */
-    function fillCloudForm() { var c = cloudCfg(); $('cfg-cloud-url').value = c.url; $('cfg-cloud-token').value = c.token; }
+    function fillCloudForm() { var c = cloudCfg(); $('cfg-cloud-url').value = c.url; $('cfg-cloud-token').value = c.token;  var sel = $('reset-pw-user'); if (sel && !sel.options.length) USERS.forEach(function (u) { var o = document.createElement('option'); o.value = u.nip; o.textContent = u.name + (u.nip === 'admin' ? '' : ' (' + u.nip + ')'); sel.appendChild(o); }); }
+    async function resetUserPassword() {
+      if (!currentUser || !currentUser.admin) { toast('Khusus admin.', 'err'); return; }
+      var nip = $('reset-pw-user').value, u = USER_MAP[nip]; if (!u) { toast('Pilih pengguna dahulu.', 'err'); return; }
+      if (!confirm('Reset password ' + u.name + ' ke password bawaan?')) return;
+      dbSet('pw:' + nip, await sha256Hash(DEFAULT_PASS + nip), 'lww'); syncNow(true);
+      toast('Password ' + u.name + ' direset ke password bawaan.', 'ok');
+    }
     function saveCloudConfig() {
       if (!currentUser || !currentUser.admin) { toast('Khusus admin.', 'err'); return; }
       var url = $('cfg-cloud-url').value.trim(), tok = $('cfg-cloud-token').value.trim();
