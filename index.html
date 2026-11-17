@@ -815,7 +815,7 @@
  *
  * TOKEN di bawah HARUS sama dengan DEFAULT_CLOUD_TOKEN di file index.html.
  */
-var TOKEN = 'SDN3SUDAN';
+var TOKEN = '30303570';
 var DB_SHEET = 'DB';
 var CHUNK = 45000;          // batas aman karakter per sel (maks. Google Sheets 50.000)
 var MAX_EXPORT_SHEETS = 40;
@@ -1366,7 +1366,7 @@ function actExport_(req) {
   <script>
     /* ===== KONFIGURASI CLOUD — tertanam di file ini; hanya admin yang melihat/mengubahnya (menu Database Cloud) ===== */
     var DEFAULT_CLOUD_URL = 'https://script.google.com/macros/s/AKfycbx_QwKC_uM86xGouQ0ltd9mgNb2NALYMULHilCI7afWsaKijltmpC_fwss34KTQNPE4Yw/exec';
-    var DEFAULT_CLOUD_TOKEN = 'SDN3SUDAN'; // HARUS sama persis dengan TOKEN di Code.gs
+    var DEFAULT_CLOUD_TOKEN = '30303570'; // HARUS sama persis dengan TOKEN di Code.gs
 
     var $ = function (id) { return document.getElementById(id); };
     function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
