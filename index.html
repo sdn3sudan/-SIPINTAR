@@ -1,0 +1,184 @@
+<!DOCTYPE html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>SIPINTAR - SD Negeri 3 Sungai Danau</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,500;0,700;1,900&family=Pacifico&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root{--b1:#0A1F6B;--b2:#1646C8;--b3:#2E7BFF;--g:#F5B800}*{box-sizing:border-box}
+body{margin:0;font-family:Montserrat,system-ui,sans-serif;color:#0b1b4d;background:#0A1F6B}
+.bg{background:radial-gradient(circle at 20% 10%,#2E7BFF 0,transparent 40%),linear-gradient(135deg,#0A1F6B,#1646C8 60%,#0A1F6B)}
+#login{min-height:100vh;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:28px;padding:24px;color:#fff}
+.hero{max-width:560px;text-align:center}.brand{font:italic 900 clamp(48px,9vw,92px)/1 Montserrat;margin:8px 0;background:linear-gradient(#fff,#b9c6e6);-webkit-background-clip:text;color:transparent;filter:drop-shadow(0 3px 0 #F5B800)}
+.pita{background:#07154f;border:1px solid var(--g);border-radius:10px;padding:8px 14px;font-weight:700;margin:6px auto;font-size:14px}.gold{background:linear-gradient(#FFD54A,#F5B800);color:#0A1F6B;font-size:20px;font-weight:900}
+.script{font:clamp(40px,7vw,64px) Pacifico;color:#FFD54A}.hexs{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.hx{width:78px;height:88px;clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);background:linear-gradient(#1646C8,#07154f);border:2px solid var(--g);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10px;font-weight:700}.hx span{font-size:24px}
+.glass{width:min(400px,100%);background:rgba(235,243,255,.93);border-radius:24px;padding:46px 24px 22px;box-shadow:0 0 40px #2E7BFF;position:relative;color:#0A1F6B}
+.glass h2{position:absolute;top:-22px;left:50%;transform:translateX(-50%);margin:0;background:#0A1F6B;color:#fff;padding:12px 28px;border-radius:30px;font-size:18px;white-space:nowrap}
+input,select,button{font:inherit}.glass input,.glass select,.f input,.f select{width:100%;padding:13px;margin:6px 0;border:1px solid #c9d6f2;border-radius:12px;background:#fff}
+.btn{background:linear-gradient(#2E7BFF,#0A3CC4);color:#fff;border:0;border-radius:12px;padding:12px 18px;font-weight:700;cursor:pointer;margin:3px}.btn.g{background:linear-gradient(#FFD54A,#F5B800);color:#0A1F6B}.btn.r{background:#d33}
+.err{color:#c00;min-height:20px;font-weight:700;font-size:13px}.eye{position:absolute;right:12px;top:14px;cursor:pointer;background:none;border:0}
+#app{display:none;min-height:100vh;color:#fff}#app.on{display:flex}
+aside{width:230px;padding:12px;background:rgba(7,21,79,.85);flex-shrink:0}aside .lg{text-align:center;margin-bottom:10px;font:italic 900 24px Montserrat}
+aside a{display:block;padding:12px;margin:6px 0;border-radius:12px;background:rgba(46,123,255,.25);cursor:pointer;font-weight:700}aside a.on{background:linear-gradient(90deg,#F5B800,#2E7BFF)}
+main{flex:1;padding:14px;min-width:0}.top{display:flex;gap:10px;flex-wrap:wrap;justify-content:space-between;align-items:center;margin-bottom:12px}
+.pill{background:#0A3CC4;border-radius:30px;padding:10px 16px;font-weight:700;font-size:13px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:12px 0}.cd{border-radius:16px;padding:16px;font-weight:700}.cd b{font-size:36px;display:block}
+.pn{background:#fff;color:#0A1F6B;border-radius:16px;padding:14px;margin:10px 0;overflow-x:auto}.pn h3{margin:0 0 10px}
+.ban{border-radius:18px;padding:30px 18px;background:linear-gradient(90deg,rgba(10,31,107,.9),rgba(46,123,255,.3)),#2E7BFF;font-style:italic}.ban h1{font:italic 900 44px Montserrat;margin:0}
+.bar{height:10px;background:#dde6f8;border-radius:8px}.bar i{display:block;height:100%;border-radius:8px;background:linear-gradient(90deg,#2E7BFF,#8a3ffc)}
+.chart{display:flex;gap:6px;align-items:flex-end;height:170px}.chart div{flex:1;text-align:center;font-size:10px}.chart i{display:block;border-radius:6px 6px 0 0;background:linear-gradient(#2E7BFF,#0A3CC4);margin-bottom:3px}
+table{border-collapse:collapse;width:100%;font-size:13px}th,td{border:1px solid #c9d6f2;padding:6px;text-align:left}th{background:#0A3CC4;color:#fff}td input{width:70px;padding:4px}
+.tabs a{display:inline-block;padding:8px 14px;border-radius:20px;background:#dde6f8;margin:2px;cursor:pointer;font-weight:700}.tabs a.on{background:#0A3CC4;color:#fff}
+.f{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px}.f label{font-size:12px;font-weight:700}
+.ok{color:#0a8a2a}.bd{color:#c00}.wn{color:#b58900}footer{text-align:center;padding:10px;font-size:12px}#hb{display:none}
+#pa{display:none}.pg{position:relative;width:210mm;height:297mm;background:#fff;color:#000;overflow:hidden;page-break-after:always}
+.mk{position:absolute;width:10mm;height:10mm;background:#000}.tt{position:absolute;left:0;right:0;text-align:center;font:bold 5mm Arial}.tt.s{font-size:3.6mm}.idb{position:absolute;left:25mm;font:3.4mm/6mm Arial}
+.qn{position:absolute;font:bold 3mm/4mm Arial;width:9mm;text-align:right}.bb{position:absolute;width:5.4mm;height:5.4mm;border:.3mm solid #000;border-radius:50%;font:2.4mm/4.8mm Arial;text-align:center;text-decoration:none;color:#999}
+body.pr #app,body.pr #login{display:none!important}body.pr #pa{display:block}@page{size:A4;margin:0}
+@media(max-width:800px){aside{position:fixed;z-index:9;height:100%;left:-240px;transition:.2s}aside.o{left:0}#hb{display:block}}
+</style></head><body>
+<div id="login" class="bg"><div class="hero"><svg width="110" height="110" viewBox="0 0 100 100"><path d="M50 4l16 8 18 2 6 18 8 16-8 16-6 18-18 2-16 8-16-8-18-2-6-18L2 48l8-16 6-18 18-2z" fill="#2aa84a"/><circle cx="50" cy="50" r="33" fill="#fff"/><path d="M17 50a33 33 0 0166 0z" fill="#d82020"/><path d="M50 26l6 14h15l-12 9 5 14-14-9-14 9 5-14-12-9h15z" fill="#F5B800"/></svg>
+<div class="brand">SIPINTAR</div><div class="pita">Sistem Informasi Penilaian Terpadu dan Terintegrasi</div><div class="pita gold">SD NEGERI 3 SUNGAI DANAU</div><div class="script">“Bungas”</div>
+<div class="hexs"><div class="hx"><span>🏆</span>Berprestasi</div><div class="hx"><span>⭐</span>Unggul</div><div class="hx"><span>🇮🇩</span>Nasionalisme</div><div class="hx"><span>👥</span>Giat</div><div class="hx"><span>🤝</span>Amanah</div><div class="hx"><span>❤️</span>Santun</div></div>
+<p style="font-style:italic">Cerdas, Berkarakter, Berprestasi untuk Masa Depan</p></div>
+<form class="glass" onsubmit="return doLogin(event)" autocomplete="on"><h2>🔒 Login Pengguna</h2>
+<input id="u" placeholder="Username (NIP)" inputmode="numeric" autocomplete="username"><div style="position:relative"><input id="p" type="password" placeholder="Password" autocomplete="current-password"><button type="button" class="eye" onclick="p.type=p.type=='password'?'text':'password'">👁</button></div>
+<select id="k"></select><div class="err" id="lm"></div><button class="btn" id="lb" style="width:100%">Login</button>
+<p style="text-align:center;font-style:italic;font-size:13px">Mari bersama wujudkan pendidikan yang lebih baik<br><small>Lupa password? Hubungi Admin untuk reset.</small></p></form></div>
+<div id="app" class="bg"><aside id="sd"><div class="lg">SIPINTAR</div><div id="nv"></div><p style="text-align:center;font:24px Pacifico;color:#FFD54A">Bungas</p></aside>
+<main><div class="top"><button class="btn" id="hb" onclick="sd.classList.toggle('o')">☰</button><div class="pill" id="ck"></div><div class="pill" id="sy">Tersimpan lokal</div><div class="pill" id="us"></div></div><div id="vw"></div><footer>SIPINTAR | SD NEGERI 3 SUNGAI DANAU — Cerdas, Berprestasi, dan Berkarakter</footer></main></div><div id="pa"></div>
+<script>
+const MAPEL=['Pendidikan Agama Islam','Pendidikan Pancasila','Bahasa Indonesia','Matematika','IPAS','Seni Rupa','Muatan Lokal','Bahasa Inggris','PJOK'],KELAS=[];for(let g=1;g<=6;g++)for(const r of'ABCD')KELAS.push(g+r);
+// nama|jenis|NIP|kelas (PAI = guru PAI semua kelas)
+const USERS={};`Khairil Anwar, S.Pd|NIP|196809281989111003|5D
+H. Zulkipli, S.Pd.SD|NIP|196806121989111004|4B
+Sri Yuhita, S.Pd.SD|NIP|197001031992032009|2B
+Rohman, S.Pd.SD|NIP|196801201993101002|5B
+Hj. Hadiah, S.Pd.SD|NIP|196703141986082004|2C
+Laila Hanifah, S.Pd.I|NIP|198203202007012014|PAI
+Maimunah, S.Pd|NIP|197704132006042026|3A
+Ainah, S.Pd|NIP|198110122014092001|3C
+Made Ardika, S.Pd.SD|NIP|197712112006041013|6A
+Redna Kustiah, S.Pd|NIPPPK|197609022022212005|5A
+Hj. Atimila, S.Pd|NIPPPK|197507122022212010|5C
+Masliani, S.Pd|NIPPPK|197010172022212006|3B
+Ersa Aulia, S.Pd|NIPPPK|198810112022212023|6C
+Rosmiati. S, S.Pd|NIPPPK|198512052022212027|1C,4D
+Haily Inayah, S.Pd|NIPPPK|199805262022212006|4C
+Raudah, S.Pd|NIPPPK|199001292023212017|6B
+Endang Susiani, S.Pd|NIPPPK|197109192024212002|1A
+Noor Biati, S.Ag|NIPPPK|197712012024212004|PAI
+Fatmawati, S.Pd|NIPPPK|198210042024212009|1B
+Siti Mahrita, S.Pd|NIPPPK|198608162024212022|2A
+Hanifah, S.Pd.I|NIPPPK|198804052024212035|PAI
+Murhayati, S.Pd|NIPPPK|199312192024212047|1D
+Siti Hajar, S.Pd|NIPPPK|199405212024212040|2D
+Abul Hasan Sazali, S.Pd|NIPPPK|199706162024211017|PAI,3D
+Muhammad Raydinor Rahman, S.Pd|NIPPPK|199807252024211014|6D
+Tantri Kumala Sari, S.Pd|NIPPPK|198912302025212027|4A`.split('\n').forEach(l=>{const[n,j,id,k]=l.split('|'),a=k.split(',');USERS[id]={n,j,pai:a.includes('PAI'),k:a.filter(x=>x!='PAI')}});
+// pemeriksaan data awal
+{const ids=Object.keys(USERS),cl=new Set();ids.forEach(i=>USERS[i].k.forEach(k=>cl.add(k)));if(ids.some(i=>i.length!=18)||ids.length!=26||KELAS.some(k=>!cl.has(k)))console.error('Data pengguna tidak valid')}
+const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const mem={},LS={g(k,d){try{const v=localStorage.getItem(k);if(v)return JSON.parse(v)}catch(e){}return k in mem?mem[k]:d},s(k,v){mem[k]=v;try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const DB=Object.assign({siswa:{},kunci:{},nilai:{},sf:{},pw:{},set:{},q:[]},LS.g('sp',{})),sv=()=>LS.s('sp',DB);
+async function H(s){if(window.crypto&&crypto.subtle){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}let h=5381;for(const c of s)h=(h*33^c.charCodeAt(0))>>>0;return'f'+h}
+$('#k').innerHTML='<option value="">Pilih Kelas</option>'+KELAS.map(k=>`<option value="${k}">Kelas ${k}</option>`).join('');
+let ME=null,KL='',fails=0,cur='beranda';
+function nip(s){return s.replace(/NIPPPK|NIP/gi,'').replace(/\D/g,'')}
+async function doLogin(e){e.preventDefault();const m=$('#lm'),u=$('#u').value.trim(),p=$('#p').value.trim(),k=$('#k').value;let id,us;m.textContent='';
+ if(u.toLowerCase()=='admin'){id='admin';us={n:'Admin Sekolah',j:'Administrator',k:[],admin:1}}else{id=nip(u);us=USERS[id];if(!us)return m.textContent='NIP tidak terdaftar'}
+ if(!p)return m.textContent='Password belum diisi';
+ const st=DB.pw[id],ok=st?(await H(id+p))===st:p==='30303570';
+ if(!ok){if(++fails>=5){$('#lb').disabled=true;m.textContent='Terlalu banyak salah. Tunggu 3 detik...';setTimeout(()=>{$('#lb').disabled=false;fails=0;m.textContent=''},3000)}else m.textContent='Password salah';return false}
+ if(!k)return m.textContent='Pilih kelas terlebih dahulu';
+ if(!us.admin&&!us.pai&&!us.k.includes(k))return m.textContent='Kelas ini bukan kelas Anda';
+ LS.s('ss',{id,k});boot();return false}
+function boot(){const s=LS.g('ss',null);if(!s)return;const us=s.id=='admin'?{n:'Admin Sekolah',j:'Administrator',k:[],admin:1}:USERS[s.id];if(!us)return;ME={id:s.id,us};KL=s.k;
+ $('#login').style.display='none';$('#app').classList.add('on');$('#us').textContent=us.n+' · '+(us.j=='Administrator'?us.j:us.j+(us.pai?' · Guru PAI':''));$('#ck').textContent='Kelas '+KL;nav();go('beranda');flush()}
+function out(){LS.s('ss',null);location.reload()}
+const NAVS=[['beranda','🏠 Beranda'],['sekolah','🏫 Data Sekolah'],['siswa','👥 Data Siswa'],['nilai','📊 Daftar Nilai'],['rekap','🧮 Rekap Nilai'],['ljk','🖥 Lembar Jawaban Komputer'],['reset','♻ Reset'],['set','⚙ Pengaturan']];
+function nav(){$('#nv').innerHTML=NAVS.map(n=>`<a data-v="${n[0]}" onclick="go('${n[0]}')">${n[1]}</a>`).join('')+'<a onclick="out()">🚪 Keluar</a>'}
+function go(v){cur=v;sd.classList.remove('o');document.querySelectorAll('aside a[data-v]').forEach(a=>a.classList.toggle('on',a.dataset.v==v));$('#vw').innerHTML=V[v]();if(A[v])A[v]()}
+setInterval(()=>{const d=new Date(),o={timeZone:'Asia/Makassar'};if(ME)$('#ck').textContent='Kelas '+KL+' · '+d.toLocaleDateString('id-ID',{...o,weekday:'long',day:'numeric',month:'long',year:'numeric'})+' | '+d.toLocaleTimeString('id-ID',{...o,hour12:false}).replace(/\./g,':')},1000);
+const SW=()=>DB.siswa[KL]||[],NL=m=>((DB.nilai[KL]||{})[m])||{},MP=()=>ME.us.admin||ME.us.k.includes(KL)?MAPEL:[MAPEL[0]],SFD=()=>Object.assign({guru:ME.us.n,nip:ME.id=='admin'?'':ME.id,sekolah:'SD Negeri 3 Sungai Danau',npsn:'30303570',jalan:'Jl. Karya RT.19',desa:'Sungai Danau',kec:'Satui',kab:'Tanah Bumbu',prov:'Kalimantan Selatan',pos:'',kepsek:'Patmasari, S.Pd',nipks:'',tp:'2026-2027',sem:'1'},DB.sf);
+const st=t=>$('#sy').textContent=t,stat=p=>p>=100?['Selesai','ok']:p>0?['Dalam Proses','wn']:['Belum Mulai','bd'];
+function enq(sheet,mode,rows){DB.q.push({sheet,mode,rows});sv();flush()}
+async function flush(){const s=DB.set[ME&&ME.id];if(!s||!s.url||!s.sid||!DB.q.length)return st(DB.q.length?'Menunggu pengaturan sinkron':'Tersimpan lokal');st('Menyinkronkan...');try{while(DB.q.length){const r=await fetch(s.url,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({sid:s.sid,...DB.q[0]})}),o=await r.json();if(!o.ok)throw o.err;DB.q.shift();sv()}st('Tersinkron ✓')}catch(e){st('Menunggu sinyal')}}
+addEventListener('online',flush);
+const sync={siswa:()=>enq('Siswa_'+KL,'replace',SW().map((s,i)=>[i+1,s.n,"'"+s.nisn])),nilai:()=>enq('Nilai_'+KL,'replace',allN()),kunci:()=>enq('Kunci','replace',Object.entries(DB.kunci).map(([m,k])=>[m,k.n,k.a])),sf:()=>enq('Data_Sekolah','replace',Object.entries(SFD()))};
+function allN(){const r=[];for(const m of MAPEL)for(const [nisn,v] of Object.entries(NL(m))){const s=SW().find(x=>x.nisn==nisn);r.push([v.t,"'"+nisn,s?s.n:'',m,v.b,v.s,v.k,v.n])}return r}
+const avg=m=>{const v=Object.values(NL(m)).map(x=>+x.n);return v.length?v.reduce((a,b)=>a+b,0)/v.length:0};
+const V={beranda(){const M=MP(),sw=SW().length,fill=M.reduce((a,m)=>a+Object.keys(NL(m)).length,0),pn=sw?Math.round(100*fill/(sw*M.length)):0,pk=Math.round(100*M.filter(m=>DB.kunci[m]).length/M.length),pr=sw&&pn>=100?100:0,
+ row=(t,p)=>{const[a,c]=stat(p);return`<p><b>${t}</b> <span style="float:right">${p}% <b class="${c}">${a}</b></span></p><div class="bar"><i style="width:${p}%"></i></div>`};
+ return`<div class="ban"><h1>Selamat Datang di SIPINTAR</h1>Sistem Informasi Penilaian Terpadu dan Terintegrasi<br><b style="color:#FFD54A">SD NEGERI 3 SUNGAI DANAU</b></div>
+ <div class="cards"><div class="cd" style="background:#2E7BFF"><b>1</b>Data Sekolah</div><div class="cd" style="background:#1fa84a"><b>${sw}</b>Data Siswa</div><div class="cd" style="background:#7b3fe4"><b>${M.filter(m=>Object.keys(NL(m)).length).length}</b>Daftar Nilai</div><div class="cd" style="background:#f59a00"><b>1</b>Kelas Aktif (${KL})</div></div>
+ <div class="pn"><h3>Progres Pekerjaan · Semester ${SFD().sem==2?'Genap':'Ganjil'}</h3>${row('Input Data Siswa',sw?100:0)}${row('Pengisian Daftar Nilai',pn)}${row('Lembar Jawaban Komputer (kunci jawaban)',pk)}${row('Pengolahan Nilai',pr)}</div>
+ <div class="pn"><h3>Grafik Daftar Nilai (rata-rata)</h3><div class="chart">${M.map(m=>{const a=avg(m);return`<div><b>${a?a.toFixed(1):'-'}</b><i style="height:${a*1.3}px"></i>${m.replace('Pendidikan ','Pend. ')}</div>`}).join('')}</div></div>`},
+sekolah(){const d=SFD(),F=(k,l,t)=>`<div><label>${l}</label><input id="sf_${k}" value="${esc(d[k])}" ${t||''}></div>`;return`<div class="pn"><h3>Data Sekolah</h3><div class="f">${F('guru','Nama Guru','readonly')}${F('nip','NIP','readonly')}${F('sekolah','Nama Sekolah')}${F('npsn','NPSN')}${F('jalan','Jalan')}${F('desa','Desa/Kelurahan')}${F('kec','Kecamatan')}${F('kab','Kabupaten')}${F('prov','Provinsi')}${F('pos','Kode Pos')}${F('kepsek','Nama Kepala Sekolah')}${F('nipks','NIP Kepala Sekolah')}${F('tp','Tahun Pelajaran')}<div><label>Semester</label><select id="sf_sem"><option value="1" ${d.sem==1?'selected':''}>1 (Ganjil)</option><option value="2" ${d.sem==2?'selected':''}>2 (Genap)</option></select></div></div><button class="btn" onclick="saveSF()">Simpan</button></div>`},
+siswa(){return`<div class="pn"><h3>Data Siswa Kelas ${KL} (${SW().length})</h3><div class="f"><input id="sn" placeholder="Nama siswa"><input id="sq" placeholder="NISN (10 digit)" inputmode="numeric"></div><button class="btn" onclick="addS()">Tambah</button> <label class="btn g">Upload Excel/CSV<input type="file" accept=".xlsx,.xls,.csv" hidden onchange="impS(this)"></label> <button class="btn" onclick="tpl()">Unduh Template</button><div id="sm"></div>
+ <table><tr><th>No</th><th>Nama</th><th>NISN</th><th></th></tr>${SW().map((s,i)=>`<tr><td>${i+1}</td><td>${esc(s.n)}</td><td>${esc(s.nisn)}</td><td><button class="btn r" onclick="delS(${i})">Hapus</button></td></tr>`).join('')}</table></div>`},
+nilai(){const M=MP();return`<div class="pn"><h3>Daftar Nilai Kelas ${KL}</h3><select id="nm" onchange="$('#nt').innerHTML=nTab(this.value)">${M.map(m=>`<option>${m}</option>`).join('')}</select><div id="nt">${nTab(M[0])}</div></div>`},
+rekap(){const M=MP(),R=SW().map(s=>{const v=M.map(m=>(NL(m)[s.nisn]||{}).n),f=v.filter(x=>x!=null),a=f.length?f.reduce((x,y)=>x+ +y,0)/f.length:0;return{s,v,a}}),o=[...R].sort((a,b)=>b.a-a.a);return`<div class="pn"><h3>Rekap Nilai Kelas ${KL} · ${SFD().tp}</h3><button class="btn g" onclick="expR()">Ekspor Excel</button><table><tr><th>No</th><th>Nama</th>${M.map(m=>`<th>${m}</th>`).join('')}<th>Rata-rata</th><th>Rank</th></tr>${R.map((r,i)=>`<tr><td>${i+1}</td><td>${esc(r.s.n)}</td>${r.v.map(x=>`<td>${x??'-'}</td>`).join('')}<td>${r.a.toFixed(1)}</td><td>${o.indexOf(r)+1}</td></tr>`).join('')}</table></div>`},
+ljk(){return`<div class="pn"><div class="tabs"><a id="t_c" onclick="tab('c')">Cetak LJK</a><a id="t_k" onclick="tab('k')">Kunci Jawaban</a><a id="t_s" onclick="tab('s')">Scan LJK</a></div><div id="tb"></div></div>`},
+reset(){return`<div class="pn"><h3>Reset Data</h3><div class="f"><select id="rs"><option value="nm">Nilai satu mata pelajaran</option><option value="na">Nilai semua mata pelajaran</option><option value="km">Kunci jawaban satu mata pelajaran</option><option value="ka">Semua kunci jawaban</option><option value="sw">Data siswa kelas ini</option><option value="all">Semuanya</option></select><select id="rm">${MAPEL.map(m=>`<option>${m}</option>`).join('')}</select><input id="rc" placeholder='Ketik RESET untuk konfirmasi'></div><button class="btn" onclick="expR(1)">Unduh cadangan Excel</button><button class="btn r" onclick="doReset()">Reset</button></div>`},
+set(){const s=DB.set[ME.id]||{};return`<div class="pn"><h3>Sinkron Spreadsheet</h3><div class="f"><div><label>URL Web App Apps Script (hasil deploy Code.gs)</label><input id="su" value="${esc(s.url)}"></div><div><label>Link Google Spreadsheet Anda</label><input id="sl" value="${esc(s.link)}"></div></div><button class="btn" onclick="saveSet()">Simpan &amp; Tes Koneksi</button> <button class="btn g" onclick="flush()">Sinkron Sekarang</button><div id="sm2"></div></div>
+ <div class="pn"><h3>Ganti Password</h3><div class="f"><input id="p0" type="password" placeholder="Password lama"><input id="p1" type="password" placeholder="Password baru (min. 6)"><input id="p2" type="password" placeholder="Ulangi password baru"></div><button class="btn" onclick="chPw()">Ganti</button><div id="sm3"></div><small>Jika lupa password, hubungi Admin untuk reset ke password awal.</small></div>
+ ${ME.us.admin?`<div class="pn"><h3>Admin: Reset Password Pengguna</h3><select id="ap">${Object.entries(USERS).map(([i,u])=>`<option value="${i}">${esc(u.n)} (${i})</option>`).join('')}</select><button class="btn r" onclick="delete DB.pw[ap.value];sv();alert('Password dikembalikan ke awal')">Reset ke password awal</button></div>`:''}`}};
+const A={};let LT='c';
+function nTab(m){const n=NL(m);return`<table><tr><th>No</th><th>Nama</th><th>NISN</th><th>Benar</th><th>Salah</th><th>Kosong</th><th>Nilai</th><th>Waktu Scan</th></tr>${SW().map((s,i)=>{const v=n[s.nisn]||{};return`<tr><td>${i+1}</td><td>${esc(s.n)}</td><td>${s.nisn}</td><td>${v.b??''}</td><td>${v.s??''}</td><td>${v.k??''}</td><td><input type="number" min="0" max="100" value="${v.n??''}" onchange="setN('${esc(m)}','${s.nisn}',this.value)"></td><td>${esc(v.t||'')}</td></tr>`}).join('')}</table>`}
+function setN(m,nisn,v){const o=(DB.nilai[KL]=DB.nilai[KL]||{})[m]=DB.nilai[KL][m]||{};if(v==='')delete o[nisn];else o[nisn]=Object.assign(o[nisn]||{b:'',s:'',k:''},{n:Math.max(0,Math.min(100,+v)),t:new Date().toLocaleString('id-ID')});sv();sync.nilai()}
+function saveSF(){const d={};document.querySelectorAll('[id^=sf_]').forEach(i=>d[i.id.slice(3)]=i.value.trim());DB.sf=d;sv();sync.sf();alert('Data sekolah tersimpan')}
+function addS(){const n=$('#sn').value.trim(),q=$('#sq').value.replace(/\D/g,'').padStart(10,'0');if(!n||q.length!=10)return alert('Nama wajib diisi dan NISN harus 10 digit');(DB.siswa[KL]=DB.siswa[KL]||[]);if(DB.siswa[KL].some(s=>s.nisn==q))return alert('NISN sudah ada');DB.siswa[KL].push({n,nisn:q});sv();sync.siswa();go('siswa')}
+function delS(i){if(confirm('Hapus siswa ini?')){SW().splice(i,1);sv();sync.siswa();go('siswa')}}
+function impS(inp){const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{const wb=XLSX.read(e.target.result,{type:'array'}),rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:'',raw:false});let ok=0,bad=0;DB.siswa[KL]=DB.siswa[KL]||[];for(const r of rows){const key=x=>Object.keys(r).find(k=>k.trim().toLowerCase()==x),n=String(r[key('nama')]||'').trim(),q=String(r[key('nisn')]||'').replace(/\D/g,'').padStart(10,'0');if(!n||q.length!=10||DB.siswa[KL].some(s=>s.nisn==q))bad++;else{DB.siswa[KL].push({n,nisn:q});ok++}}sv();sync.siswa();go('siswa');$('#sm').innerHTML=`<p>Berhasil ${ok}, gagal/ganda ${bad}</p>`};r.readAsArrayBuffer(f)}
+function tpl(){const w=XLSX.utils.book_new();XLSX.utils.book_append_sheet(w,XLSX.utils.aoa_to_sheet([['Nama','NISN'],['Contoh Siswa','0123456789']]),'Siswa');XLSX.writeFile(w,'Template_Siswa.xlsx')}
+function expR(b){const M=MAPEL,a=[['Nama','NISN',...M]];SW().forEach(s=>a.push([s.n,s.nisn,...M.map(m=>(NL(m)[s.nisn]||{}).n??'')]));const w=XLSX.utils.book_new();XLSX.utils.book_append_sheet(w,XLSX.utils.aoa_to_sheet(a),'Rekap '+KL);XLSX.writeFile(w,(b?'Cadangan_':'Rekap_')+KL+'.xlsx')}
+function doReset(){const t=$('#rs').value,m=$('#rm').value;if($('#rc').value!='RESET')return alert('Ketik RESET untuk konfirmasi');if(!confirm('Data yang dihapus tidak bisa dikembalikan. Lanjutkan?'))return;
+ if(t=='nm'||t=='all'&&0){(DB.nilai[KL]||{})[m]={}}if(t=='na'||t=='all')DB.nilai[KL]={};if(t=='km')delete DB.kunci[m];if(t=='ka'||t=='all')DB.kunci={};if(t=='sw'||t=='all')DB.siswa[KL]=[];sv();sync.nilai();sync.kunci();sync.siswa();alert('Reset selesai');go('reset')}
+function saveSet(){const u=$('#su').value.trim(),l=$('#sl').value.trim(),m=l.match(/\/d\/([\w-]+)/);if(!/^https:\/\/script\.google\.com\//.test(u)||!m)return $('#sm2').innerHTML='<p class="bd">URL Web App atau link spreadsheet tidak valid</p>';DB.set[ME.id]={url:u,link:l,sid:m[1]};sv();$('#sm2').textContent='Menguji...';fetch(u+'?sid='+m[1]).then(r=>r.json()).then(o=>{$('#sm2').innerHTML=o.ok?'<p class="ok">Koneksi berhasil</p>':'<p class="bd">'+esc(o.err)+'</p>';if(o.ok){sync.sf();sync.siswa();sync.kunci();sync.nilai()}}).catch(()=>$('#sm2').innerHTML='<p class="bd">Gagal terhubung. Periksa URL dan akses "Siapa saja".</p>')}
+async function chPw(){const m=$('#sm3'),o=$('#p0').value,n=$('#p1').value;const st=DB.pw[ME.id],ok=st?(await H(ME.id+o))===st:o==='30303570';if(!ok)return m.innerHTML='<p class="bd">Password lama salah</p>';if(n.length<6)return m.innerHTML='<p class="bd">Minimal 6 karakter</p>';if(n!=$('#p2').value)return m.innerHTML='<p class="bd">Konfirmasi tidak sama</p>';DB.pw[ME.id]=await H(ME.id+n);sv();m.innerHTML='<p class="ok">Password diganti</p>'}
+// ===== Tata letak LJK: SATU sumber untuk cetak dan scan (satuan mm, A4) =====
+const MK=[[13,13],[197,13],[13,284],[197,284]];
+function LY(n){const b=[];for(let i=0;i<n;i++){const c=Math.floor(i/10),r=i%10,x0=20+c*45,y=88+r*14;b.push({q:i+1,nx:x0,y,o:[0,1,2,3].map(k=>({x:x0+12+k*8,y}))})}return b}
+function pg(sw,n,jd){let h='<div class="pg">';MK.forEach(([x,y])=>h+=`<i class="mk" style="left:${x-5}mm;top:${y-5}mm"></i>`);const s=SFD();
+ h+=`<div class="tt" style="top:20mm">${esc(jd)}</div><div class="tt s" style="top:30mm">${esc(s.sekolah)} · Tahun Pelajaran ${esc(s.tp)} · Kelas ${KL}</div><div class="idb" style="top:44mm">Nama : ${sw?esc(sw.n):'..................................'}<br>NISN : ${sw?esc(sw.nisn):'..........'}<br>Tanda tangan : ..................</div>`;
+ LY(n).forEach(q=>{h+=`<b class="qn" style="left:${q.nx-9}mm;top:${q.y-2}mm">${q.q}</b>`;q.o.forEach((o,k)=>h+=`<u class="bb" style="left:${o.x-2.7}mm;top:${o.y-2.7}mm">${'ABCD'[k]}</u>`)});return h+'</div>'}
+function tab(t){LT=t;['c','k','s'].forEach(x=>$('#t_'+x).classList.toggle('on',x==t));const M=MP(),mo=M.map(m=>`<option>${m}</option>`).join('');
+ if(t=='c')$('#tb').innerHTML=`<div class="f"><select id="cm" onchange="jd()">${mo}</select><input type="date" id="cd" value="${new Date().toISOString().slice(0,10)}" onchange="jd()"><input type="number" id="cn" min="10" max="40" value="40"><input id="cj"><select id="cmd"><option value="s">Satu LJK per siswa (nama+NISN tercetak)</option><option value="k">LJK kosong</option></select></div><button class="btn g" onclick="cetak()">Cetak LJK</button><p><small>Cetak skala 100%, tanpa margin/header-footer browser.</small></p>`,jd();
+ if(t=='k')$('#tb').innerHTML=`<div class="f"><select id="km" onchange="kk()">${mo}</select><input type="number" id="kn" min="10" max="40" value="40" onchange="kk()"></div><p>Ketik/tempel kunci (A-D), mis. ABCDABCD…</p><input id="ka" style="width:100%;padding:10px" oninput="this.value=this.value.toUpperCase().replace(/[^ABCD]/g,'')"><button class="btn" onclick="saveK()">Simpan Kunci</button><div id="km2"></div>`,kk();
+ if(t=='s')scanUI(mo)}
+A.ljk=()=>tab(LT);
+function jd(){const d=new Date($('#cd').value||Date.now()).toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'});$('#cj').value=`SUMATIF AKHIR SEMESTER ${SFD().sem==2?'GENAP':'GANJIL'} - ${$('#cm').value.toUpperCase()} - ${d}`}
+function cetak(){const n=Math.max(10,Math.min(40,+$('#cn').value||40)),j=$('#cj').value;$('#pa').innerHTML=$('#cmd').value=='k'?pg(null,n,j):(SW().length?SW().map(s=>pg(s,n,j)).join(''):'');if(!$('#pa').innerHTML)return alert('Data siswa kosong');document.body.classList.add('pr');setTimeout(()=>{print();document.body.classList.remove('pr')},400)}
+function kk(){const k=DB.kunci[$('#km').value];$('#ka').value=k?k.a:'';if(k)$('#kn').value=k.n}
+function saveK(){const a=$('#ka').value,n=+$('#kn').value;if(a.length!=n)return $('#km2').innerHTML=`<p class="bd">Panjang kunci (${a.length}) harus sama dengan jumlah soal (${n})</p>`;DB.kunci[$('#km').value]={n,a};sv();sync.kunci();$('#km2').innerHTML='<p class="ok">Kunci tersimpan</p>'}
+// ===== Scan =====
+let SC=null,stream=null,loop=null,okc=0;
+function scanUI(mo){$('#tb').innerHTML=`<div class="f"><select id="sm_">${mo}</select><select id="ss">${SW().map(s=>`<option value="${s.nisn}">${esc(s.n)} (${s.nisn})</option>`).join('')}</select></div><label class="btn g">Upload foto<input type="file" accept="image/*" hidden onchange="fromFile(this)"></label><button class="btn" onclick="camOn()">Buka Kamera</button><button class="btn" onclick="camOff()">Tutup Kamera</button><div id="sx" class="bd"></div><video id="vd" playsinline muted style="width:100%;max-width:480px;display:none"></video><canvas id="cv" style="width:100%;max-width:520px"></canvas><div id="sr"></div>`}
+async function camOn(){const m=$('#sx');try{stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment',width:{ideal:1920},height:{ideal:1080}},audio:false});vd.srcObject=stream;vd.style.display='block';await vd.play();okc=0;loop=setInterval(tick,600);m.textContent='Arahkan kamera: 4 kotak hitam sudut LJK harus terlihat. Akan memotret otomatis.'}catch(e){m.textContent='Kamera tidak bisa dibuka ('+e.name+'). Buka lewat HTTPS dan izinkan kamera, atau gunakan Upload foto.'}}
+function camOff(){clearInterval(loop);if(stream)stream.getTracks().forEach(t=>t.stop());if($('#vd'))vd.style.display='none'}
+function frame(){const c=document.createElement('canvas');c.width=vd.videoWidth;c.height=vd.videoHeight;c.getContext('2d').drawImage(vd,0,0);return c}
+function tick(){if(!vd.videoWidth)return;const c=frame();okc=findM(c)?okc+1:0;$('#sx').textContent=okc?`Penanda terdeteksi, tahan stabil… (${okc}/3)`:'Penanda sudut belum terlihat semua / terlalu gelap / goyang';if(okc>=3){camOff();run(c)}}
+function fromFile(i){const f=i.files[0];if(!f)return;const im=new Image();im.onload=()=>{const c=document.createElement('canvas');c.width=im.naturalWidth;c.height=im.naturalHeight;c.getContext('2d').drawImage(im,0,0);run(c)};im.src=URL.createObjectURL(f)}
+function otsu(g){const h=new Array(256).fill(0);for(const v of g)h[v]++;let t=g.length,s=0;for(let i=0;i<256;i++)s+=i*h[i];let sb=0,wb=0,mx=0,th=100;for(let i=0;i<256;i++){wb+=h[i];if(!wb)continue;const wf=t-wb;if(!wf)break;sb+=i*h[i];const v=wb*wf*(sb/wb-(s-sb)/wf)**2;if(v>mx){mx=v;th=i}}return th}
+function findM(c){const sc=Math.min(1,900/c.width),W=Math.round(c.width*sc),Hh=Math.round(c.height*sc),t=document.createElement('canvas');t.width=W;t.height=Hh;const x=t.getContext('2d');x.drawImage(c,0,0,W,Hh);const d=x.getImageData(0,0,W,Hh).data,g=new Uint8Array(W*Hh);for(let i=0;i<g.length;i++)g[i]=(d[4*i]*3+d[4*i+1]*6+d[4*i+2])/10;
+ const th=otsu(g),vis=new Uint8Array(g.length),best=[null,null,null,null],cut=0.02*W*Hh;
+ for(let i=0;i<g.length;i++){if(vis[i]||g[i]>=th)continue;const st=[i];vis[i]=1;let a=0,sx=0,sy=0,x0=W,x1=0,y0=Hh,y1=0;while(st.length){const p=st.pop(),px=p%W,py=(p/W)|0;a++;sx+=px;sy+=py;if(px<x0)x0=px;if(px>x1)x1=px;if(py<y0)y0=py;if(py>y1)y1=py;for(const q of[p-1,p+1,p-W,p+W])if(q>=0&&q<g.length&&!vis[q]&&g[q]<th&&!((q==p-1&&px==0)||(q==p+1&&px==W-1))){vis[q]=1;st.push(q)}}
+  const bw=x1-x0+1,bh=y1-y0+1;if(a<80||a>cut||bw/bh<.6||bw/bh>1.6||a/(bw*bh)<.8)continue;const cx=sx/a,cy=sy/a,qd=(cx>W/2?1:0)+(cy>Hh/2?2:0);if(!best[qd]||a>best[qd].a)best[qd]={a,x:cx/sc,y:cy/sc}}
+ return best.every(Boolean)?best.map(b=>[b.x,b.y]):null}
+function solve(A,b){const n=b.length;for(let i=0;i<n;i++){let p=i;for(let r=i+1;r<n;r++)if(Math.abs(A[r][i])>Math.abs(A[p][i]))p=r;[A[i],A[p]]=[A[p],A[i]];[b[i],b[p]]=[b[p],b[i]];for(let r=i+1;r<n;r++){const f=A[r][i]/A[i][i];for(let c=i;c<n;c++)A[r][c]-=f*A[i][c];b[r]-=f*b[i]}}const x=Array(n);for(let i=n-1;i>=0;i--){let s=b[i];for(let c=i+1;c<n;c++)s-=A[i][c]*x[c];x[i]=s/A[i][i]}return x}
+function homog(S,D){const A=[],b=[];for(let i=0;i<4;i++){const[x,y]=S[i],[u,v]=D[i];A.push([x,y,1,0,0,0,-u*x,-u*y]);b.push(u);A.push([0,0,0,x,y,1,-v*x,-v*y]);b.push(v)}return solve(A,b)}
+const ap=(h,x,y)=>{const w=h[6]*x+h[7]*y+1;return[(h[0]*x+h[1]*y+h[2])/w,(h[3]*x+h[4]*y+h[5])/w]};
+function run(c0){const key=DB.kunci[$('#sm_').value],m=$('#sx');if(!key){m.textContent='Kunci jawaban mapel ini belum diisi.';return}
+ const sc=Math.min(1,1600/c0.width),c=document.createElement('canvas');c.width=Math.round(c0.width*sc);c.height=Math.round(c0.height*sc);c.getContext('2d').drawImage(c0,0,0,c.width,c.height);
+ const mk=findM(c);if(!mk){m.textContent='Gagal: 4 penanda sudut tidak terdeteksi semua. Foto ulang, lebih terang, rata, dan seluruh kertas terlihat.';return}
+ const h=homog(MK,mk),d=c.getContext('2d').getImageData(0,0,c.width,c.height).data,gy=(x,y)=>{x=Math.round(x);y=Math.round(y);if(x<0||y<0||x>=c.width||y>=c.height)return 255;const i=4*(y*c.width+x);return(d[i]*3+d[i+1]*6+d[i+2])/10},
+ P=[[0,0],[1,0],[-1,0],[0,1],[0,-1],[.7,.7],[-.7,.7],[.7,-.7],[-.7,-.7]],L=LY(key.n),
+ D=L.map(q=>q.o.map(o=>{let s=0;for(const[a,b]of P){const[x,y]=ap(h,o.x+a*1.4,o.y+b*1.4);s+=255-gy(x,y)}return s/P.length})),fl=D.flat().sort((a,b)=>a-b),base=fl[fl.length>>1];
+ const ans=D.map(r=>{const mx=Math.max(...r);if(mx-base<35)return'';const s=r.map((v,i)=>v>base+.55*(mx-base)?i:-1).filter(i=>i>=0);return s.length>1?'*':'ABCD'[s[0]]});
+ const bad=ans.filter(a=>a==''||a=='*').length;if(bad>.6*key.n){m.textContent='Hasil meragukan (terlalu banyak kosong/ganda). Foto ulang dengan posisi lebih lurus dan cahaya merata.';}else m.textContent='';
+ SC={ans,key,h,c,L};draw();showR()}
+function draw(){const{ans,key,h,c,L}=SC,cv=$('#cv');cv.width=c.width;cv.height=c.height;const x=cv.getContext('2d');x.drawImage(c,0,0);x.lineWidth=3;L.forEach((q,i)=>q.o.forEach((o,k)=>{const[px,py]=ap(h,o.x,o.y),[qx]=ap(h,o.x+2.7,o.y),r=Math.abs(qx-px)*1.1,a=ans[i],kk=key.a[i];if('ABCD'[k]==a){x.strokeStyle=a==kk?'#0c0':'#e00'}else if('ABCD'[k]==kk&&a!=kk){x.strokeStyle=a==''||a=='*'?'#fc0':'#09f'}else return;x.beginPath();x.arc(px,py,r,0,7);x.stroke()}))}
+function score(){const{ans,key}=SC;let b=0,k=0;ans.forEach((a,i)=>{if(a==key.a[i])b++;else if(a=='')k++});return{b,k,s:key.n-b-k,n:Math.round(b/key.n*10000)/100}}
+function showR(){const r=score();$('#sr').innerHTML=`<div class="pn"><b>Benar ${r.b} · Salah ${r.s} · Kosong ${r.k} · Nilai ${r.n}</b><br><small>Hijau=benar, merah=salah, kuning=kosong/ganda (kunci ditandai)</small><div class="f" style="margin:8px 0">${SC.ans.map((a,i)=>`<div>${i+1}. <select onchange="SC.ans[${i}]=this.value;draw();showR()">${['','A','B','C','D','*'].map(o=>`<option value="${o}" ${o==a?'selected':''}>${o==''?'kosong':o=='*'?'ganda':o}</option>`).join('')}</select> <small>kunci ${SC.key.a[i]}</small></div>`).join('')}</div><button class="btn g" onclick="saveScan()">Simpan Nilai</button></div>`}
+function saveScan(){const nisn=$('#ss').value,m=$('#sm_').value;if(!nisn)return alert('Pilih siswa');const o=(DB.nilai[KL]=DB.nilai[KL]||{})[m]=DB.nilai[KL][m]||{};if(o[nisn]&&!confirm('Nilai siswa ini sudah ada. Timpa?'))return;const r=score();o[nisn]={b:r.b,s:r.s,k:r.k,n:r.n,t:new Date().toLocaleString('id-ID'),j:SC.ans.join('')};sv();sync.nilai();const i=$('#ss').selectedIndex;if(i<$('#ss').options.length-1)$('#ss').selectedIndex=i+1;$('#sx').className='ok';$('#sx').textContent='Tersimpan. Siswa berikutnya dipilih otomatis ('+Object.keys(o).length+' dari '+SW().length+' sudah dinilai)'}
+boot();
+</script></body></html>
