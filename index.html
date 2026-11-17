@@ -822,7 +822,7 @@ var MAX_EXPORT_SHEETS = 40;
 var MAX_EXPORT_ROWS = 6000;
 
 function doGet() {
-  return out_({ ok: true, message: 'SIPINTAR cloud aktif', time: Date.now() });
+  return out_({ ok: true, message: 'SIPINTAR cloud aktif', version: 'v2-token-30303570', time: Date.now() });
 }
 
 function doPost(e) {
@@ -1510,7 +1510,7 @@ function actExport_(req) {
       var ctrl = new AbortController(), t = setTimeout(function () { ctrl.abort(); }, timeout || 20000);
       try {
         var res = await fetch(cfg.url, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(Object.assign({}, body, { token: cfg.token })), signal: ctrl.signal, redirect: 'follow' });
-        var j = await res.json(); if (!j.ok) throw new Error(j.error || 'Galat server'); return j;
+        var j = await res.json(); if (!j.ok) { if (j.error === 'Token salah') { var tk = String(cfg.token || ''); throw new Error('Token salah. Token di aplikasi: ' + (tk ? tk.substr(0, 2) + '***' + tk.substr(-2) + ' (' + tk.length + ' karakter)' : 'kosong') + ' tidak sama dengan TOKEN di Code.gs yang ter-deploy. Perbarui Code.gs lalu Deploy > Kelola deployment > Edit > Versi baru.'); } throw new Error(j.error || 'Galat server'); } return j;
       } finally { clearTimeout(t); }
     }
     var syncing = false, syncTimer = null, syncErr = '', pendingRefresh = false;
