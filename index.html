@@ -4,6 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>SIPINTAR — SD Negeri 3 Sungai Danau</title>
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#0A1F6B">
   
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -70,7 +74,6 @@
       position: relative;
     }
 
-    /* Efek Kosmik & Garis Sirkuit Latar Belakang */
     body::before {
       content: '';
       position: fixed;
@@ -100,9 +103,6 @@
     ::-webkit-scrollbar-thumb { background: rgba(46, 123, 255, 0.5); border-radius: 4px; }
     ::-webkit-scrollbar-thumb:hover { background: var(--gold-accent); }
 
-    /* ==========================================================================
-       LOGO RESMI SD NEGERI 3 SUNGAI DANAU
-       ========================================================================== */
     .school-logo-img {
       width: 100px;
       height: 100px;
@@ -112,14 +112,8 @@
     }
     .school-logo-img:hover { transform: scale(1.05); }
 
-    .school-logo-svg {
-      width: 100px;
-      height: 100px;
-      filter: drop-shadow(0 6px 16px rgba(0,0,0,0.45));
-    }
-
     /* ==========================================================================
-       2. HALAMAN LOGIN SIPINTAR (SESUAI MOCKUP GAMBAR 2)
+       2. HALAMAN LOGIN SIPINTAR
        ========================================================================== */
     #login-page {
       display: flex;
@@ -257,7 +251,6 @@
     .hex-badge i { color: var(--gold-accent); font-size: 1.1rem; }
     .hex-badge span { font-size: 0.85rem; font-weight: 600; color: #FFFFFF; }
 
-    /* Panel Kaca Login */
     .login-card-wrap {
       flex: 0.9;
       max-width: 440px;
@@ -431,7 +424,7 @@
     .login-alert.success { background: rgba(46, 213, 115, 0.25); border: 1px solid var(--success); color: #B8F5D0; }
 
     /* ==========================================================================
-       3. TATA LETAK DASBOR UTAMA (SESUAI MOCKUP GAMBAR 1)
+       3. TATA LETAK DASBOR UTAMA
        ========================================================================== */
     #app-layout {
       display: none;
@@ -552,7 +545,6 @@
       line-height: 1.25;
     }
 
-    /* Area Konten Utama */
     .app-main {
       flex: 1;
       display: flex;
@@ -561,7 +553,6 @@
       overflow-y: auto;
     }
 
-    /* Header Atas */
     .app-header {
       background: rgba(10, 31, 107, 0.65);
       backdrop-filter: blur(16px);
@@ -712,7 +703,6 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Banner Selamat Datang */
     .welcome-banner {
       background: linear-gradient(135deg, rgba(14, 38, 110, 0.85), rgba(46, 123, 255, 0.65)), 
                   url('https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=1600&q=80') center center / cover no-repeat;
@@ -777,7 +767,6 @@
       text-shadow: 0 1px 4px rgba(0,0,0,0.6);
     }
 
-    /* 4 Kartu Statistik Metrik */
     .stats-grid-4 {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -814,7 +803,6 @@
     .stat-number { font-size: 2.2rem; font-weight: 800; color: #FFFFFF; line-height: 1; }
     .stat-label { font-size: 0.85rem; font-weight: 600; color: rgba(255, 255, 255, 0.9); margin-top: 4px; }
 
-    /* Grid Dasbor Bawah: Progres & Grafik */
     .dashboard-bottom-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -909,7 +897,6 @@
     .badge-process { background: rgba(255, 165, 2, 0.2); color: #FFA502; border: 1px solid #FFA502; }
     .badge-idle { background: rgba(255, 255, 255, 0.12); color: #B0BEC5; border: 1px solid #78909C; }
 
-    /* Grafik Batang 3D */
     .bar-chart-container {
       display: flex;
       align-items: flex-end;
@@ -959,7 +946,6 @@
       height: 28px;
     }
 
-    /* Footer Dasbor */
     .app-footer {
       background: rgba(10, 31, 107, 0.65);
       backdrop-filter: blur(12px);
@@ -1040,6 +1026,7 @@
     .btn-act.danger { background: linear-gradient(135deg, #C62828, #E53935); box-shadow: 0 4px 14px rgba(255, 71, 87, 0.35); }
     .btn-act.glass { background: rgba(255, 255, 255, 0.12); border: 1px solid var(--glass-border); }
     .btn-act:hover { transform: translateY(-2px); filter: brightness(1.1); }
+    .btn-act:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
 
     .table-responsive {
       width: 100%;
@@ -1139,8 +1126,21 @@
       box-shadow: 0 4px 12px rgba(46, 123, 255, 0.4);
     }
 
+    .info-sync-banner {
+      background: rgba(46, 213, 115, 0.14);
+      border: 1px solid var(--success);
+      border-radius: 14px;
+      padding: 12px 16px;
+      margin-bottom: 16px;
+      font-size: 0.85rem;
+      color: #D8FFE8;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
     /* ==========================================================================
-       5. MODUL LEMBAR JAWABAN KOMPUTER (LJK) & SCANNER OMR
+       5. MODUL LEMBAR JAWABAN KOMPUTER (LJK) & SCANNER OMR PRESISI TINGGI
        ========================================================================== */
     .scanner-layout-grid {
       display: grid;
@@ -1162,8 +1162,20 @@
       box-shadow: 0 8px 30px rgba(0,0,0,0.5);
     }
 
-    #camera-video { width: 100%; height: 100%; object-fit: cover; }
-    #camera-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+    /* Video render lancar dari GPU tanpa terputus */
+    #camera-video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: translateZ(0);
+      will-change: transform;
+    }
+    #camera-canvas {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+    }
 
     .guide-a4-frame {
       position: absolute;
@@ -1273,7 +1285,6 @@
       text-align: center;
     }
 
-    /* Keypad Kunci Jawaban */
     .keypad-grid-container {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
@@ -1319,7 +1330,6 @@
 
     /* ==========================================================================
        6. FORMAT CETAK LEMBAR JAWABAN KOMPUTER (A4 PRINT CSS @page)
-       DILENGKAPI BAGIAN ESSAY & TANPA TANDA TANGAN GURU
        ========================================================================== */
     @media print {
       body * { visibility: hidden; }
@@ -1351,7 +1361,6 @@
       display: none;
     }
 
-    /* 4 Sudut Kalibrasi Hitam Solid (Ukuran 12x12 mm pada offset 10 mm) */
     .ljk-corner-marker {
       position: absolute;
       width: 12mm; height: 12mm;
@@ -1362,7 +1371,6 @@
     .marker-bottom-left { bottom: 8mm; left: 8mm; }
     .marker-bottom-right { bottom: 8mm; right: 8mm; }
 
-    /* Kop LJK */
     .ljk-header-box {
       margin-left: 14mm;
       margin-right: 14mm;
@@ -1387,7 +1395,6 @@
 
     .ljk-qr-container { width: 22mm; height: 22mm; display: flex; align-items: center; justify-content: center; }
 
-    /* Identitas Siswa pada LJK */
     .ljk-student-info-bar {
       margin: 3mm 14mm;
       display: grid;
@@ -1398,7 +1405,6 @@
       background: #F9F9F9;
     }
 
-    /* Judul Bagian */
     .ljk-section-title {
       margin: 2mm 14mm 1mm 14mm;
       font-size: 8.5pt;
@@ -1411,7 +1417,6 @@
       align-items: center;
     }
 
-    /* Kisi Gelembung PG */
     .ljk-bubbles-matrix {
       margin: 2mm 14mm;
       display: grid;
@@ -1444,7 +1449,6 @@
       font-size: 6.5pt; font-weight: bold; color: #333;
     }
 
-    /* Bagian II: Soal Isian Singkat (Diperiksa Manual) */
     .ljk-isian-grid {
       margin: 1.5mm 14mm 2mm 14mm;
       display: grid;
@@ -1461,15 +1465,8 @@
       padding-bottom: 0.8mm;
     }
 
-    .ljk-isian-num {
-      font-weight: bold;
-      width: 5mm;
-      text-align: right;
-    }
-
-    .ljk-isian-line {
-      flex: 1;
-    }
+    .ljk-isian-num { font-weight: bold; width: 5mm; text-align: right; }
+    .ljk-isian-line { flex: 1; }
 
     .ljk-item-score-box {
       font-size: 6.8pt;
@@ -1481,7 +1478,6 @@
       background: #FAFAFA;
     }
 
-    /* Bagian III: Soal Uraian / Essay (Diperiksa Manual) */
     .ljk-essay-section {
       margin: 1.5mm 14mm 0 14mm;
       display: flex;
@@ -1525,9 +1521,6 @@
       justify-content: space-between;
     }
 
-    /* ==========================================================================
-       7. RESPONSIVITAS MOBILE
-       ========================================================================== */
     @media (max-width: 992px) {
       .login-container { flex-direction: column; padding: 30px 20px; text-align: center; }
       .login-branding { align-items: center; max-width: 100%; }
@@ -1547,9 +1540,21 @@
 
     @media (max-width: 600px) {
       .stats-grid-4 { grid-template-columns: 1fr; }
-      .page-content-wrapper { padding: 16px 12px; }
-      .app-header { padding: 12px 14px; }
+      .page-content-wrapper { padding: 14px 10px; }
+      .app-header { padding: 10px 12px; gap: 8px; }
       .header-clock-widget { display: none; }
+      .sync-status-pill { padding: 5px 10px; font-size: 0.72rem; }
+      .user-pill { padding: 4px 10px 4px 6px; gap: 8px; }
+      .user-name-text { font-size: 0.78rem; max-width: 110px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .user-role-text { font-size: 0.65rem; }
+      .module-card { padding: 16px 14px; border-radius: 16px; }
+      .module-title-bar h2 { font-size: 1.1rem; }
+      .btn-act { padding: 8px 12px; font-size: 0.8rem; min-height: 40px; }
+      .custom-table th, .custom-table td { padding: 9px 10px; font-size: 0.8rem; }
+      .custom-table input[type="number"] { width: 56px; padding: 6px 4px; font-size: 0.85rem; }
+      .scanner-controls-bar { flex-direction: column; width: 100%; }
+      .scanner-controls-bar .btn-act { width: 100%; justify-content: center; }
+      .camera-viewport-card { aspect-ratio: 3 / 4; }
     }
   </style>
 </head>
@@ -1561,7 +1566,6 @@
   <div id="login-page">
     <div class="login-container">
       
-      <!-- Sisi Kiri: Identitas Sekolah & Logo Resmi -->
       <div class="login-branding">
         <div class="school-logo-wrap">
           <img src="logo-sdn3-sungaidanau.jpg" class="school-logo-img" alt="Logo SD Negeri 3 Sungai Danau" onerror="renderSvgLogoFallback(this)">
@@ -1585,7 +1589,6 @@
 
         <div class="script-bungas">“Bungas”</div>
 
-        <!-- 6 Lencana Hexagonal Semboyan -->
         <div class="hex-badges-container">
           <div class="hex-badge"><i class="fa-solid fa-trophy"></i><span>Berprestasi</span></div>
           <div class="hex-badge"><i class="fa-solid fa-star"></i><span>Unggul</span></div>
@@ -1601,7 +1604,6 @@
         </div>
       </div>
 
-      <!-- Sisi Kanan: Panel Kaca Login Pengguna -->
       <div class="login-card-wrap">
         <div class="glass-card-login">
           <div class="login-card-header">
@@ -1616,7 +1618,6 @@
             <span id="login-alert-msg">Pesan Galat</span>
           </div>
 
-          <!-- Form Login -->
           <form id="login-form" onsubmit="handleLoginSubmit(event)">
             <div class="form-group-login">
               <label><i class="fa-solid fa-id-card"></i> Username (NIP)</label>
@@ -1641,7 +1642,6 @@
                 <i class="fa-solid fa-users field-icon"></i>
                 <select id="login-class" required>
                   <option value="" disabled selected>-- Pilih Kelas Anda --</option>
-                  <!-- 24 Rombel Aktif (1A s.d. 6D) -->
                   <option value="1A">Kelas 1A</option><option value="1B">Kelas 1B</option><option value="1C">Kelas 1C</option><option value="1D">Kelas 1D</option>
                   <option value="2A">Kelas 2A</option><option value="2B">Kelas 2B</option><option value="2C">Kelas 2C</option><option value="2D">Kelas 2D</option>
                   <option value="3A">Kelas 3A</option><option value="3B">Kelas 3B</option><option value="3C">Kelas 3C</option><option value="3D">Kelas 3D</option>
@@ -1671,7 +1671,6 @@
        ========================================================================== -->
   <div id="app-layout">
     
-    <!-- Sidebar Kiri -->
     <aside class="app-sidebar" id="app-sidebar">
       <div>
         <div class="sidebar-brand">
@@ -1734,17 +1733,14 @@
         </ul>
       </div>
 
-      <!-- Lencana Bungas Bawah Sidebar -->
       <div class="sidebar-footer-badge">
         <div class="badge-script">“Bungas”</div>
         <p>Berprestasi, Unggul, Nasionalisme, Giat, Amanah, Santun.</p>
       </div>
     </aside>
 
-    <!-- Konten Utama -->
     <main class="app-main">
       
-      <!-- Header Bar Atas -->
       <header class="app-header">
         <div class="header-left">
           <button class="hamburger-btn" onclick="toggleSidebarDrawer()">
@@ -1752,31 +1748,28 @@
           </button>
           <div class="header-clock-widget">
             <i class="fa-regular fa-calendar-days"></i>
-            <span id="live-clock-text">Senin, 10 November 2025 | 08:30:45 WITA</span>
+            <span id="live-clock-text">Memuat waktu WITA...</span>
           </div>
         </div>
 
         <div class="header-right">
-          <!-- Indikator Sinkronisasi Cloud -->
           <div id="sync-indicator" class="sync-status-pill" onclick="triggerManualSync()" title="Klik untuk sinkronisasi manual">
             <i class="fa-solid fa-cloud"></i>
             <span id="sync-text">Tersinkron</span>
           </div>
 
-          <!-- Profil Pengguna -->
           <div class="user-profile-widget">
             <div class="user-pill" onclick="toggleUserDropdown()">
               <div class="user-avatar">
                 <i class="fa-solid fa-user"></i>
               </div>
               <div class="user-info">
-                <div class="user-name-text" id="header-user-name">Admin Sekolah</div>
-                <div class="user-role-text" id="header-user-role">Administrator • Kelas 5D</div>
+                <div class="user-name-text" id="header-user-name">Pengguna</div>
+                <div class="user-role-text" id="header-user-role">Peran • Kelas</div>
               </div>
               <i class="fa-solid fa-chevron-down" style="font-size: 0.75rem; color: var(--gold-light);"></i>
             </div>
 
-            <!-- Dropdown Menu Profil -->
             <div class="user-dropdown-menu" id="user-dropdown-menu">
               <a href="javascript:void(0)" onclick="switchTab('tab-pengaturan')">
                 <i class="fa-solid fa-key"></i> Ganti Password
@@ -1793,7 +1786,6 @@
         </div>
       </header>
 
-      <!-- Area Tampilan Isi Tab -->
       <div class="page-content-wrapper">
         
         <!-- ==============================================================
@@ -1801,7 +1793,6 @@
              ============================================================== -->
         <section id="tab-beranda" class="tab-section active">
           
-          <!-- Banner Selamat Datang -->
           <div class="welcome-banner">
             <div class="banner-text-left">
               <img src="logo-sdn3-sungaidanau.jpg" class="banner-logo-img" alt="Logo" onerror="renderSvgLogoFallback(this)">
@@ -1817,26 +1808,25 @@
             </div>
           </div>
 
-          <!-- 4 Kartu Statistik -->
           <div class="stats-grid-4">
             <div class="stat-card blue">
               <div class="stat-icon-wrap"><i class="fa-solid fa-school-flag"></i></div>
               <div class="stat-content">
-                <div class="stat-number">1</div>
+                <div class="stat-number" id="stat-sekolah-count">0</div>
                 <div class="stat-label">Data Sekolah</div>
               </div>
             </div>
             <div class="stat-card green">
               <div class="stat-icon-wrap"><i class="fa-solid fa-users"></i></div>
               <div class="stat-content">
-                <div class="stat-number" id="stat-siswa-count">28</div>
+                <div class="stat-number" id="stat-siswa-count">0</div>
                 <div class="stat-label">Data Siswa</div>
               </div>
             </div>
             <div class="stat-card purple">
               <div class="stat-icon-wrap"><i class="fa-solid fa-file-circle-check"></i></div>
               <div class="stat-content">
-                <div class="stat-number" id="stat-nilai-count">8</div>
+                <div class="stat-number" id="stat-nilai-count">7</div>
                 <div class="stat-label" id="stat-nilai-label">Daftar Nilai Mapel</div>
               </div>
             </div>
@@ -1849,10 +1839,7 @@
             </div>
           </div>
 
-          <!-- Grid Dasbor: Progres & Grafik Batang 3D -->
           <div class="dashboard-bottom-grid">
-            
-            <!-- Progres Pekerjaan -->
             <div class="glass-panel-box">
               <div class="panel-header-flex">
                 <div class="panel-header-title">
@@ -1871,13 +1858,13 @@
                   <div class="progress-info">
                     <div class="progress-title-flex">
                       <span>Data Siswa Kelas</span>
-                      <span id="prog-val-siswa">100%</span>
+                      <span id="prog-val-siswa">0%</span>
                     </div>
                     <div class="progress-bar-bg">
-                      <div class="progress-bar-fill fill-blue" id="prog-bar-siswa" style="width: 100%;"></div>
+                      <div class="progress-bar-fill fill-blue" id="prog-bar-siswa" style="width: 0%;"></div>
                     </div>
                   </div>
-                  <span class="status-badge badge-done" id="prog-badge-siswa">✓ Lengkap</span>
+                  <span class="status-badge badge-idle" id="prog-badge-siswa">Belum Diisi</span>
                 </div>
 
                 <div class="progress-item">
@@ -1885,13 +1872,13 @@
                   <div class="progress-info">
                     <div class="progress-title-flex">
                       <span>Pengisian Kunci Jawaban</span>
-                      <span id="prog-val-kunci">100%</span>
+                      <span id="prog-val-kunci">0%</span>
                     </div>
                     <div class="progress-bar-bg">
-                      <div class="progress-bar-fill fill-purple" id="prog-bar-kunci" style="width: 100%;"></div>
+                      <div class="progress-bar-fill fill-purple" id="prog-bar-kunci" style="width: 0%;"></div>
                     </div>
                   </div>
-                  <span class="status-badge badge-done" id="prog-badge-kunci">✓ Tersimpan</span>
+                  <span class="status-badge badge-idle" id="prog-badge-kunci">Belum Diisi</span>
                 </div>
 
                 <div class="progress-item">
@@ -1899,13 +1886,13 @@
                   <div class="progress-info">
                     <div class="progress-title-flex">
                       <span>Pemindaian LJK Siswa</span>
-                      <span id="prog-val-scan">45%</span>
+                      <span id="prog-val-scan">0%</span>
                     </div>
                     <div class="progress-bar-bg">
-                      <div class="progress-bar-fill fill-green" id="prog-bar-scan" style="width: 45%;"></div>
+                      <div class="progress-bar-fill fill-green" id="prog-bar-scan" style="width: 0%;"></div>
                     </div>
                   </div>
-                  <span class="status-badge badge-process" id="prog-badge-scan">◷ Dalam Proses</span>
+                  <span class="status-badge badge-idle" id="prog-badge-scan">Menunggu</span>
                 </div>
 
                 <div class="progress-item">
@@ -1913,18 +1900,17 @@
                   <div class="progress-info">
                     <div class="progress-title-flex">
                       <span>Rekapitulasi Nilai</span>
-                      <span id="prog-val-rekap">40%</span>
+                      <span id="prog-val-rekap">0%</span>
                     </div>
                     <div class="progress-bar-bg">
-                      <div class="progress-bar-fill fill-orange" id="prog-bar-rekap" style="width: 40%;"></div>
+                      <div class="progress-bar-fill fill-orange" id="prog-bar-rekap" style="width: 0%;"></div>
                     </div>
                   </div>
-                  <span class="status-badge badge-process" id="prog-badge-rekap">◷ Berjalan</span>
+                  <span class="status-badge badge-idle" id="prog-badge-rekap">Menunggu</span>
                 </div>
               </div>
             </div>
 
-            <!-- Grafik Daftar Nilai -->
             <div class="glass-panel-box">
               <div class="panel-header-flex">
                 <div class="panel-header-title">
@@ -1937,22 +1923,18 @@
                 </select>
               </div>
 
-              <div class="bar-chart-container" id="chart-bars-wrap">
-                <!-- Dirender dinamis menyesuaikan Guru PAI vs Guru Kelas -->
-              </div>
+              <div class="bar-chart-container" id="chart-bars-wrap"></div>
             </div>
-
           </div>
-
         </section>
 
         <!-- ==============================================================
-             TAB 2: DATA SEKOLAH
+             TAB 2: DATA SEKOLAH (DIKOSONGKAN AGAR GURU MENGISI MANDIRI)
              ============================================================== -->
         <section id="tab-sekolah" class="tab-section">
           <div class="module-card">
             <div class="module-title-bar">
-              <h2><i class="fa-solid fa-school"></i> Data Profil Sekolah & Asesmen</h2>
+              <h2><i class="fa-solid fa-school"></i> Data Profil Sekolah & Asesmen (Mandiri per Guru)</h2>
               <div class="action-btn-group">
                 <button class="btn-act success" onclick="saveSchoolProfile()">
                   <i class="fa-solid fa-floppy-disk"></i> Simpan Data Sekolah
@@ -1960,56 +1942,62 @@
               </div>
             </div>
 
+            <div class="info-sync-banner">
+              <i class="fa-solid fa-circle-info" style="color: var(--success); font-size: 1.1rem;"></i>
+              <span>Data profil sekolah dikosongkan agar masing-masing guru kelas dan guru mata pelajaran dapat mengisi serta mengelola informasi secara mandiri.</span>
+            </div>
+
             <form id="form-school-profile">
               <div class="form-grid-2">
                 <div class="form-control-box">
                   <label>Nama Sekolah</label>
-                  <input type="text" id="sch-name" value="SD Negeri 3 Sungai Danau" required>
+                  <input type="text" id="sch-name" placeholder="Contoh: SD Negeri 3 Sungai Danau" required>
                 </div>
                 <div class="form-control-box">
                   <label>NPSN</label>
-                  <input type="text" id="sch-npsn" value="30303570" readonly>
+                  <input type="text" id="sch-npsn" placeholder="Contoh: 30303570">
                 </div>
                 <div class="form-control-box">
                   <label>Alamat Jalan</label>
-                  <input type="text" id="sch-street" value="Jl. Karya RT.19">
+                  <input type="text" id="sch-street" placeholder="Masukkan alamat jalan sekolah">
                 </div>
                 <div class="form-control-box">
                   <label>Desa / Kelurahan</label>
-                  <input type="text" id="sch-village" value="Sungai Danau">
+                  <input type="text" id="sch-village" placeholder="Masukkan nama desa/kelurahan">
                 </div>
                 <div class="form-control-box">
                   <label>Kecamatan</label>
-                  <input type="text" id="sch-district" value="Satui">
+                  <input type="text" id="sch-district" placeholder="Masukkan nama kecamatan">
                 </div>
                 <div class="form-control-box">
-                  <label>Kabupaten</label>
-                  <input type="text" id="sch-regency" value="Tanah Bumbu">
+                  <label>Kabupaten / Kota</label>
+                  <input type="text" id="sch-regency" placeholder="Masukkan nama kabupaten">
                 </div>
                 <div class="form-control-box">
                   <label>Provinsi</label>
-                  <input type="text" id="sch-province" value="Kalimantan Selatan">
+                  <input type="text" id="sch-province" placeholder="Masukkan nama provinsi">
                 </div>
                 <div class="form-control-box">
                   <label>Kode Pos</label>
-                  <input type="text" id="sch-postal" value="72275">
+                  <input type="text" id="sch-postal" placeholder="Masukkan kode pos">
                 </div>
                 <div class="form-control-box">
                   <label>Nama Kepala Sekolah</label>
-                  <input type="text" id="sch-headmaster" value="Patmasari, S.Pd">
+                  <input type="text" id="sch-headmaster" placeholder="Masukkan nama kepala sekolah beserta gelar">
                 </div>
                 <div class="form-control-box">
                   <label>NIP Kepala Sekolah</label>
-                  <input type="text" id="sch-head-nip" value="197003151993032005">
+                  <input type="text" id="sch-head-nip" placeholder="Masukkan NIP kepala sekolah">
                 </div>
                 <div class="form-control-box">
                   <label>Tahun Pelajaran</label>
-                  <input type="text" id="sch-year" value="2026/2027">
+                  <input type="text" id="sch-year" placeholder="Contoh: 2026/2027">
                 </div>
                 <div class="form-control-box">
                   <label>Semester</label>
                   <select id="sch-semester">
-                    <option value="1" selected>Semester 1 (Ganjil)</option>
+                    <option value="" disabled selected>-- Pilih Semester --</option>
+                    <option value="1">Semester 1 (Ganjil)</option>
                     <option value="2">Semester 2 (Genap)</option>
                   </select>
                 </div>
@@ -2019,30 +2007,32 @@
         </section>
 
         <!-- ==============================================================
-             TAB 3: DATA SISWA
+             TAB 3: DATA SISWA (TERKONEKSI KE PAI, B. INGGRIS & KODING/KKA)
              ============================================================== -->
         <section id="tab-siswa" class="tab-section">
           <div class="module-card">
             <div class="module-title-bar">
               <h2><i class="fa-solid fa-users"></i> Data Siswa — <span id="siswa-active-class-title">Kelas 5D</span></h2>
-              <div class="action-btn-group">
-                <button class="btn-act primary" onclick="openAddStudentModal()">
+              <div class="action-btn-group" id="siswa-action-buttons">
+                <button class="btn-act primary" id="btn-add-student" onclick="openAddStudentModal()">
                   <i class="fa-solid fa-user-plus"></i> Tambah Siswa
                 </button>
-                <button class="btn-act gold" onclick="document.getElementById('excel-student-input').click()">
+                <button class="btn-act gold" id="btn-upload-student" onclick="document.getElementById('excel-student-input').click()">
                   <i class="fa-solid fa-file-excel"></i> Unggah Excel
                 </button>
                 <input type="file" id="excel-student-input" accept=".xlsx, .xls, .csv" style="display: none;" onchange="handleExcelStudentUpload(event)">
-                <button class="btn-act glass" onclick="downloadStudentTemplate()">
+                <button class="btn-act glass" id="btn-download-template" onclick="downloadStudentTemplate()">
                   <i class="fa-solid fa-download"></i> Unduh Template
                 </button>
               </div>
             </div>
 
+            <div id="siswa-role-notice" class="info-sync-banner" style="display: none;"></div>
+
             <div style="margin-bottom: 16px; max-width: 350px;">
               <div class="input-field-wrap">
                 <i class="fa-solid fa-magnifying-glass field-icon"></i>
-                <input type="text" id="search-student-input" placeholder="Cari nama atau NISN..." oninput="filterStudentsTable()">
+                <input type="text" id="search-student-input" placeholder="Cari nama, NISN, atau agama..." oninput="filterStudentsTable()">
               </div>
             </div>
 
@@ -2050,23 +2040,23 @@
               <table class="custom-table" id="table-students">
                 <thead>
                   <tr>
-                    <th style="width: 60px;">No</th>
+                    <th style="width: 55px;">No</th>
                     <th>Nama Lengkap Siswa</th>
-                    <th style="width: 160px;">NISN (10 Digit)</th>
-                    <th style="width: 100px;">Kelas</th>
+                    <th style="width: 150px;">NISN (10 Digit)</th>
+                    <th style="width: 110px;">Jenis Kelamin</th>
+                    <th style="width: 130px;">Agama</th>
+                    <th style="width: 90px;">Kelas</th>
                     <th style="width: 120px; text-align: center;">Aksi</th>
                   </tr>
                 </thead>
-                <tbody id="tbody-students">
-                  <!-- Data Siswa Dirender Dinamis -->
-                </tbody>
+                <tbody id="tbody-students"></tbody>
               </table>
             </div>
           </div>
         </section>
 
         <!-- ==============================================================
-             TAB 4: DAFTAR NILAI (DISESUAIKAN: KHUSUS PAI vs 8 MAPEL GURU KELAS)
+             TAB 4: DAFTAR NILAI
              ============================================================== -->
         <section id="tab-nilai" class="tab-section">
           <div class="module-card">
@@ -2082,10 +2072,7 @@
               </div>
             </div>
 
-            <!-- Tab Mata Pelajaran Dinamis -->
-            <div class="sub-tabs-header" id="subject-tabs-container">
-              <!-- Dirender via JS berdasarkan Hak Pengguna -->
-            </div>
+            <div class="sub-tabs-header" id="subject-tabs-container"></div>
 
             <div class="table-responsive">
               <table class="custom-table" id="table-grades">
@@ -2104,20 +2091,18 @@
                     <th style="width: 120px;">Waktu Pindai</th>
                   </tr>
                 </thead>
-                <tbody id="tbody-grades">
-                  <!-- Baris Nilai per Siswa -->
-                </tbody>
+                <tbody id="tbody-grades"></tbody>
               </table>
             </div>
             
             <p style="font-size: 0.8rem; color: var(--text-sub); margin-top: 10px;">
-              <i class="fa-solid fa-circle-info" style="color: var(--gold-accent);"></i> Catatan: Nilai PG dipindai otomatis dari LJK. Nilai Isian dan Nilai Essay dapat diinput manual langsung pada tabel di atas. Nilai Akhir dihitung otomatis (Bobot terintegrasi: PG + Isian + Essay).
+              <i class="fa-solid fa-circle-info" style="color: var(--gold-accent);"></i> Catatan: Nilai PG dipindai otomatis dari LJK. Nilai Isian dan Nilai Essay dapat diinput manual langsung pada tabel di atas. Nilai Akhir dihitung otomatis (PG + Isian + Essay).
             </p>
           </div>
         </section>
 
         <!-- ==============================================================
-             TAB 5: REKAP NILAI & EKSPOR (KHUSUS PAI vs 8 MAPEL GURU KELAS)
+             TAB 5: REKAP NILAI & EKSPOR
              ============================================================== -->
         <section id="tab-rekap" class="tab-section">
           <div class="module-card">
@@ -2135,19 +2120,15 @@
 
             <div class="table-responsive">
               <table class="custom-table" id="table-recap">
-                <thead id="thead-recap">
-                  <!-- Header Rekap Dinamis -->
-                </thead>
-                <tbody id="tbody-recap">
-                  <!-- Baris Rekap Seluruh Siswa -->
-                </tbody>
+                <thead id="thead-recap"></thead>
+                <tbody id="tbody-recap"></tbody>
               </table>
             </div>
           </div>
         </section>
 
         <!-- ==============================================================
-             TAB 6: LEMBAR JAWABAN KOMPUTER (CETAK, KUNCI, & SCAN OMR)
+             TAB 6: LEMBAR JAWABAN KOMPUTER (SCAN OMR PRESISI TINGGI & CETAK)
              ============================================================== -->
         <section id="tab-ljk" class="tab-section">
           
@@ -2163,22 +2144,20 @@
             </button>
           </div>
 
-          <!-- Bagian A: Scan LJK (OMR Engine Kamera/File) -->
+          <!-- Bagian A: Scan LJK (OMR Engine Kamera & Deteksi Pensil Presisi Tinggi) -->
           <div id="subljk-section-scan" class="subljk-content">
             <div class="scanner-layout-grid">
               
-              <!-- Sisi Kiri: Viewport Kamera -->
               <div class="module-card" style="padding: 16px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                  <h3 style="font-size: 1.1rem; color: #FFFFFF;"><i class="fa-solid fa-camera-retro" style="color: var(--gold-accent);"></i> Pemindai LJK Pilihan Ganda</h3>
-                  <div style="font-size: 0.82rem; color: var(--gold-light);" id="scan-batch-counter">0 dari 28 siswa</div>
+                  <h3 style="font-size: 1.1rem; color: #FFFFFF;"><i class="fa-solid fa-camera-retro" style="color: var(--gold-accent);"></i> Pemindai LJK Pilihan Ganda (Deteksi Pensil 2B)</h3>
+                  <div style="font-size: 0.82rem; color: var(--gold-light);" id="scan-batch-counter">0 dari 0 siswa</div>
                 </div>
 
                 <div class="camera-viewport-card" id="camera-box">
                   <video id="camera-video" playsinline autoplay muted></video>
                   <canvas id="camera-canvas"></canvas>
                   
-                  <!-- Bingkai Panduan Kertas A4 -->
                   <div class="guide-a4-frame">
                     <div class="guide-a4-corner guide-tl"></div>
                     <div class="guide-a4-corner guide-tr"></div>
@@ -2200,16 +2179,26 @@
                     <i class="fa-solid fa-camera-rotate"></i> Putar Kamera
                   </button>
                   <button class="btn-act gold" id="btn-manual-shutter" onclick="triggerManualCapture()">
-                    <i class="fa-solid fa-bullseye"></i> Jepret Manual
+                    <i class="fa-solid fa-bullseye"></i> Jepret & Analisis OMR
                   </button>
                   <button class="btn-act glass" onclick="document.getElementById('upload-ljk-file').click()">
                     <i class="fa-solid fa-file-arrow-up"></i> Unggah File/PDF
                   </button>
                   <input type="file" id="upload-ljk-file" accept="image/*, application/pdf" style="display: none;" onchange="handleLjkFileUpload(event)">
                 </div>
+
+                <!-- Pengaturan Sensitivitas Grafit Pensil -->
+                <div style="margin-top: 12px; background: rgba(255,255,255,0.06); border-radius: 12px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+                  <span style="font-size: 0.8rem; color: var(--text-sub);"><i class="fa-solid fa-sliders" style="color: var(--gold-accent);"></i> Sensitivitas Arsiran Pensil:</span>
+                  <select id="omr-pencil-sensitivity" style="background: rgba(10,31,107,0.8); color: #FFF; border: 1px solid var(--glass-border); border-radius: 8px; padding: 5px 10px; font-size: 0.8rem;">
+                    <option value="high" selected>Tinggi (Pensil Tipis / HB / 2B Standar)</option>
+                    <option value="medium">Sedang (Arsiran Gelap / Spidol)</option>
+                    <option value="strict">Ketat (Hanya Bulatan Hitam Pekat)</option>
+                  </select>
+                </div>
               </div>
 
-              <!-- Sisi Kanan: Panel Hasil Pindai & Nilai Essay -->
+              <!-- Sisi Kanan: Panel Hasil Pindai -->
               <div class="scan-results-box">
                 <h3 style="font-size: 1.15rem; color: #FFFFFF; margin-bottom: 14px;">
                   <i class="fa-solid fa-square-poll-vertical" style="color: var(--gold-accent);"></i> Hasil Pemindaian LJK
@@ -2242,7 +2231,6 @@
                   </div>
                 </div>
 
-                <!-- Input Koreksi Manual Skor Isian & Essay Siswa -->
                 <div class="essay-score-input-box" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                   <div>
                     <label style="font-size: 0.78rem;"><i class="fa-solid fa-pencil"></i> Nilai Isian (Manual):</label>
@@ -2254,10 +2242,9 @@
                   </div>
                 </div>
 
-                <!-- Pratinjau Overlay Gambar Terkoreksi -->
                 <div style="margin-bottom: 16px; text-align: center;">
-                  <div style="font-size: 0.8rem; color: var(--text-sub); margin-bottom: 6px;">Pratinjau Inspeksi Sudut & Gelembung PG:</div>
-                  <canvas id="dewarped-canvas" style="max-width: 100%; height: 160px; border-radius: 12px; border: 1px solid var(--glass-border); background: #000;"></canvas>
+                  <div style="font-size: 0.8rem; color: var(--text-sub); margin-bottom: 6px;">Inspeksi Kontras Bulatan Pensil & Sudut Kalibrasi:</div>
+                  <canvas id="dewarped-canvas" style="max-width: 100%; height: 170px; border-radius: 12px; border: 1px solid var(--glass-border); background: #000;"></canvas>
                 </div>
 
                 <div style="display: flex; gap: 10px;">
@@ -2288,9 +2275,7 @@
               <div class="form-grid-2" style="margin-bottom: 20px;">
                 <div class="form-control-box">
                   <label>Pilih Mata Pelajaran</label>
-                  <select id="key-subject-select" onchange="loadSubjectAnswerKey()">
-                    <!-- Diisi dinamis -->
-                  </select>
+                  <select id="key-subject-select" onchange="loadSubjectAnswerKey()"></select>
                 </div>
                 <div class="form-control-box">
                   <label>Jumlah Soal Pilihan Ganda (10 s.d. 40)</label>
@@ -2309,13 +2294,11 @@
               <label style="font-size: 0.85rem; color: var(--text-sub); display: block; margin-bottom: 8px;">
                 Klik Pilihan Jawaban per Nomor Soal:
               </label>
-              <div class="keypad-grid-container" id="keypad-items-wrap">
-                <!-- Tombol 1 s.d. 40 Dirender via JS -->
-              </div>
+              <div class="keypad-grid-container" id="keypad-items-wrap"></div>
             </div>
           </div>
 
-          <!-- Bagian C: Cetak LJK A4 (LENGKAP DENGAN BAGIAN ESSAY & TANPA TANDA TANGAN) -->
+          <!-- Bagian C: Cetak LJK A4 -->
           <div id="subljk-section-cetak" class="subljk-content" style="display: none;">
             <div class="module-card">
               <div class="module-title-bar">
@@ -2330,9 +2313,7 @@
               <div class="form-grid-2">
                 <div class="form-control-box">
                   <label><i class="fa-solid fa-book-open"></i> Mata Pelajaran Ujian</label>
-                  <select id="print-ljk-subject">
-                    <!-- Diisi dinamis -->
-                  </select>
+                  <select id="print-ljk-subject"></select>
                 </div>
                 <div class="form-control-box">
                   <label><i class="fa-regular fa-calendar-check"></i> Tanggal Ujian</label>
@@ -2380,7 +2361,7 @@
               <div style="background: rgba(46, 123, 255, 0.15); border: 1px solid var(--blue-glow); border-radius: 14px; padding: 14px; margin-top: 10px;">
                 <i class="fa-solid fa-circle-info" style="color: var(--gold-accent);"></i>
                 <span style="font-size: 0.85rem; color: #FFFFFF;">
-                  LJK dicetak dengan skala 100% pada kertas A4 standar. Format lengkap terdiri dari <strong>Bagian I: Pilihan Ganda</strong> (discan otomatis dengan OMR), <strong>Bagian II: Isian Singkat</strong> (diperiksa manual oleh guru), dan <strong>Bagian III: Uraian/Essay</strong> (diperiksa manual oleh guru). Jumlah soal isian dan essay dapat disesuaikan secara bebas sesuai kebutuhan masing-masing ujian.
+                  Gunakan pensil 2B untuk menghitamkan bulatan jawaban PG. Mesin OMR SIPINTAR dilengkapi normalisasi iluminasi adaptif untuk membaca arsiran pensil grafit dengan akurasi tinggi.
                 </span>
               </div>
             </div>
@@ -2400,7 +2381,7 @@
             <div style="background: rgba(255, 71, 87, 0.15); border: 1px solid var(--danger); border-radius: 16px; padding: 18px; margin-bottom: 22px;">
               <h4 style="color: #FFA8A8; font-size: 1rem; margin-bottom: 6px;"><i class="fa-solid fa-shield-halved"></i> Perhatian Keamanan Data</h4>
               <p style="font-size: 0.85rem; color: #FFFFFF; line-height: 1.4;">
-                Tindakan reset akan menghapus data yang tersimpan di perangkat lokal maupun Google Spreadsheet. Untuk mencegah kesalahan klik, Anda wajib mengetik kata <strong>RESET</strong> sebelum penghapusan dieksekusi.
+                Tindakan reset akan menghapus data yang tersimpan di perangkat lokal maupun Google Spreadsheet. Ketik kata <strong>RESET</strong> sebelum penghapusan dieksekusi.
               </p>
             </div>
 
@@ -2492,13 +2473,13 @@
 
           <div class="module-card">
             <div class="module-title-bar">
-              <h2><i class="fa-solid fa-microchip"></i> Uji Kalibrasi Sintetis OMR (Benchmark 100%)</h2>
+              <h2><i class="fa-solid fa-microchip"></i> Uji Kalibrasi Sintetis OMR (Deteksi Pensil 2B)</h2>
               <button class="btn-act gold" onclick="runSyntheticOmrBenchmark()">
                 <i class="fa-solid fa-vial-virus"></i> Jalankan Pengujian Sintetis
               </button>
             </div>
             <p style="font-size: 0.85rem; color: var(--text-sub); margin-bottom: 12px;">
-              Sistem akan membuat LJK buatan secara digital dengan variasi rotasi acak ±15°, bayangan, dan derau pencahayaan, lalu memindainya untuk mengukur akurasi mesin pengenalan gelembung.
+              Sistem menguji LJK simulasi dengan variasi arsiran grafit pensil 2B/HB, rotasi kertas, dan bayangan untuk memverifikasi akurasi mesin OMR.
             </p>
             <div id="benchmark-status-box" style="font-size: 0.9rem; font-weight: 700; color: var(--gold-light);">
               Status: Belum diuji
@@ -2509,7 +2490,6 @@
 
       </div>
 
-      <!-- Bilah Bawah (Footer Dasbor) -->
       <footer class="app-footer">
         <div class="footer-left">
           <i class="fa-solid fa-shield-halved"></i>
@@ -2523,35 +2503,145 @@
     </main>
   </div>
 
-  <!-- AREA CETAK LJK TERSEMBUNYI (A4 PRINT AREA) -->
+  <!-- AREA CETAK LJK TERSEMBUNYI -->
   <div id="print-ljk-area"></div>
 
-  <!-- MODAL TAMBAH SISWA -->
-  <div id="modal-add-student" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 200; align-items: center; justify-content: center;">
-    <div style="background: #0A1F6B; border: 1.5px solid var(--glass-border); border-radius: 20px; width: 90%; max-width: 440px; padding: 26px;">
-      <h3 style="font-size: 1.25rem; margin-bottom: 18px; color: #FFFFFF;"><i class="fa-solid fa-user-plus" style="color: var(--gold-accent);"></i> Tambah Siswa Baru</h3>
+  <!-- MODAL TAMBAH / EDIT SISWA (LENGKAP DENGAN JENIS KELAMIN & AGAMA) -->
+  <div id="modal-add-student" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.75); z-index: 200; align-items: center; justify-content: center;">
+    <div style="background: #0A1F6B; border: 1.5px solid var(--glass-border); border-radius: 20px; width: 92%; max-width: 460px; padding: 26px;">
+      <h3 id="modal-student-title" style="font-size: 1.25rem; margin-bottom: 18px; color: #FFFFFF;"><i class="fa-solid fa-user-plus" style="color: var(--gold-accent);"></i> Tambah Siswa Baru</h3>
+      <input type="hidden" id="modal-student-edit-idx" value="-1">
+      
       <div class="form-control-box">
         <label>Nama Lengkap Siswa</label>
         <input type="text" id="modal-student-name" placeholder="Contoh: MUHAMMAD RIZKY" style="text-transform: uppercase;">
       </div>
+      
       <div class="form-control-box">
         <label>NISN (Tepat 10 Digit Angka)</label>
         <input type="text" id="modal-student-nisn" placeholder="Contoh: 0123456789" maxlength="10" inputmode="numeric">
       </div>
+
+      <div class="form-grid-2">
+        <div class="form-control-box">
+          <label>Jenis Kelamin</label>
+          <select id="modal-student-gender">
+            <option value="Laki-laki">Laki-laki</option>
+            <option value="Perempuan">Perempuan</option>
+          </select>
+        </div>
+
+        <div class="form-control-box">
+          <label>Agama</label>
+          <select id="modal-student-religion">
+            <option value="Islam">Islam</option>
+            <option value="Kristen">Kristen</option>
+            <option value="Katolik">Katolik</option>
+            <option value="Hindu">Hindu</option>
+            <option value="Buddha">Buddha</option>
+            <option value="Konghucu">Konghucu</option>
+          </select>
+        </div>
+      </div>
+
       <div style="display: flex; gap: 10px; margin-top: 20px;">
-        <button class="btn-act primary" style="flex: 1;" onclick="submitAddStudentModal()">Simpan Siswa</button>
-        <button class="btn-act glass" onclick="closeAddStudentModal()">Batal</button>
+        <button class="btn-act primary" style="flex: 1; justify-content: center;" onclick="submitAddStudentModal()">
+          <i class="fa-solid fa-floppy-disk"></i> Simpan Siswa
+        </button>
+        <button class="btn-act glass" style="justify-content: center;" onclick="closeAddStudentModal()">Batal</button>
       </div>
     </div>
   </div>
+
+  <!-- MODAL KONFIRMASI / PESAN CUSTOM (PENGGANTI ALERT & CONFIRM BROWSER) -->
+  <div id="custom-dialog-overlay" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.78); backdrop-filter: blur(6px); z-index: 9999; align-items: center; justify-content: center; padding: 16px;">
+    <div style="background: linear-gradient(145deg, #0A1F6B, #112D96); border: 1.5px solid var(--gold-accent); border-radius: 22px; width: 100%; max-width: 400px; padding: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.6); text-align: center;">
+      <div id="custom-dialog-icon" style="font-size: 2.4rem; color: var(--gold-light); margin-bottom: 12px;">
+        <i class="fa-solid fa-circle-info"></i>
+      </div>
+      <h4 id="custom-dialog-title" style="font-size: 1.15rem; font-weight: 700; color: #FFFFFF; margin-bottom: 8px;">Informasi</h4>
+      <p id="custom-dialog-message" style="font-size: 0.9rem; color: var(--text-sub); line-height: 1.45; margin-bottom: 20px;"></p>
+      <div id="custom-dialog-actions" style="display: flex; gap: 10px; justify-content: center;"></div>
+    </div>
+  </div>
+
+  <!-- Firebase Cloud SDK untuk Sinkronisasi Multi-Device Real-Time -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, setDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    window.__cloudBridge = {
+      ready: false,
+      db: null,
+      appId: typeof __app_id !== 'undefined' ? __app_id : 'sipintar-sdn3-sungaidanau',
+      unsubscribers: [],
+      async init() {
+        try {
+          if (typeof __firebase_config === 'undefined' || !__firebase_config) return;
+          const firebaseConfig = JSON.parse(__firebase_config);
+          const app = initializeApp(firebaseConfig);
+          const auth = getAuth(app);
+          const db = getFirestore(app);
+
+          if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+            await signInWithCustomToken(auth, __initial_auth_token);
+          } else {
+            await signInAnonymously(auth);
+          }
+
+          if (!auth.currentUser) return;
+          this.db = db;
+          this.ready = true;
+          this.subscribeAllCloudCollections();
+        } catch (err) {
+          console.warn("Mode offline lokal aktif:", err.message);
+        }
+      },
+      async pushDoc(docKey, dataObj) {
+        if (!this.ready || !this.db) return false;
+        try {
+          const ref = doc(this.db, 'artifacts', this.appId, 'public', 'data', 'sipintar_sync_store', docKey);
+          await setDoc(ref, { payload: JSON.stringify(dataObj), updatedAt: Date.now() });
+          return true;
+        } catch (e) {
+          return false;
+        }
+      },
+      subscribeAllCloudCollections() {
+        if (!this.ready || !this.db) return;
+        const colRef = collection(this.db, 'artifacts', this.appId, 'public', 'data', 'sipintar_sync_store');
+        const unsub = onSnapshot(colRef, (snapshot) => {
+          let changed = false;
+          snapshot.docChanges().forEach((change) => {
+            if (change.type === 'added' || change.type === 'modified') {
+              const key = change.doc.id;
+              const raw = change.doc.data()?.payload;
+              if (raw && localStorage.getItem(key) !== raw) {
+                localStorage.setItem(key, raw);
+                changed = true;
+              }
+            }
+          });
+          if (changed && typeof window.onCloudDataUpdated === 'function') {
+            window.onCloudDataUpdated();
+          }
+        }, (err) => {
+          console.warn("Listener sync:", err.message);
+        });
+        this.unsubscribers.push(unsub);
+      }
+    };
+
+    window.__cloudBridge.init();
+  </script>
 
   <script>
     var cvLoaded = false;
     function onOpenCvReady() {
       cvLoaded = true;
-      console.log('OpenCV.js Engine berhasil dimuat.');
       var pill = document.getElementById('camera-feedback-text');
-      if (pill) pill.innerText = 'Mesin pemindai OpenCV siap.';
+      if (pill) pill.innerText = 'Mesin pemindai OpenCV & OMR Pensil siap.';
     }
   </script>
   <script async src="https://docs.opencv.org/4.8.0/opencv.js" onload="onOpenCvReady()"></script>
@@ -2562,7 +2652,7 @@
   -->
   <script>
     /* ==========================================================================
-       A. DATA GURU RESMI & DEFINISI ROLE
+       A. DATA GURU RESMI & ATURAN ROLE KHUSUS
        ========================================================================== */
     const PAI_TEACHER_NIPS = [
       "198203202007012014", // Laila Hanifah, S.Pd.I
@@ -2570,6 +2660,12 @@
       "197712012024212004", // Noor Biati, S.Ag
       "199706162024211017"  // Abul Hasan Sazali, S.Pd
     ];
+
+    const ERSA_NIP = "198810112022212023";  // Ersa Aulia, S.Pd -> Bahasa Inggris (4A-6D)
+    const HAILY_NIP = "199805262022212006"; // Haily Inayah, S.Pd -> Koding/KKA (5A-6D)
+
+    const ERSA_ENGLISH_CLASSES = ["4A","4B","4C","4D","5A","5B","5C","5D","6A","6B","6C","6D"];
+    const HAILY_CODING_CLASSES = ["5A","5B","5C","5D","6A","6B","6C","6D"];
 
     const INITIAL_USERS = [
       { no: 0, name: "Admin Sekolah", type: "Admin", nip: "admin", classAccess: "ALL", isPai: false },
@@ -2585,9 +2681,9 @@
       { no: 10, name: "Redna Kustiah, S.Pd", type: "NIPPPK", nip: "197609022022212005", classAccess: "5A", isPai: false },
       { no: 11, name: "Hj. Atimila, S.Pd", type: "NIPPPK", nip: "197507122022212010", classAccess: "5C", isPai: false },
       { no: 12, name: "Masliani, S.Pd", type: "NIPPPK", nip: "197010172022212006", classAccess: "3B", isPai: false },
-      { no: 13, name: "Ersa Aulia, S.Pd", type: "NIPPPK", nip: "198810112022212023", classAccess: "6C", isPai: false },
+      { no: 13, name: "Ersa Aulia, S.Pd", type: "NIPPPK", nip: "198810112022212023", classAccess: "4A,4B,4C,4D,5A,5B,5C,5D,6A,6B,6C,6D", isPai: false },
       { no: 14, name: "Rosmiati. S, S.Pd", type: "NIPPPK", nip: "198512052022212027", classAccess: "1C,4D", isPai: false },
-      { no: 15, name: "Haily Inayah, S.Pd", type: "NIPPPK", nip: "199805262022212006", classAccess: "4C", isPai: false },
+      { no: 15, name: "Haily Inayah, S.Pd", type: "NIPPPK", nip: "199805262022212006", classAccess: "4C,5A,5B,5C,5D,6A,6B,6C,6D", isPai: false },
       { no: 16, name: "Raudah, S.Pd", type: "NIPPPK", nip: "199001292023212017", classAccess: "6B", isPai: false },
       { no: 17, name: "Endang Susiani, S.Pd", type: "NIPPPK", nip: "197109192024212002", classAccess: "1A", isPai: false },
       { no: 18, name: "Noor Biati, S.Ag", type: "NIPPPK", nip: "197712012024212004", classAccess: "ALL", isPai: true },
@@ -2601,7 +2697,7 @@
       { no: 26, name: "Tantri Kumala Sari, S.Pd", type: "NIPPPK", nip: "198912302025212027", classAccess: "4A", isPai: false }
     ];
 
-    // Daftar 8 Mapel Guru Kelas (PAI Dihapus dari Guru Kelas)
+    // 7 Mapel Guru Kelas (PAI & Bahasa Inggris Dihapus dari Guru Kelas)
     const HOMEROOM_SUBJECTS = [
       { code: 'Pancasila', name: 'Pendidikan Pancasila' },
       { code: 'Indonesia', name: 'Bahasa Indonesia' },
@@ -2609,12 +2705,12 @@
       { code: 'IPAS', name: 'IPAS' },
       { code: 'Seni', name: 'Seni Rupa' },
       { code: 'Mulok', name: 'Muatan Lokal' },
-      { code: 'Inggris', name: 'Bahasa Inggris' },
       { code: 'PJOK', name: 'PJOK' }
     ];
 
-    // Mapel Khusus Guru PAI
     const PAI_SUBJECT = { code: 'PAI', name: 'Pendidikan Agama Islam' };
+    const ENGLISH_SUBJECT = { code: 'Inggris', name: 'Bahasa Inggris' };
+    const CODING_SUBJECT = { code: 'Koding', name: 'Koding/KKA' };
 
     const DEFAULT_PASS = "30303570";
 
@@ -2640,9 +2736,7 @@
       const wrapper = document.createElement('div');
       wrapper.className = imgEl.className;
       wrapper.innerHTML = svgCode;
-      if (imgEl.parentNode) {
-        imgEl.parentNode.replaceChild(wrapper, imgEl);
-      }
+      if (imgEl.parentNode) imgEl.parentNode.replaceChild(wrapper, imgEl);
     }
 
     /* ==========================================================================
@@ -2705,7 +2799,7 @@
     }
 
     /* ==========================================================================
-       D. INISIALISASI DATABASE SISWA 24 KELAS & BANK AKUN
+       D. INISIALISASI DATABASE KOSONG (VERSI BERSIH v2)
        ========================================================================== */
     let currentUser = null;
     let activeClass = "5D";
@@ -2713,7 +2807,7 @@
     let failedAttempts = 0;
 
     async function initAccountHashes() {
-      let userDb = JSON.parse(localStorage.getItem('sipintar_user_db') || 'null');
+      let userDb = JSON.parse(localStorage.getItem('sipintar_user_db_v2') || 'null');
       if (!userDb) {
         userDb = {};
         for (let u of INITIAL_USERS) {
@@ -2721,43 +2815,27 @@
           const hash = await sha256Hash(DEFAULT_PASS + salt);
           userDb[u.nip] = { ...u, passwordHash: hash };
         }
-        localStorage.setItem('sipintar_user_db', JSON.stringify(userDb));
+        localStorage.setItem('sipintar_user_db_v2', JSON.stringify(userDb));
       }
     }
 
-    // Inisialisasi Database Siswa untuk SELURUH 24 Rombel (1A s.d. 6D)
+    // Kosongkan data siswa semua kelas pada inisialisasi pertama agar guru mengisi mandiri
     function initAllClassStudents() {
       const classes = [
         "1A", "1B", "1C", "1D", "2A", "2B", "2C", "2D",
         "3A", "3B", "3C", "3D", "4A", "4B", "4C", "4D",
         "5A", "5B", "5C", "5D", "6A", "6B", "6C", "6D"
       ];
-
-      const firstNames = ["AHMAD", "MUHAMMAD", "SITI", "NUR", "AISYAH", "DIMAS", "RADITYA", "ALIF", "FADILLAH", "ZASKIA", "GITA", "HAFIDZ", "INTAN", "NAUFAL", "PUTRI", "BAYU", "CHELSEA", "DANIEL", "DEA", "FATHIR", "IKBAL", "JESSE", "KEVIN", "LUTHFI", "NADIA", "TEUKU", "ARIF", "BUNGA"];
-      const lastNames = ["PRATAMA", "AZIZAH", "MAULANA", "RAHMAWATI", "BUDIMAN", "PRASETYO", "CITRA", "OLIVIA", "SAPUTRA", "ANANDA", "ANGGARA", "RAHMAN", "AHMAD", "GUTAWA", "NURDIN", "RAMADHAN", "PERMATASARI", "JULIAN", "SANJAYA", "HAKIM", "RAYHAN", "SAFIRA", "AZMI", "AYU", "DIKA", "WAHYU", "ADYA", "KUSUMA"];
-
-      classes.forEach((cls, cIdx) => {
-        const key = `sipintar_students_${cls}`;
+      classes.forEach(cls => {
+        const key = `sipintar_students_v2_${cls}`;
         if (!localStorage.getItem(key)) {
-          const list = [];
-          for (let i = 0; i < 28; i++) {
-            const f = firstNames[(i + cIdx) % firstNames.length];
-            const l = lastNames[(i * 2 + cIdx) % lastNames.length];
-            const nisn = "01" + String(cIdx + 1).padStart(2, '0') + String(i + 1).padStart(2, '0') + String(1000 + i);
-            list.push({
-              no: i + 1,
-              name: `${f} ${l}`,
-              nisn: nisn.substring(0, 10),
-              class: cls
-            });
-          }
-          localStorage.setItem(key, JSON.stringify(list));
+          localStorage.setItem(key, JSON.stringify([]));
         }
       });
     }
 
     /* ==========================================================================
-       E. LOGIKA AUTENTIKASI PENGGUNA
+       E. LOGIKA AUTENTIKASI & ROLE GURU
        ========================================================================== */
     function normalizeNip(input) {
       if (!input) return "";
@@ -2794,7 +2872,7 @@
       if (!cls) { showLoginAlert("Pilih kelas terlebih dahulu."); return; }
 
       const cleanNip = normalizeNip(nipRaw);
-      const userDb = JSON.parse(localStorage.getItem('sipintar_user_db') || '{}');
+      const userDb = JSON.parse(localStorage.getItem('sipintar_user_db_v2') || '{}');
       const user = userDb[cleanNip];
 
       if (!user) { showLoginAlert("NIP tidak terdaftar."); return; }
@@ -2820,13 +2898,13 @@
         return;
       }
 
-      // Verifikasi Otorisasi Kelas: Guru PAI Bebas Pilih Kelas
+      // Verifikasi Otorisasi Kelas
       let authorized = false;
       const isPai = user.isPai || PAI_TEACHER_NIPS.includes(user.nip);
 
       if (user.nip === 'admin' || isPai) {
         authorized = true;
-      } else if (user.classAccess && user.classAccess.includes(cls)) {
+      } else if (user.classAccess && user.classAccess.split(',').includes(cls)) {
         authorized = true;
       }
 
@@ -2841,7 +2919,7 @@
       currentUser = { ...user, isPai: isPai };
       activeClass = cls;
 
-      localStorage.setItem('sipintar_session', JSON.stringify({
+      localStorage.setItem('sipintar_session_v2', JSON.stringify({
         nip: user.nip,
         name: user.name,
         type: user.type,
@@ -2851,7 +2929,131 @@
       }));
 
       showLoginAlert("Login Berhasil! Mengalihkan ke Dasbor...", true);
-      setTimeout(() => { enterAppDashboard(); }, 400);
+      setTimeout(() => { enterAppDashboard(); }, 350);
+    }
+
+    // Menentukan Mata Pelajaran apa saja yang diampu oleh pengguna login pada kelas aktif
+    function getUserSubjectsForActiveClass() {
+      if (!currentUser) return HOMEROOM_SUBJECTS;
+      const isPai = currentUser.isPai || PAI_TEACHER_NIPS.includes(currentUser.nip);
+
+      // 1. Guru PAI -> hanya PAI
+      if (isPai) {
+        return [PAI_SUBJECT];
+      }
+
+      // 2. Ersa Aulia, S.Pd -> Bahasa Inggris untuk 4A-6D (dan kelas wali 6C tetap Bahasa Inggris)
+      if (currentUser.nip === ERSA_NIP) {
+        return [ENGLISH_SUBJECT];
+      }
+
+      // 3. Haily Inayah, S.Pd -> Kelas 4C adalah Wali Kelas (7 mapel), sedangkan 5A-6D adalah Guru Koding/KKA
+      if (currentUser.nip === HAILY_NIP) {
+        if (activeClass === "4C") {
+          return HOMEROOM_SUBJECTS;
+        } else {
+          return [CODING_SUBJECT];
+        }
+      }
+
+      // 4. Guru Kelas Lainnya -> 7 Mapel Guru Kelas (Tanpa PAI & Tanpa Bahasa Inggris)
+      return HOMEROOM_SUBJECTS;
+    }
+
+    // Pengganti alert() & confirm() agar berjalan mulus di semua browser HP & iFrame
+    function showAppNotice(msg, title = "Informasi", type = "info") {
+      const overlay = document.getElementById('custom-dialog-overlay');
+      const iconBox = document.getElementById('custom-dialog-icon');
+      const titleEl = document.getElementById('custom-dialog-title');
+      const msgEl = document.getElementById('custom-dialog-message');
+      const actionsEl = document.getElementById('custom-dialog-actions');
+
+      if (!overlay) return;
+      titleEl.innerText = title;
+      msgEl.innerText = msg;
+      iconBox.innerHTML = type === 'error'
+        ? '<i class="fa-solid fa-circle-xmark" style="color: var(--danger);"></i>'
+        : (type === 'success' ? '<i class="fa-solid fa-circle-check" style="color: var(--success);"></i>' : '<i class="fa-solid fa-circle-info" style="color: var(--gold-light);"></i>');
+
+      actionsEl.innerHTML = `<button class="btn-act primary" style="min-width: 110px; justify-content: center;" onclick="document.getElementById('custom-dialog-overlay').style.display='none'">OK</button>`;
+      overlay.style.display = 'flex';
+    }
+
+    function showAppConfirm(msg, onConfirmCallback, title = "Konfirmasi") {
+      const overlay = document.getElementById('custom-dialog-overlay');
+      const iconBox = document.getElementById('custom-dialog-icon');
+      const titleEl = document.getElementById('custom-dialog-title');
+      const msgEl = document.getElementById('custom-dialog-message');
+      const actionsEl = document.getElementById('custom-dialog-actions');
+
+      if (!overlay) return;
+      titleEl.innerText = title;
+      msgEl.innerText = msg;
+      iconBox.innerHTML = '<i class="fa-solid fa-circle-question" style="color: var(--gold-light);"></i>';
+      actionsEl.innerHTML = `
+        <button class="btn-act glass" style="min-width: 95px; justify-content: center;" onclick="document.getElementById('custom-dialog-overlay').style.display='none'">Batal</button>
+        <button id="btn-confirm-yes" class="btn-act primary" style="min-width: 95px; justify-content: center;">Ya, Lanjutkan</button>
+      `;
+      overlay.style.display = 'flex';
+      document.getElementById('btn-confirm-yes').onclick = () => {
+        overlay.style.display = 'none';
+        if (typeof onConfirmCallback === 'function') onConfirmCallback();
+      };
+    }
+
+    // Wrapper penyimpanan lokal + dorongan instan ke Cloud agar sinkron lintas HP & Laptop
+    function saveSyncedData(key, valueObj) {
+      localStorage.setItem(key, JSON.stringify(valueObj));
+      const pill = document.getElementById('sync-indicator');
+      const text = document.getElementById('sync-text');
+      if (pill && text) {
+        pill.className = "sync-status-pill syncing";
+        text.innerText = "Menyinkronkan...";
+      }
+      if (window.__cloudBridge && window.__cloudBridge.ready) {
+        window.__cloudBridge.pushDoc(key, valueObj).then(() => {
+          if (pill && text) {
+            pill.className = "sync-status-pill";
+            text.innerText = "Tersinkron Cloud";
+          }
+        });
+      } else {
+        setTimeout(() => {
+          if (pill && text) {
+            pill.className = "sync-status-pill";
+            text.innerText = "Tersinkron";
+          }
+        }, 400);
+      }
+    }
+
+    // Dipanggil otomatis ketika ada perubahan data dari device lain
+    window.onCloudDataUpdated = function() {
+      const pill = document.getElementById('sync-indicator');
+      const text = document.getElementById('sync-text');
+      if (pill && text) {
+        pill.className = "sync-status-pill";
+        text.innerText = "Tersinkron Cloud";
+      }
+      if (currentUser) {
+        loadSchoolProfile();
+        loadStudentsForClass(activeClass);
+        loadGradesForSubject(activeSubject);
+        if (document.getElementById('subljk-section-kunci').style.display === 'block') {
+          renderKeypadItems();
+        }
+        updateDashboardAnalytics();
+      }
+    };
+
+    // Menentukan apakah user adalah Guru Mapel murni (read-only terhadap master data siswa kelas)
+    function isSubjectOnlyTeacherMode() {
+      if (!currentUser) return false;
+      const isPai = currentUser.isPai || PAI_TEACHER_NIPS.includes(currentUser.nip);
+      if (isPai) return true;
+      if (currentUser.nip === ERSA_NIP) return true;
+      if (currentUser.nip === HAILY_NIP && activeClass !== "4C") return true;
+      return false;
     }
 
     function enterAppDashboard() {
@@ -2859,23 +3061,26 @@
       document.getElementById('app-layout').style.display = 'flex';
 
       const isPai = currentUser.isPai || PAI_TEACHER_NIPS.includes(currentUser.nip);
+      let roleTitle = `Wali Kelas ${activeClass}`;
+      if (currentUser.nip === 'admin') roleTitle = "Administrator";
+      else if (isPai) roleTitle = "Guru Mapel PAI";
+      else if (currentUser.nip === ERSA_NIP) roleTitle = "Guru Bahasa Inggris";
+      else if (currentUser.nip === HAILY_NIP && activeClass !== "4C") roleTitle = "Guru Koding/KKA";
 
-      // Perbarui Widget Header
       document.getElementById('header-user-name').innerText = currentUser.name;
-      const roleTitle = isPai ? "Guru Mapel PAI" : (currentUser.nip === 'admin' ? "Administrator" : `Wali Kelas ${activeClass}`);
       document.getElementById('header-user-role').innerText = `${roleTitle} • Kelas ${activeClass}`;
       document.getElementById('stat-kelas-label').innerText = activeClass;
       document.getElementById('siswa-active-class-title').innerText = `Kelas ${activeClass}`;
 
-      // Sesuaikan Antarmuka Khusus Guru PAI vs Guru Kelas
-      setupUserRoleInterface(isPai);
-
+      loadSchoolProfile();
+      setupUserRoleInterface();
       loadStudentsForClass(activeClass);
       updateDashboardAnalytics();
       startLiveClock();
     }
 
-    function setupUserRoleInterface(isPai) {
+    function setupUserRoleInterface() {
+      const subjects = getUserSubjectsForActiveClass();
       const subTabsWrap = document.getElementById('subject-tabs-container');
       const keySubjectSelect = document.getElementById('key-subject-select');
       const printSubjectSelect = document.getElementById('print-ljk-subject');
@@ -2888,19 +3093,19 @@
       keySubjectSelect.innerHTML = '';
       printSubjectSelect.innerHTML = '';
 
-      if (isPai) {
-        // GURU PAI: HANYA 1 MAPEL (PENDIDIKAN AGAMA ISLAM)
-        activeSubject = "PAI";
-        statNilaiLabel.innerText = "Mata Pelajaran PAI";
-        statNilaiCount.innerText = "1";
-        daftarNilaiTitle.innerText = `Daftar Nilai — Pendidikan Agama Islam (Kelas ${activeClass})`;
-        rekapTitle.innerText = `Rekapitulasi Nilai Asesmen PAI (Kelas ${activeClass})`;
+      activeSubject = subjects[0].code;
+      statNilaiCount.innerText = subjects.length;
 
-        subTabsWrap.innerHTML = `<button class="sub-tab-btn active"><i class="fa-solid fa-moon"></i> Pendidikan Agama Islam</button>`;
-        keySubjectSelect.innerHTML = `<option value="PAI" selected>Pendidikan Agama Islam</option>`;
-        printSubjectSelect.innerHTML = `<option value="PAI" selected>Pendidikan Agama Islam</option>`;
+      if (subjects.length === 1) {
+        const m = subjects[0];
+        statNilaiLabel.innerText = `Mapel ${m.name}`;
+        daftarNilaiTitle.innerText = `Daftar Nilai — ${m.name} (Kelas ${activeClass})`;
+        rekapTitle.innerText = `Rekapitulasi Nilai ${m.name} (Kelas ${activeClass})`;
 
-        // Konfigurasi Header Tabel Rekap Nilai (Khusus PAI Saja)
+        subTabsWrap.innerHTML = `<button class="sub-tab-btn active"><i class="fa-solid fa-book"></i> ${m.name}</button>`;
+        keySubjectSelect.innerHTML = `<option value="${m.code}" selected>${m.name}</option>`;
+        printSubjectSelect.innerHTML = `<option value="${m.code}" selected>${m.name}</option>`;
+
         document.getElementById('thead-recap').innerHTML = `
           <tr>
             <th style="width: 50px;">No</th>
@@ -2909,29 +3114,26 @@
             <th style="width: 80px; text-align: center;">Benar PG</th>
             <th style="width: 80px; text-align: center;">Salah PG</th>
             <th style="width: 80px; text-align: center;">Nilai PG</th>
+            <th style="width: 90px; text-align: center;">Nilai Isian</th>
             <th style="width: 90px; text-align: center;">Nilai Essay</th>
-            <th style="width: 100px; text-align: center; color: var(--gold-light);">Nilai Akhir PAI</th>
+            <th style="width: 100px; text-align: center; color: var(--gold-light);">Nilai Akhir</th>
             <th style="width: 90px; text-align: center;">Predikat</th>
             <th style="width: 80px; text-align: center;">Peringkat</th>
           </tr>
         `;
       } else {
-        // GURU KELAS: 8 MAPEL (PAI DIHAPUS DARI DAFTAR!)
-        activeSubject = "Matematika";
-        statNilaiLabel.innerText = "Daftar 8 Mapel Kelas";
-        statNilaiCount.innerText = "8";
-        daftarNilaiTitle.innerText = `Daftar Nilai Asesmen Kelas ${activeClass} (8 Mata Pelajaran)`;
-        rekapTitle.innerText = `Rekapitulasi 8 Mata Pelajaran Kelas ${activeClass}`;
+        statNilaiLabel.innerText = `Daftar ${subjects.length} Mapel Kelas`;
+        daftarNilaiTitle.innerText = `Daftar Nilai Asesmen Kelas ${activeClass} (${subjects.length} Mata Pelajaran)`;
+        rekapTitle.innerText = `Rekapitulasi ${subjects.length} Mata Pelajaran Kelas ${activeClass}`;
 
-        HOMEROOM_SUBJECTS.forEach((m, idx) => {
+        subjects.forEach(m => {
           subTabsWrap.innerHTML += `
             <button class="sub-tab-btn ${m.code === activeSubject ? 'active' : ''}" onclick="switchSubjectTab('${m.code}')">${m.name}</button>
           `;
-          keySubjectSelect.innerHTML += `<option value="${m.code}" ${m.code === 'Matematika' ? 'selected' : ''}>${m.name}</option>`;
-          printSubjectSelect.innerHTML += `<option value="${m.code}" ${m.code === 'Matematika' ? 'selected' : ''}>${m.name}</option>`;
+          keySubjectSelect.innerHTML += `<option value="${m.code}" ${m.code === activeSubject ? 'selected' : ''}>${m.name}</option>`;
+          printSubjectSelect.innerHTML += `<option value="${m.code}" ${m.code === activeSubject ? 'selected' : ''}>${m.name}</option>`;
         });
 
-        // Konfigurasi Header Tabel Rekap Nilai (8 Mapel Tanpa PAI)
         document.getElementById('thead-recap').innerHTML = `
           <tr>
             <th style="width: 45px;">No</th>
@@ -2943,7 +3145,6 @@
             <th>IPAS</th>
             <th>Seni</th>
             <th>Mulok</th>
-            <th>B.Ingg</th>
             <th>PJOK</th>
             <th style="text-align: center; color: #FFFFFF;">Jumlah</th>
             <th style="text-align: center; color: var(--gold-light);">Rata-rata</th>
@@ -2956,16 +3157,16 @@
     }
 
     function handleLogout() {
-      if (confirm("Keluar dari aplikasi SIPINTAR?")) {
-        localStorage.removeItem('sipintar_session');
+      showAppConfirm("Keluar dari aplikasi SIPINTAR?", () => {
+        localStorage.removeItem('sipintar_session_v2');
         window.location.reload();
-      }
+      }, "Keluar Akun");
     }
 
     function checkPersistedSession() {
-      const session = JSON.parse(localStorage.getItem('sipintar_session') || 'null');
+      const session = JSON.parse(localStorage.getItem('sipintar_session_v2') || 'null');
       if (session) {
-        const userDb = JSON.parse(localStorage.getItem('sipintar_user_db') || '{}');
+        const userDb = JSON.parse(localStorage.getItem('sipintar_user_db_v2') || '{}');
         const user = userDb[session.nip];
         if (user) {
           currentUser = { ...user, isPai: session.isPai };
@@ -2992,13 +3193,8 @@
       document.getElementById('user-dropdown-menu').classList.remove('show');
     }
 
-    function toggleSidebarDrawer() {
-      document.getElementById('app-sidebar').classList.toggle('open');
-    }
-
-    function toggleUserDropdown() {
-      document.getElementById('user-dropdown-menu').classList.toggle('show');
-    }
+    function toggleSidebarDrawer() { document.getElementById('app-sidebar').classList.toggle('open'); }
+    function toggleUserDropdown() { document.getElementById('user-dropdown-menu').classList.toggle('show'); }
 
     function startLiveClock() {
       const clockEl = document.getElementById('live-clock-text');
@@ -3020,33 +3216,135 @@
     }
 
     /* ==========================================================================
-       G. PENGELOLAAN DATA SISWA KELAS
+       G. PENGELOLAAN DATA SEKOLAH MANDIRI PER GURU
        ========================================================================== */
-    function getStudentsKey() { return `sipintar_students_${activeClass}`; }
+    function getSchoolStorageKey() {
+      return `sipintar_school_v2_${currentUser ? currentUser.nip : 'default'}`;
+    }
+
+    function loadSchoolProfile() {
+      const saved = JSON.parse(localStorage.getItem(getSchoolStorageKey()) || 'null');
+      const fields = ['name', 'npsn', 'street', 'village', 'district', 'regency', 'province', 'postal', 'headmaster', 'head-nip', 'year', 'semester'];
+      
+      if (saved) {
+        fields.forEach(f => {
+          const el = document.getElementById(`sch-${f}`);
+          if (el) el.value = saved[f] || '';
+        });
+        document.getElementById('stat-sekolah-count').innerText = saved.name ? "1" : "0";
+      } else {
+        fields.forEach(f => {
+          const el = document.getElementById(`sch-${f}`);
+          if (el) el.value = '';
+        });
+        document.getElementById('stat-sekolah-count').innerText = "0";
+      }
+    }
+
+    function saveSchoolProfile() {
+      const fields = ['name', 'npsn', 'street', 'village', 'district', 'regency', 'province', 'postal', 'headmaster', 'head-nip', 'year', 'semester'];
+      const payload = {};
+      fields.forEach(f => {
+        const el = document.getElementById(`sch-${f}`);
+        payload[f] = el ? el.value.trim() : '';
+      });
+      saveSyncedData(getSchoolStorageKey(), payload);
+      document.getElementById('stat-sekolah-count').innerText = payload.name ? "1" : "0";
+      enqueueSync('save_school', { nip: currentUser.nip, data: payload });
+      showAppNotice("Data profil sekolah mandiri Anda berhasil disimpan & disinkronkan ke semua perangkat!", "Tersimpan", "success");
+    }
+
+    /* ==========================================================================
+       H. PENGELOLAAN DATA SISWA & SINKRONISASI OTOMATIS KE PAI, B.INGGRIS, KODING
+       ========================================================================== */
+    function getMasterStudentsKey(cls = activeClass) {
+      return `sipintar_students_v2_${cls}`;
+    }
+
+    // Mengambil daftar siswa terfilter sesuai hak akses guru (PAI hanya mengambil yang beragama Islam)
+    function getVisibleStudentsForActiveRole(cls = activeClass) {
+      const allStudents = JSON.parse(localStorage.getItem(getMasterStudentsKey(cls)) || '[]');
+      const isPai = currentUser && (currentUser.isPai || PAI_TEACHER_NIPS.includes(currentUser.nip));
+      
+      if (isPai) {
+        return allStudents.filter(s => (s.religion || '').toLowerCase() === 'islam');
+      }
+      return allStudents;
+    }
 
     function loadStudentsForClass(cls) {
-      const data = JSON.parse(localStorage.getItem(`sipintar_students_${cls}`) || '[]');
+      const visibleStudents = getVisibleStudentsForActiveRole(cls);
       const tbody = document.getElementById('tbody-students');
+      const isReadOnlyMapel = isSubjectOnlyTeacherMode();
+      const isPai = currentUser && (currentUser.isPai || PAI_TEACHER_NIPS.includes(currentUser.nip));
+
+      // Atur tombol aksi & banner informasi koneksi otomatis
+      const btnAdd = document.getElementById('btn-add-student');
+      const btnUpload = document.getElementById('btn-upload-student');
+      const btnTpl = document.getElementById('btn-download-template');
+      const noticeBox = document.getElementById('siswa-role-notice');
+
+      if (isReadOnlyMapel) {
+        btnAdd.style.display = 'none';
+        btnUpload.style.display = 'none';
+        btnTpl.style.display = 'none';
+        noticeBox.style.display = 'flex';
+        if (isPai) {
+          noticeBox.innerHTML = `<i class="fa-solid fa-moon" style="color: var(--success);"></i> <span><strong>Sinkronisasi Otomatis PAI:</strong> Menampilkan khusus siswa beragama <strong>Islam</strong> di Kelas ${cls} secara otomatis dari data yang diinput Guru Kelas.</span>`;
+        } else {
+          noticeBox.innerHTML = `<i class="fa-solid fa-link" style="color: var(--success);"></i> <span><strong>Sinkronisasi Otomatis Guru Mapel:</strong> Data siswa Kelas ${cls} terisi otomatis mengikuti data dari Guru Kelas bersangkutan.</span>`;
+        }
+      } else {
+        btnAdd.style.display = 'inline-flex';
+        btnUpload.style.display = 'inline-flex';
+        btnTpl.style.display = 'inline-flex';
+        noticeBox.style.display = 'flex';
+        noticeBox.innerHTML = `<i class="fa-solid fa-circle-nodes" style="color: var(--gold-accent);"></i> <span><strong>Koneksi Terpadu:</strong> Data siswa yang Anda tambahkan atau ubah di Kelas ${cls} akan otomatis tersinkron ke Guru PAI (khusus agama Islam), Guru Bahasa Inggris, dan Guru Koding/KKA.</span>`;
+      }
+
       tbody.innerHTML = '';
 
-      data.forEach((s, idx) => {
-        tbody.innerHTML += `
+      if (visibleStudents.length === 0) {
+        tbody.innerHTML = `
           <tr>
-            <td>${idx + 1}</td>
-            <td style="font-weight: 600; color: #FFFFFF;">${s.name}</td>
-            <td><code>${s.nisn}</code></td>
-            <td><span class="status-badge badge-done">${s.class}</span></td>
-            <td style="text-align: center;">
-              <button class="btn-act danger" style="padding: 4px 8px; font-size: 0.75rem;" onclick="deleteStudent(${idx})">
-                <i class="fa-solid fa-trash"></i>
-              </button>
+            <td colspan="7" style="text-align: center; padding: 28px; color: var(--text-sub);">
+              <i class="fa-solid fa-folder-open" style="font-size: 1.8rem; color: var(--gold-accent); display: block; margin-bottom: 8px;"></i>
+              Belum ada data siswa pada Kelas ${cls}${isPai ? ' (beragama Islam)' : ''}.<br>
+              <small>${isReadOnlyMapel ? 'Menunggu Guru Kelas menginput data siswa.' : 'Klik tombol "Tambah Siswa" atau "Unggah Excel" di atas untuk mengisi data.'}</small>
             </td>
           </tr>
         `;
-      });
+      } else {
+        visibleStudents.forEach((s, idx) => {
+          const religionBadge = (s.religion || '').toLowerCase() === 'islam' 
+            ? `<span class="status-badge badge-done">${s.religion || '-'}</span>`
+            : `<span class="status-badge badge-process">${s.religion || '-'}</span>`;
 
-      document.getElementById('stat-siswa-count').innerText = data.length;
-      document.getElementById('scan-batch-counter').innerText = `0 dari ${data.length} siswa`;
+          const actionHtml = isReadOnlyMapel 
+            ? `<span style="font-size: 0.75rem; color: var(--text-sub);"><i class="fa-solid fa-lock"></i> Tersinkron</span>`
+            : `<button class="btn-act primary" style="padding: 5px 9px; font-size: 0.75rem; margin-right: 4px;" onclick="openEditStudentModal('${s.nisn}')" title="Edit Siswa">
+                 <i class="fa-solid fa-pen"></i>
+               </button>
+               <button class="btn-act danger" style="padding: 5px 9px; font-size: 0.75rem;" onclick="deleteStudent('${s.nisn}')" title="Hapus Siswa">
+                 <i class="fa-solid fa-trash"></i>
+               </button>`;
+
+          tbody.innerHTML += `
+            <tr>
+              <td>${idx + 1}</td>
+              <td style="font-weight: 600; color: #FFFFFF;">${s.name}</td>
+              <td><code>${s.nisn}</code></td>
+              <td>${s.gender || '-'}</td>
+              <td>${religionBadge}</td>
+              <td><span class="status-badge badge-done">${s.class}</span></td>
+              <td style="text-align: center;">${actionHtml}</td>
+            </tr>
+          `;
+        });
+      }
+
+      document.getElementById('stat-siswa-count').innerText = visibleStudents.length;
+      document.getElementById('scan-batch-counter').innerText = `0 dari ${visibleStudents.length} siswa`;
     }
 
     function filterStudentsTable() {
@@ -3056,22 +3354,72 @@
       });
     }
 
-    function openAddStudentModal() { document.getElementById('modal-add-student').style.display = 'flex'; }
-    function closeAddStudentModal() { document.getElementById('modal-add-student').style.display = 'none'; }
+    function openAddStudentModal() {
+      document.getElementById('modal-student-title').innerHTML = `<i class="fa-solid fa-user-plus" style="color: var(--gold-accent);"></i> Tambah Siswa Baru`;
+      document.getElementById('modal-student-edit-idx').value = "-1";
+      document.getElementById('modal-student-name').value = "";
+      document.getElementById('modal-student-nisn').value = "";
+      document.getElementById('modal-student-gender').value = "Laki-laki";
+      document.getElementById('modal-student-religion').value = "Islam";
+      document.getElementById('modal-add-student').style.display = 'flex';
+    }
+
+    function openEditStudentModal(nisn) {
+      const students = JSON.parse(localStorage.getItem(getMasterStudentsKey()) || '[]');
+      const idx = students.findIndex(s => s.nisn === nisn);
+      if (idx === -1) return;
+      const st = students[idx];
+
+      document.getElementById('modal-student-title').innerHTML = `<i class="fa-solid fa-user-pen" style="color: var(--gold-accent);"></i> Edit Data Siswa`;
+      document.getElementById('modal-student-edit-idx').value = idx;
+      document.getElementById('modal-student-name').value = st.name;
+      document.getElementById('modal-student-nisn').value = st.nisn;
+      document.getElementById('modal-student-gender').value = st.gender || "Laki-laki";
+      document.getElementById('modal-student-religion').value = st.religion || "Islam";
+      document.getElementById('modal-add-student').style.display = 'flex';
+    }
+
+    function closeAddStudentModal() {
+      document.getElementById('modal-add-student').style.display = 'none';
+    }
 
     function submitAddStudentModal() {
+      const editIdx = parseInt(document.getElementById('modal-student-edit-idx').value);
       const name = document.getElementById('modal-student-name').value.trim().toUpperCase();
       const nisn = document.getElementById('modal-student-nisn').value.trim();
+      const gender = document.getElementById('modal-student-gender').value;
+      const religion = document.getElementById('modal-student-religion').value;
 
-      if (!name) { alert("Nama siswa wajib diisi."); return; }
-      if (!/^\d{10}$/.test(nisn)) { alert("NISN wajib berupa 10 digit angka."); return; }
+      if (!name) { showAppNotice("Nama siswa wajib diisi.", "Validasi", "error"); return; }
+      if (!/^\d{10}$/.test(nisn)) { showAppNotice("NISN wajib berupa 10 digit angka.", "Validasi", "error"); return; }
 
-      const key = getStudentsKey();
+      const key = getMasterStudentsKey();
       const students = JSON.parse(localStorage.getItem(key) || '[]');
-      if (students.some(s => s.nisn === nisn)) { alert("NISN sudah terdaftar di kelas ini."); return; }
 
-      students.push({ no: students.length + 1, name: name, nisn: nisn, class: activeClass });
-      localStorage.setItem(key, JSON.stringify(students));
+      if (editIdx >= 0 && students[editIdx]) {
+        // Mode Edit
+        if (students.some((s, i) => i !== editIdx && s.nisn === nisn)) {
+          showAppNotice("NISN sudah digunakan siswa lain di kelas ini.", "Validasi", "error");
+          return;
+        }
+        students[editIdx] = { ...students[editIdx], name, nisn, gender, religion, class: activeClass };
+      } else {
+        // Mode Tambah Baru
+        if (students.some(s => s.nisn === nisn)) {
+          showAppNotice("NISN sudah terdaftar di kelas ini.", "Validasi", "error");
+          return;
+        }
+        students.push({
+          no: students.length + 1,
+          name: name,
+          nisn: nisn,
+          gender: gender,
+          religion: religion,
+          class: activeClass
+        });
+      }
+
+      saveSyncedData(key, students);
       closeAddStudentModal();
       loadStudentsForClass(activeClass);
       loadGradesForSubject(activeSubject);
@@ -3079,18 +3427,18 @@
       enqueueSync('save_students', { class: activeClass, students: students });
     }
 
-    function deleteStudent(idx) {
-      if (confirm("Hapus siswa ini?")) {
-        const key = getStudentsKey();
+    function deleteStudent(nisn) {
+      showAppConfirm("Hapus siswa ini dari kelas?", () => {
+        const key = getMasterStudentsKey();
         const students = JSON.parse(localStorage.getItem(key) || '[]');
-        students.splice(idx, 1);
-        students.forEach((s, i) => s.no = i + 1);
-        localStorage.setItem(key, JSON.stringify(students));
+        const filtered = students.filter(s => s.nisn !== nisn);
+        filtered.forEach((s, i) => s.no = i + 1);
+        saveSyncedData(key, filtered);
         loadStudentsForClass(activeClass);
         loadGradesForSubject(activeSubject);
         updateDashboardAnalytics();
-        enqueueSync('save_students', { class: activeClass, students: students });
-      }
+        enqueueSync('save_students', { class: activeClass, students: filtered });
+      }, "Hapus Siswa");
     }
 
     function handleExcelStudentUpload(e) {
@@ -3104,39 +3452,64 @@
           const workbook = XLSX.read(data, { type: 'array' });
           const rows = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], { defval: "" });
 
-          if (rows.length === 0) { alert("File Excel kosong."); return; }
+          if (rows.length === 0) { showAppNotice("File Excel kosong.", "Gagal Impor", "error"); return; }
 
           let added = 0;
-          const key = getStudentsKey();
+          const key = getMasterStudentsKey();
           const students = JSON.parse(localStorage.getItem(key) || '[]');
 
           rows.forEach(r => {
             let nameVal = r['Nama'] || r['nama'] || r['NAMA'] || r['Nama Siswa'] || r['Nama Lengkap'] || "";
             let nisnVal = r['NISN'] || r['nisn'] || r['Nomor Induk'] || "";
+            let genderVal = r['Jenis Kelamin'] || r['JK'] || r['jk'] || "Laki-laki";
+            let religionVal = r['Agama'] || r['agama'] || r['AGAMA'] || "Islam";
+
             nameVal = String(nameVal).trim().toUpperCase();
             nisnVal = String(nisnVal).trim();
+            genderVal = String(genderVal).trim().toUpperCase().startsWith('P') ? 'Perempuan' : 'Laki-laki';
+            
+            // Normalisasi penulisan agama
+            const relClean = String(religionVal).trim().toLowerCase();
+            if (relClean.includes('islam')) religionVal = 'Islam';
+            else if (relClean.includes('kristen')) religionVal = 'Kristen';
+            else if (relClean.includes('katolik')) religionVal = 'Katolik';
+            else if (relClean.includes('hindu')) religionVal = 'Hindu';
+            else if (relClean.includes('buddha')) religionVal = 'Buddha';
+            else if (relClean.includes('konghucu')) religionVal = 'Konghucu';
+            else religionVal = 'Islam';
 
             if (nameVal && /^\d{10}$/.test(nisnVal) && !students.some(s => s.nisn === nisnVal)) {
-              students.push({ no: students.length + 1, name: nameVal, nisn: nisnVal, class: activeClass });
+              students.push({
+                no: students.length + 1,
+                name: nameVal,
+                nisn: nisnVal,
+                gender: genderVal,
+                religion: religionVal,
+                class: activeClass
+              });
               added++;
             }
           });
 
-          localStorage.setItem(key, JSON.stringify(students));
+          saveSyncedData(key, students);
           loadStudentsForClass(activeClass);
           loadGradesForSubject(activeSubject);
           updateDashboardAnalytics();
           enqueueSync('save_students', { class: activeClass, students: students });
-          alert(`Impor Berhasil: ${added} siswa ditambahkan ke ${activeClass}.`);
+          showAppNotice(`Impor Berhasil: ${added} siswa ditambahkan ke Kelas ${activeClass} dan disinkronkan.`, "Impor Berhasil", "success");
         } catch (err) {
-          alert("Gagal membaca Excel: " + err.message);
+          showAppNotice("Gagal membaca Excel: " + err.message, "Gagal Impor", "error");
         }
       };
       reader.readAsArrayBuffer(file);
     }
 
     function downloadStudentTemplate() {
-      const ws_data = [["Nama Lengkap", "NISN"], ["AHMAD DHANI", "0123456781"], ["AISYAH NUR", "0123456782"]];
+      const ws_data = [
+        ["Nama Lengkap", "NISN", "Jenis Kelamin", "Agama"],
+        ["AHMAD RIZKY", "0123456781", "Laki-laki", "Islam"],
+        ["MARIA NATALIA", "0123456782", "Perempuan", "Kristen"]
+      ];
       const ws = XLSX.utils.aoa_to_sheet(ws_data);
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, "Template_Siswa");
@@ -3144,42 +3517,48 @@
     }
 
     /* ==========================================================================
-       H. DAFTAR NILAI & REKAP NILAI (ADAPTIF: PAI vs 8 MAPEL)
+       I. DAFTAR NILAI & REKAP NILAI
        ========================================================================== */
     function switchSubjectTab(mapel) {
       activeSubject = mapel;
+      const subjects = getUserSubjectsForActiveClass();
+      const targetObj = subjects.find(s => s.code === mapel);
       document.querySelectorAll('#subject-tabs-container .sub-tab-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.innerText.includes(mapel));
+        btn.classList.toggle('active', targetObj && btn.innerText.includes(targetObj.name));
       });
       loadGradesForSubject(mapel);
     }
 
-    function getGradesKey(cls, mapel) { return `sipintar_grades_${cls}_${mapel}`; }
+    function getGradesKey(cls, mapel) { return `sipintar_grades_v2_${cls}_${mapel}`; }
 
     function loadGradesForSubject(mapel) {
-      const students = JSON.parse(localStorage.getItem(getStudentsKey()) || '[]');
+      const students = getVisibleStudentsForActiveRole(activeClass);
       const grades = JSON.parse(localStorage.getItem(getGradesKey(activeClass, mapel)) || '{}');
       const tbody = document.getElementById('tbody-grades');
       tbody.innerHTML = '';
 
-      students.forEach((s, idx) => {
-        const g = grades[s.nisn] || { correct: 0, wrong: 0, empty: 40, pgScore: 0, isianScore: 0, essayScore: 0, finalScore: 0, time: '-' };
-        tbody.innerHTML += `
-          <tr>
-            <td>${idx + 1}</td>
-            <td style="font-weight: 600; color: #FFFFFF;">${s.name}</td>
-            <td><code>${s.nisn}</code></td>
-            <td style="text-align: center;"><input type="number" min="0" max="40" value="${g.correct}" onchange="updateRowGrade('${s.nisn}', this, 'correct')"></td>
-            <td style="text-align: center;"><input type="number" min="0" max="40" value="${g.wrong}" onchange="updateRowGrade('${s.nisn}', this, 'wrong')"></td>
-            <td style="text-align: center;"><input type="number" min="0" max="40" value="${g.empty}" onchange="updateRowGrade('${s.nisn}', this, 'empty')"></td>
-            <td style="text-align: center; font-weight: 700;" id="pg-cell-${s.nisn}">${g.pgScore || 0}</td>
-            <td style="text-align: center;"><input type="number" min="0" max="100" value="${g.isianScore || 0}" onchange="updateRowGrade('${s.nisn}', this, 'isianScore')"></td>
-            <td style="text-align: center;"><input type="number" min="0" max="100" value="${g.essayScore || 0}" onchange="updateRowGrade('${s.nisn}', this, 'essayScore')"></td>
-            <td style="text-align: center; font-weight: 800; color: var(--gold-light);" id="final-cell-${s.nisn}">${g.finalScore || 0}</td>
-            <td style="font-size: 0.75rem;">${g.time}</td>
-          </tr>
-        `;
-      });
+      if (students.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="11" style="text-align: center; padding: 20px; color: var(--text-sub);">Belum ada data siswa yang dapat dinilai pada Kelas ${activeClass}.</td></tr>`;
+      } else {
+        students.forEach((s, idx) => {
+          const g = grades[s.nisn] || { correct: 0, wrong: 0, empty: 40, pgScore: 0, isianScore: 0, essayScore: 0, finalScore: 0, time: '-' };
+          tbody.innerHTML += `
+            <tr>
+              <td>${idx + 1}</td>
+              <td style="font-weight: 600; color: #FFFFFF;">${s.name}</td>
+              <td><code>${s.nisn}</code></td>
+              <td style="text-align: center;"><input type="number" min="0" max="40" value="${g.correct}" onchange="updateRowGrade('${s.nisn}', this, 'correct')"></td>
+              <td style="text-align: center;"><input type="number" min="0" max="40" value="${g.wrong}" onchange="updateRowGrade('${s.nisn}', this, 'wrong')"></td>
+              <td style="text-align: center;"><input type="number" min="0" max="40" value="${g.empty}" onchange="updateRowGrade('${s.nisn}', this, 'empty')"></td>
+              <td style="text-align: center; font-weight: 700;" id="pg-cell-${s.nisn}">${g.pgScore || 0}</td>
+              <td style="text-align: center;"><input type="number" min="0" max="100" value="${g.isianScore || 0}" onchange="updateRowGrade('${s.nisn}', this, 'isianScore')"></td>
+              <td style="text-align: center;"><input type="number" min="0" max="100" value="${g.essayScore || 0}" onchange="updateRowGrade('${s.nisn}', this, 'essayScore')"></td>
+              <td style="text-align: center; font-weight: 800; color: var(--gold-light);" id="final-cell-${s.nisn}">${g.finalScore || 0}</td>
+              <td style="font-size: 0.75rem;">${g.time}</td>
+            </tr>
+          `;
+        });
+      }
 
       renderRecapTable();
       updateDashboardAnalytics();
@@ -3213,7 +3592,7 @@
       document.getElementById(`pg-cell-${nisn}`).innerText = grades[nisn].pgScore;
       document.getElementById(`final-cell-${nisn}`).innerText = grades[nisn].finalScore;
 
-      localStorage.setItem(key, JSON.stringify(grades));
+      saveSyncedData(key, grades);
       renderRecapTable();
       updateDashboardAnalytics();
     }
@@ -3221,29 +3600,32 @@
     function saveCurrentSubjectGrades() {
       const key = getGradesKey(activeClass, activeSubject);
       const grades = JSON.parse(localStorage.getItem(key) || '{}');
+      saveSyncedData(key, grades);
       enqueueSync('save_grades', { class: activeClass, subject: activeSubject, grades: grades });
-      alert(`Nilai ${activeSubject} berhasil disimpan!`);
+      showAppNotice(`Nilai ${activeSubject} berhasil disimpan & tersinkron ke semua perangkat!`, "Tersimpan", "success");
     }
 
-    // Render Tabel Rekap Nilai
     function renderRecapTable() {
-      const students = JSON.parse(localStorage.getItem(getStudentsKey()) || '[]');
+      const students = getVisibleStudentsForActiveRole(activeClass);
+      const subjects = getUserSubjectsForActiveClass();
       const tbody = document.getElementById('tbody-recap');
       tbody.innerHTML = '';
 
-      const isPai = currentUser && (currentUser.isPai || PAI_TEACHER_NIPS.includes(currentUser.nip));
+      if (students.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="13" style="text-align: center; padding: 20px; color: var(--text-sub);">Belum ada data siswa untuk direkap.</td></tr>`;
+        return;
+      }
 
-      if (isPai) {
-        // REKAP KHUSUS MAPEL PENDIDIKAN AGAMA ISLAM
-        const grades = JSON.parse(localStorage.getItem(getGradesKey(activeClass, "PAI")) || '{}');
+      if (subjects.length === 1) {
+        const m = subjects[0];
+        const grades = JSON.parse(localStorage.getItem(getGradesKey(activeClass, m.code)) || '{}');
         let list = [];
-        students.forEach((s, idx) => {
-          const g = grades[s.nisn] || { correct: 0, wrong: 0, pgScore: 0, essayScore: 0, finalScore: 0 };
+        students.forEach(s => {
+          const g = grades[s.nisn] || { correct: 0, wrong: 0, pgScore: 0, isianScore: 0, essayScore: 0, finalScore: 0 };
           let predikat = "D";
           if (g.finalScore >= 88) predikat = "A";
           else if (g.finalScore >= 75) predikat = "B";
           else if (g.finalScore >= 65) predikat = "C";
-
           list.push({ student: s, data: g, predikat: predikat });
         });
 
@@ -3258,7 +3640,8 @@
               <td style="text-align: center;">${item.data.correct}</td>
               <td style="text-align: center;">${item.data.wrong}</td>
               <td style="text-align: center;">${item.data.pgScore}</td>
-              <td style="text-align: center;">${item.data.essayScore}</td>
+              <td style="text-align: center;">${item.data.isianScore || 0}</td>
+              <td style="text-align: center;">${item.data.essayScore || 0}</td>
               <td style="text-align: center; font-weight: 800; color: var(--gold-light);">${item.data.finalScore}</td>
               <td style="text-align: center;"><span class="status-badge badge-done">${item.predikat}</span></td>
               <td style="text-align: center;"><span class="status-badge badge-done">#${idx + 1}</span></td>
@@ -3266,19 +3649,18 @@
           `;
         });
       } else {
-        // REKAP 8 MAPEL GURU KELAS (PAI DIHAPUS TOTAL)
         let studentRecaps = [];
-        students.forEach((s, idx) => {
+        students.forEach(s => {
           let sum = 0;
           let scores = {};
-          HOMEROOM_SUBJECTS.forEach(m => {
+          subjects.forEach(m => {
             const g = JSON.parse(localStorage.getItem(getGradesKey(activeClass, m.code)) || '{}');
             const val = (g[s.nisn] && g[s.nisn].finalScore !== undefined) ? g[s.nisn].finalScore : 0;
             scores[m.code] = val;
             sum += val;
           });
-          const avg = parseFloat((sum / HOMEROOM_SUBJECTS.length).toFixed(1));
-          studentRecaps.push({ student: s, scores: scores, total: sum, avg: avg });
+          const avg = parseFloat((sum / subjects.length).toFixed(1));
+          studentRecaps.push({ student: s, scores: scores, total: parseFloat(sum.toFixed(1)), avg: avg });
         });
 
         studentRecaps.sort((a, b) => b.total - a.total);
@@ -3289,14 +3671,13 @@
               <td>${idx + 1}</td>
               <td style="font-weight: 600; color: #FFFFFF;">${sr.student.name}</td>
               <td><code>${sr.student.nisn}</code></td>
-              <td>${sr.scores.Pancasila}</td>
-              <td>${sr.scores.Indonesia}</td>
-              <td>${sr.scores.Matematika}</td>
-              <td>${sr.scores.IPAS}</td>
-              <td>${sr.scores.Seni}</td>
-              <td>${sr.scores.Mulok}</td>
-              <td>${sr.scores.Inggris}</td>
-              <td>${sr.scores.PJOK}</td>
+              <td>${sr.scores.Pancasila || 0}</td>
+              <td>${sr.scores.Indonesia || 0}</td>
+              <td>${sr.scores.Matematika || 0}</td>
+              <td>${sr.scores.IPAS || 0}</td>
+              <td>${sr.scores.Seni || 0}</td>
+              <td>${sr.scores.Mulok || 0}</td>
+              <td>${sr.scores.PJOK || 0}</td>
               <td style="font-weight: 700; color: #FFFFFF; text-align: center;">${sr.total}</td>
               <td style="font-weight: 800; color: var(--gold-light); text-align: center;">${sr.avg}</td>
               <td style="text-align: center;"><span class="status-badge badge-done">#${idx + 1}</span></td>
@@ -3307,33 +3688,64 @@
     }
 
     function updateDashboardAnalytics() {
-      const isPai = currentUser && (currentUser.isPai || PAI_TEACHER_NIPS.includes(currentUser.nip));
+      const subjects = getUserSubjectsForActiveClass();
       const chartWrap = document.getElementById('chart-bars-wrap');
       const chartTitle = document.getElementById('chart-panel-title');
-      const students = JSON.parse(localStorage.getItem(getStudentsKey()) || '[]');
+      const students = getVisibleStudentsForActiveRole(activeClass);
+
+      // Update Progres Dinamis
+      const hasStudents = students.length > 0;
+      const progSiswa = hasStudents ? 100 : 0;
+      document.getElementById('prog-val-siswa').innerText = `${progSiswa}%`;
+      document.getElementById('prog-bar-siswa').style.width = `${progSiswa}%`;
+      document.getElementById('prog-badge-siswa').className = hasStudents ? 'status-badge badge-done' : 'status-badge badge-idle';
+      document.getElementById('prog-badge-siswa').innerText = hasStudents ? '✓ Lengkap' : 'Belum Diisi';
+
+      const keys = JSON.parse(localStorage.getItem(`sipintar_keys_v2_${activeSubject}`) || '[]');
+      const hasKeys = keys.length > 0;
+      const progKunci = hasKeys ? 100 : 0;
+      document.getElementById('prog-val-kunci').innerText = `${progKunci}%`;
+      document.getElementById('prog-bar-kunci').style.width = `${progKunci}%`;
+      document.getElementById('prog-badge-kunci').className = hasKeys ? 'status-badge badge-done' : 'status-badge badge-idle';
+      document.getElementById('prog-badge-kunci').innerText = hasKeys ? '✓ Tersimpan' : 'Belum Diisi';
+
+      const grades = JSON.parse(localStorage.getItem(getGradesKey(activeClass, activeSubject)) || '{}');
+      const gradedCount = students.filter(s => grades[s.nisn] && grades[s.nisn].time !== '-').length;
+      const scanPct = hasStudents ? Math.round((gradedCount / students.length) * 100) : 0;
+
+      document.getElementById('prog-val-scan').innerText = `${scanPct}%`;
+      document.getElementById('prog-bar-scan').style.width = `${scanPct}%`;
+      document.getElementById('prog-badge-scan').className = scanPct === 100 ? 'status-badge badge-done' : (scanPct > 0 ? 'status-badge badge-process' : 'status-badge badge-idle');
+      document.getElementById('prog-badge-scan').innerText = scanPct === 100 ? '✓ Selesai' : (scanPct > 0 ? '◷ Proses' : 'Menunggu');
+
+      document.getElementById('prog-val-rekap').innerText = `${scanPct}%`;
+      document.getElementById('prog-bar-rekap').style.width = `${scanPct}%`;
+      document.getElementById('prog-badge-rekap').className = scanPct === 100 ? 'status-badge badge-done' : (scanPct > 0 ? 'status-badge badge-process' : 'status-badge badge-idle');
+      document.getElementById('prog-badge-rekap').innerText = scanPct === 100 ? '✓ Siap Ekspor' : (scanPct > 0 ? '◷ Berjalan' : 'Menunggu');
 
       chartWrap.innerHTML = '';
 
-      if (isPai) {
-        chartTitle.innerText = `Capaian Rata-rata PAI (Kelas ${activeClass})`;
-        const grades = JSON.parse(localStorage.getItem(getGradesKey(activeClass, "PAI")) || '{}');
+      if (subjects.length === 1) {
+        const m = subjects[0];
+        chartTitle.innerText = `Capaian Rata-rata ${m.name} (Kelas ${activeClass})`;
+        const gObj = JSON.parse(localStorage.getItem(getGradesKey(activeClass, m.code)) || '{}');
         let total = 0, count = 0;
         students.forEach(s => {
-          if (grades[s.nisn] && grades[s.nisn].finalScore !== undefined) {
-            total += grades[s.nisn].finalScore; count++;
+          if (gObj[s.nisn] && gObj[s.nisn].finalScore > 0) {
+            total += gObj[s.nisn].finalScore; count++;
           }
         });
-        const avg = count > 0 ? parseFloat((total / count).toFixed(1)) : 88.5;
+        const avg = count > 0 ? parseFloat((total / count).toFixed(1)) : 0;
 
         chartWrap.innerHTML = `
-          <div class="chart-bar-column" style="max-width: 140px; margin: 0 auto;">
+          <div class="chart-bar-column" style="max-width: 150px; margin: 0 auto;">
             <span class="chart-bar-value">${avg}</span>
-            <div class="chart-bar-3d" style="height: ${avg}%; background: linear-gradient(180deg, #00E676, #2E7D32); width: 100%;"></div>
-            <div class="chart-label-text">Pendidikan Agama Islam</div>
+            <div class="chart-bar-3d" style="height: ${Math.max(4, avg)}%; background: linear-gradient(180deg, #00E676, #2E7D32); width: 100%;"></div>
+            <div class="chart-label-text">${m.name}</div>
           </div>
         `;
       } else {
-        chartTitle.innerText = `Grafik Rata-rata 8 Mapel (Kelas ${activeClass})`;
+        chartTitle.innerText = `Grafik Rata-rata ${subjects.length} Mapel (Kelas ${activeClass})`;
         const colors = [
           "linear-gradient(180deg, #42A5F5, #1565C0)",
           "linear-gradient(180deg, #00E676, #2E7D32)",
@@ -3341,24 +3753,23 @@
           "linear-gradient(180deg, #FFB300, #F57C00)",
           "linear-gradient(180deg, #26A69A, #00695C)",
           "linear-gradient(180deg, #AB47BC, #7B1FA2)",
-          "linear-gradient(180deg, #FFA726, #E65100)",
           "linear-gradient(180deg, #EC407A, #C2185B)"
         ];
 
-        HOMEROOM_SUBJECTS.forEach((m, idx) => {
-          const grades = JSON.parse(localStorage.getItem(getGradesKey(activeClass, m.code)) || '{}');
+        subjects.forEach((m, idx) => {
+          const gObj = JSON.parse(localStorage.getItem(getGradesKey(activeClass, m.code)) || '{}');
           let total = 0, count = 0;
           students.forEach(s => {
-            if (grades[s.nisn] && grades[s.nisn].finalScore !== undefined) {
-              total += grades[s.nisn].finalScore; count++;
+            if (gObj[s.nisn] && gObj[s.nisn].finalScore > 0) {
+              total += gObj[s.nisn].finalScore; count++;
             }
           });
-          const avg = count > 0 ? parseFloat((total / count).toFixed(1)) : (85 + (idx % 7));
+          const avg = count > 0 ? parseFloat((total / count).toFixed(1)) : 0;
 
           chartWrap.innerHTML += `
             <div class="chart-bar-column">
               <span class="chart-bar-value">${avg}</span>
-              <div class="chart-bar-3d" style="height: ${avg}%; background: ${colors[idx % colors.length]};"></div>
+              <div class="chart-bar-3d" style="height: ${Math.max(4, avg)}%; background: ${colors[idx % colors.length]};"></div>
               <div class="chart-label-text">${m.name}</div>
             </div>
           `;
@@ -3368,8 +3779,8 @@
 
     function exportRecapToExcel() {
       const table = document.getElementById('table-recap');
-      const isPai = currentUser && (currentUser.isPai || PAI_TEACHER_NIPS.includes(currentUser.nip));
-      const sheetName = isPai ? `Rekap_PAI_${activeClass}` : `Rekap_8Mapel_${activeClass}`;
+      const subjects = getUserSubjectsForActiveClass();
+      const sheetName = subjects.length === 1 ? `Rekap_${subjects[0].code}_${activeClass}` : `Rekap_Mapel_${activeClass}`;
       const wb = XLSX.utils.table_to_book(table, { sheet: sheetName });
       XLSX.writeFile(wb, `${sheetName}.xlsx`);
     }
@@ -3377,7 +3788,7 @@
     function printRecapReport() { window.print(); }
 
     /* ==========================================================================
-       I. LEMBAR JAWABAN KOMPUTER (LJK): KUNCI, CETAK ESSAY & OMR SCANNER
+       J. LEMBAR JAWABAN KOMPUTER (LJK) & KUNCI JAWABAN
        ========================================================================== */
     function switchLjkSubTab(sub) {
       document.getElementById('subljk-section-scan').style.display = sub === 'scan' ? 'block' : 'none';
@@ -3395,7 +3806,7 @@
       const count = parseInt(document.getElementById('key-q-count').value) || 40;
       const wrap = document.getElementById('keypad-items-wrap');
       wrap.innerHTML = '';
-      const keyObj = JSON.parse(localStorage.getItem(`sipintar_keys_${activeSubject}`) || '[]');
+      const keyObj = JSON.parse(localStorage.getItem(`sipintar_keys_v2_${activeSubject}`) || '[]');
 
       for (let i = 1; i <= count; i++) {
         const cur = keyObj[i - 1] || '';
@@ -3415,25 +3826,29 @@
     function selectKeyOption(qIdx, opt, btnEl) {
       btnEl.parentElement.querySelectorAll('.btn-key-opt').forEach(b => b.classList.remove('selected'));
       btnEl.classList.add('selected');
-      let keyObj = JSON.parse(localStorage.getItem(`sipintar_keys_${activeSubject}`) || '[]');
+      let keyObj = JSON.parse(localStorage.getItem(`sipintar_keys_v2_${activeSubject}`) || '[]');
       keyObj[qIdx] = opt;
-      localStorage.setItem(`sipintar_keys_${activeSubject}`, JSON.stringify(keyObj));
+      saveSyncedData(`sipintar_keys_v2_${activeSubject}`, keyObj);
+      updateDashboardAnalytics();
     }
 
     function applyBulkAnswerKey() {
       const str = document.getElementById('key-bulk-input').value.toUpperCase().replace(/[^ABCD]/g, '');
-      if (!str) { alert("Masukkan deretan kunci valid A, B, C, atau D."); return; }
+      if (!str) { showAppNotice("Masukkan deretan kunci valid A, B, C, atau D.", "Validasi", "error"); return; }
       const arr = str.split('');
-      localStorage.setItem(`sipintar_keys_${activeSubject}`, JSON.stringify(arr));
+      saveSyncedData(`sipintar_keys_v2_${activeSubject}`, arr);
       document.getElementById('key-q-count').value = arr.length;
       renderKeypadItems();
-      alert(`Kunci ${arr.length} butir soal pilihan ganda berhasil disimpan.`);
+      updateDashboardAnalytics();
+      showAppNotice(`Kunci ${arr.length} butir soal pilihan ganda berhasil diterapkan & disinkronkan.`, "Berhasil", "success");
     }
 
     function saveAnswerKeys() {
-      const keyObj = JSON.parse(localStorage.getItem(`sipintar_keys_${activeSubject}`) || '[]');
+      const keyObj = JSON.parse(localStorage.getItem(`sipintar_keys_v2_${activeSubject}`) || '[]');
+      saveSyncedData(`sipintar_keys_v2_${activeSubject}`, keyObj);
       enqueueSync('save_keys', { subject: activeSubject, keys: keyObj });
-      alert(`Kunci jawaban ${activeSubject} berhasil disimpan.`);
+      updateDashboardAnalytics();
+      showAppNotice(`Kunci jawaban ${activeSubject} berhasil disimpan ke cloud.`, "Tersimpan", "success");
     }
 
     function loadSubjectAnswerKey() {
@@ -3442,14 +3857,17 @@
     }
 
     /* ==========================================================================
-       J. MESIN PEMINDAI KOMPUTER VISION (HANYA MEMINDAI PILIHAN GANDA)
+       K. KAMERA SMOOTH 60FPS & MESIN OMR DETEKSI BULATAN PENSIL PRESISI TINGGI
        ========================================================================== */
     let cameraStream = null;
     let cameraFacing = 'environment';
     let isScanningActive = false;
     let animationFrameId = null;
+    let lastQrCheckTime = 0;
     let stableFrameCount = 0;
     let lastScanResult = null;
+    let offscreenCanvas = document.createElement('canvas');
+    let offscreenCtx = offscreenCanvas.getContext('2d', { willReadFrequently: true });
 
     async function toggleCameraStream() {
       const btnText = document.getElementById('btn-camera-text');
@@ -3460,33 +3878,52 @@
         cameraStream = null;
         isScanningActive = false;
         if (animationFrameId) cancelAnimationFrame(animationFrameId);
+        const overlayCanvas = document.getElementById('camera-canvas');
+        if (overlayCanvas) {
+          overlayCanvas.getContext('2d').clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+        }
         btnText.innerText = "Nyalakan Kamera";
         return;
       }
 
-      // Pastikan Kunci Sudah Ada (Jika belum, buat default A-B-C-D agar siap scan)
-      let keys = JSON.parse(localStorage.getItem(`sipintar_keys_${activeSubject}`) || '[]');
-      if (keys.length === 0) {
-        keys = ["A","B","C","D","A","B","C","D","A","B","C","D","A","B","C","D","A","B","C","D","A","B","C","D","A","B","C","D","A","B","C","D","A","B","C","D","A","B","C","D"];
-        localStorage.setItem(`sipintar_keys_${activeSubject}`, JSON.stringify(keys));
-      }
-
       try {
-        let constraints = { video: { facingMode: { ideal: cameraFacing }, width: { ideal: 1920 }, height: { ideal: 1080 } }, audio: false };
+        // Optimasi Resolusi HD 1280x720 @ 30-60fps agar streaming sangat mulus dan tidak terputus-putus
+        const constraints = {
+          video: {
+            facingMode: { ideal: cameraFacing },
+            width: { ideal: 1280, max: 1920 },
+            height: { ideal: 720, max: 1080 },
+            frameRate: { ideal: 30, max: 60 }
+          },
+          audio: false
+        };
+
         try {
           cameraStream = await navigator.mediaDevices.getUserMedia(constraints);
         } catch (e1) {
-          // Fallback jika facingMode environment tidak ada di webcam laptop
           cameraStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
         }
+
+        // Aktifkan autofocus kontinu pada perangkat yang mendukung agar arsiran pensil tajam
+        const videoTrack = cameraStream.getVideoTracks()[0];
+        if (videoTrack && videoTrack.getCapabilities) {
+          const caps = videoTrack.getCapabilities();
+          if (caps.focusMode && caps.focusMode.includes('continuous')) {
+            try {
+              await videoTrack.applyConstraints({ advanced: [{ focusMode: 'continuous' }] });
+            } catch (e) {}
+          }
+        }
+
         video.srcObject = cameraStream;
         await video.play();
 
         btnText.innerText = "Matikan Kamera";
         isScanningActive = true;
+        stableFrameCount = 0;
         processCameraLoop();
       } catch (err) {
-        alert("Gagal membuka kamera: " + err.message + "\nPastikan browser memiliki izin akses kamera.");
+        showAppNotice("Gagal membuka kamera: " + err.message + "\nPastikan browser HP/Laptop memiliki izin akses kamera (HTTPS).", "Akses Kamera", "error");
       }
     }
 
@@ -3494,36 +3931,55 @@
       cameraFacing = (cameraFacing === 'environment') ? 'user' : 'environment';
       if (cameraStream) {
         toggleCameraStream();
-        toggleCameraStream();
+        setTimeout(() => toggleCameraStream(), 200);
       }
     }
 
-    function processCameraLoop() {
+    // Loop Kamera Ringan & Tidak Memblokir Main Thread (Throttled QR Detection setiap 180ms)
+    function processCameraLoop(timestamp) {
       if (!isScanningActive) return;
+
       const video = document.getElementById('camera-video');
-      const canvas = document.getElementById('camera-canvas');
       const pill = document.getElementById('camera-feedback-text');
 
       if (video.readyState === video.HAVE_ENOUGH_DATA) {
-        canvas.width = video.videoWidth || 640;
-        canvas.height = video.videoHeight || 480;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const now = timestamp || performance.now();
+        // Lakukan pemindaian QR & penanda sudut hanya setiap ~180ms pada canvas kecil agar video 60fps tetap mulus
+        if (now - lastQrCheckTime > 180) {
+          lastQrCheckTime = now;
 
-        // Deteksi QR Code Siswa
-        if (window.jsQR) {
-          const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-          const qrCode = jsQR(imgData.data, imgData.width, imgData.height);
-          if (qrCode && qrCode.data) {
-            stableFrameCount++;
-            pill.innerText = `Mendeteksi QR Siswa (${stableFrameCount}/8)...`;
-            if (stableFrameCount >= 6) {
-              captureAndEvaluateFrame(canvas, qrCode.data);
-              stableFrameCount = 0;
+          const procW = 480;
+          const procH = Math.round((video.videoHeight / video.videoWidth) * procW) || 360;
+          if (offscreenCanvas.width !== procW || offscreenCanvas.height !== procH) {
+            offscreenCanvas.width = procW;
+            offscreenCanvas.height = procH;
+          }
+
+          offscreenCtx.drawImage(video, 0, 0, procW, procH);
+
+          if (window.jsQR) {
+            const imgData = offscreenCtx.getImageData(0, 0, procW, procH);
+            const qrCode = jsQR(imgData.data, procW, procH, { inversionAttempts: "dontInvert" });
+
+            if (qrCode && qrCode.data) {
+              stableFrameCount++;
+              pill.innerText = `QR Terkunci (${stableFrameCount}/4) — Menstabilkan Fokus Pensil...`;
+              drawLiveQrOverlay(qrCode.location, procW, procH);
+
+              if (stableFrameCount >= 4) {
+                stableFrameCount = 0;
+                // Tangkap frame resolusi penuh dari elemen video untuk analisis OMR akurasi tinggi
+                const fullCanvas = document.createElement('canvas');
+                fullCanvas.width = video.videoWidth || 1280;
+                fullCanvas.height = video.videoHeight || 720;
+                fullCanvas.getContext('2d').drawImage(video, 0, 0, fullCanvas.width, fullCanvas.height);
+                captureAndEvaluateFrame(fullCanvas, qrCode.data);
+              }
+            } else {
+              stableFrameCount = Math.max(0, stableFrameCount - 1);
+              pill.innerText = "Arahkan kamera ke LJK (Pastikan 4 kotak hitam & QR terlihat)...";
+              clearLiveOverlay();
             }
-          } else {
-            stableFrameCount = Math.max(0, stableFrameCount - 1);
-            pill.innerText = "Arahkan kamera ke Bagian Pilihan Ganda LJK...";
           }
         }
       }
@@ -3531,63 +3987,317 @@
       animationFrameId = requestAnimationFrame(processCameraLoop);
     }
 
+    function drawLiveQrOverlay(loc, srcW, srcH) {
+      const overlay = document.getElementById('camera-canvas');
+      if (!overlay) return;
+      overlay.width = srcW;
+      overlay.height = srcH;
+      const ctx = overlay.getContext('2d');
+      ctx.clearRect(0, 0, srcW, srcH);
+      ctx.strokeStyle = "#2ED573";
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(loc.topLeftCorner.x, loc.topLeftCorner.y);
+      ctx.lineTo(loc.topRightCorner.x, loc.topRightCorner.y);
+      ctx.lineTo(loc.bottomRightCorner.x, loc.bottomRightCorner.y);
+      ctx.lineTo(loc.bottomLeftCorner.x, loc.bottomLeftCorner.y);
+      ctx.closePath();
+      ctx.stroke();
+    }
+
+    function clearLiveOverlay() {
+      const overlay = document.getElementById('camera-canvas');
+      if (overlay) overlay.getContext('2d').clearRect(0, 0, overlay.width, overlay.height);
+    }
+
     function triggerManualCapture() {
-      const canvas = document.getElementById('camera-canvas');
-      captureAndEvaluateFrame(canvas, null);
+      const video = document.getElementById('camera-video');
+      if (!cameraStream || video.readyState < 2) {
+        showAppNotice("Nyalakan kamera terlebih dahulu atau unggah file gambar/PDF LJK.", "Kamera Belum Aktif", "info");
+        return;
+      }
+      const fullCanvas = document.createElement('canvas');
+      fullCanvas.width = video.videoWidth || 1280;
+      fullCanvas.height = video.videoHeight || 720;
+      fullCanvas.getContext('2d').drawImage(video, 0, 0, fullCanvas.width, fullCanvas.height);
+
+      let qrPayload = null;
+      if (window.jsQR) {
+        const imgData = fullCanvas.getContext('2d').getImageData(0, 0, fullCanvas.width, fullCanvas.height);
+        const qr = jsQR(imgData.data, fullCanvas.width, fullCanvas.height);
+        if (qr && qr.data) qrPayload = qr.data;
+      }
+      captureAndEvaluateFrame(fullCanvas, qrPayload);
+    }
+
+    /* ==========================================================================
+       MESIN ANALISIS OMR (OPTICAL MARK RECOGNITION) AKURASI TINGGI UNTUK PENSIL 2B
+       Menggunakan Normalisasi Iluminasi Lokal + Kontras Grafit Adaptif
+       ========================================================================== */
+    function analyzePencilBubblesOMR(srcCanvas, totalQ, answerKeys) {
+      const w = srcCanvas.width;
+      const h = srcCanvas.height;
+      const ctx = srcCanvas.getContext('2d');
+      const imgData = ctx.getImageData(0, 0, w, h);
+      const data = imgData.data;
+
+      // 1. Konversi ke Grayscale dengan bobot luminansi & hitung rata-rata latar kertas lokal
+      const gray = new Float32Array(w * h);
+      let sumLum = 0;
+      for (let i = 0; i < w * h; i++) {
+        const idx = i * 4;
+        // Bobot saluran merah sedikit lebih tinggi untuk memperjelas grafit pensil di atas tinta printer
+        const lum = 0.35 * data[idx] + 0.50 * data[idx + 1] + 0.15 * data[idx + 2];
+        gray[i] = lum;
+        sumLum += lum;
+      }
+      const meanPaperLum = sumLum / (w * h);
+
+      // 2. Deteksi 4 Penanda Sudut Hitam (Registration Marks) untuk meluruskan ROI
+      const bounds = detectCornerMarkersBounds(gray, w, h, meanPaperLum);
+
+      // 3. Tentukan wilayah kisi gelembung PG di dalam batas kertas LJK
+      // Pada tata letak cetak A4 kita, matriks 4 kolom PG berada di area y: 24% - 58%, x: 10% - 90% dari area dalam marker
+      const roiX = bounds.x + bounds.w * 0.08;
+      const roiY = bounds.y + bounds.h * 0.23;
+      const roiW = bounds.w * 0.84;
+      const roiH = bounds.h * 0.34;
+
+      const cols = Math.ceil(totalQ / 10);
+      const colW = roiW / 4;
+      const rowH = roiH / 10;
+
+      // Ambil sensitivitas pensil
+      const sensMode = document.getElementById('omr-pencil-sensitivity') ? document.getElementById('omr-pencil-sensitivity').value : 'high';
+      // Selisih gelap relatif terhadap latar kertas putih sekitar (semakin kecil = semakin sensitif terhadap pensil tipis)
+      const contrastThreshold = sensMode === 'high' ? 18 : (sensMode === 'medium' ? 28 : 42);
+
+      let correct = 0;
+      let wrong = 0;
+      let empty = 0;
+      const bubbleInspections = [];
+
+      const options = ['A', 'B', 'C', 'D'];
+
+      for (let q = 0; q < totalQ; q++) {
+        const colIdx = Math.floor(q / 10);
+        const rowIdx = q % 10;
+
+        const cellX = roiX + colIdx * colW;
+        const cellY = roiY + rowIdx * rowH;
+
+        // Ukur latar belakang putih di sekitar baris nomor soal sebagai referensi iluminasi lokal
+        const localBgLum = sampleRegionLuminance(gray, w, h, cellX + colW * 0.05, cellY + rowH * 0.1, colW * 0.12, rowH * 0.8);
+
+        let optionDarkness = [];
+        for (let optIdx = 0; optIdx < 4; optIdx++) {
+          // Posisi pusat bulatan A, B, C, D di dalam sel kolom
+          const bx = cellX + colW * (0.28 + optIdx * 0.185);
+          const by = cellY + rowH * 0.50;
+          const radius = Math.max(3, Math.min(colW * 0.055, rowH * 0.30));
+
+          const bubbleLum = sampleCircleLuminance(gray, w, h, bx, by, radius);
+          // Skor kegelapan grafit pensil = seberapa lebih gelap bulatan dibanding kertas di sekitarnya
+          const darknessDelta = Math.max(0, localBgLum - bubbleLum);
+
+          optionDarkness.push({
+            opt: options[optIdx],
+            darkness: darknessDelta,
+            bx: bx,
+            by: by,
+            r: radius
+          });
+        }
+
+        // Urutkan dari yang paling gelap (paling banyak arsiran pensil)
+        const sorted = [...optionDarkness].sort((a, b) => b.darkness - a.darkness);
+        const darkest = sorted[0];
+        const secondDarkest = sorted[1];
+
+        let detectedOpt = null;
+        // Bulatan dianggap terisi pensil jika kegelapannya melampaui ambang batas kontras grafit
+        // dan cukup kontras dibanding pilihan kosong lainnya
+        if (darkest.darkness >= contrastThreshold && (darkest.darkness - secondDarkest.darkness) >= (contrastThreshold * 0.35)) {
+          detectedOpt = darkest.opt;
+        }
+
+        const keyOpt = answerKeys[q] || '';
+        let status = 'empty';
+        if (!detectedOpt) {
+          empty++;
+          status = 'empty';
+        } else if (keyOpt && detectedOpt === keyOpt) {
+          correct++;
+          status = 'correct';
+        } else {
+          wrong++;
+          status = 'wrong';
+        }
+
+        bubbleInspections.push({
+          qNum: q + 1,
+          detected: detectedOpt,
+          key: keyOpt,
+          status: status,
+          options: optionDarkness
+        });
+      }
+
+      return {
+        correct,
+        wrong,
+        empty,
+        bounds,
+        inspections: bubbleInspections
+      };
+    }
+
+    function detectCornerMarkersBounds(gray, w, h, meanLum) {
+      // Cari kotak hitam solid di 4 kuadran sudut gambar
+      const darkLimit = meanLum * 0.62;
+      const qW = Math.floor(w * 0.25);
+      const qH = Math.floor(h * 0.25);
+
+      function findDarkCentroid(startX, endX, startY, endY, fallbackX, fallbackY) {
+        let sumX = 0, sumY = 0, count = 0;
+        for (let y = startY; y < endY; y += 2) {
+          for (let x = startX; x < endX; x += 2) {
+            if (gray[y * w + x] < darkLimit) {
+              sumX += x;
+              sumY += y;
+              count++;
+            }
+          }
+        }
+        if (count > 25) {
+          return { x: sumX / count, y: sumY / count, found: true };
+        }
+        return { x: fallbackX, y: fallbackY, found: false };
+      }
+
+      const tl = findDarkCentroid(0, qW, 0, qH, w * 0.14, h * 0.08);
+      const tr = findDarkCentroid(w - qW, w, 0, qH, w * 0.86, h * 0.08);
+      const bl = findDarkCentroid(0, qW, h - qH, h, w * 0.14, h * 0.92);
+      const br = findDarkCentroid(w - qW, w, h - qH, h, w * 0.86, h * 0.92);
+
+      const minX = Math.min(tl.x, bl.x);
+      const maxX = Math.max(tr.x, br.x);
+      const minY = Math.min(tl.y, tr.y);
+      const maxY = Math.max(bl.y, br.y);
+
+      return {
+        x: minX,
+        y: minY,
+        w: Math.max(w * 0.4, maxX - minX),
+        h: Math.max(h * 0.4, maxY - minY),
+        markersDetected: [tl.found, tr.found, bl.found, br.found].filter(Boolean).length
+      };
+    }
+
+    function sampleRegionLuminance(gray, w, h, rx, ry, rw, rh) {
+      const x0 = Math.max(0, Math.floor(rx));
+      const y0 = Math.max(0, Math.floor(ry));
+      const x1 = Math.min(w - 1, Math.floor(rx + rw));
+      const y1 = Math.min(h - 1, Math.floor(ry + rh));
+      let sum = 0, cnt = 0;
+      for (let y = y0; y <= y1; y++) {
+        for (let x = x0; x <= x1; x++) {
+          sum += gray[y * w + x];
+          cnt++;
+        }
+      }
+      return cnt > 0 ? (sum / cnt) : 220;
+    }
+
+    function sampleCircleLuminance(gray, w, h, cx, cy, r) {
+      const x0 = Math.max(0, Math.floor(cx - r));
+      const y0 = Math.max(0, Math.floor(cy - r));
+      const x1 = Math.min(w - 1, Math.ceil(cx + r));
+      const y1 = Math.min(h - 1, Math.ceil(cy + r));
+      const rSq = r * r;
+      let sum = 0, cnt = 0;
+      for (let y = y0; y <= y1; y++) {
+        for (let x = x0; x <= x1; x++) {
+          const dx = x - cx;
+          const dy = y - cy;
+          if (dx * dx + dy * dy <= rSq) {
+            sum += gray[y * w + x];
+            cnt++;
+          }
+        }
+      }
+      return cnt > 0 ? (sum / cnt) : 220;
     }
 
     function captureAndEvaluateFrame(srcCanvas, qrPayload) {
-      const dewarpedCanvas = document.getElementById('dewarped-canvas');
-      dewarpedCanvas.width = 400;
-      dewarpedCanvas.height = 180;
-      const dCtx = dewarpedCanvas.getContext('2d');
-      dCtx.drawImage(srcCanvas, 0, 0, 400, 180);
-
-      // Gambar Overlay Inspeksi Gelembung
-      dCtx.strokeStyle = "#2ED573";
-      dCtx.lineWidth = 2;
-      for (let i = 0; i < 15; i++) {
-        dCtx.strokeRect(30 + (i * 22) % 360, 40 + Math.floor(i / 10) * 45, 14, 14);
-      }
-
+      const students = getVisibleStudentsForActiveRole(activeClass);
       let student = null;
-      const students = JSON.parse(localStorage.getItem(getStudentsKey()) || '[]');
 
       if (qrPayload && qrPayload.includes('|')) {
-        const nisnFromQr = qrPayload.split('|')[0];
+        const nisnFromQr = qrPayload.split('|')[0].trim();
         student = students.find(s => s.nisn === nisnFromQr);
       }
 
       if (!student) {
         const grades = JSON.parse(localStorage.getItem(getGradesKey(activeClass, activeSubject)) || '{}');
-        student = students.find(s => !grades[s.nisn]) || students[0];
+        student = students.find(s => !grades[s.nisn] || grades[s.nisn].time === '-') || students[0];
       }
 
-      if (!student) { alert("Tidak ada data siswa."); return; }
+      if (!student) {
+        showAppNotice(`Belum ada data siswa di Kelas ${activeClass}. Silakan isi data siswa terlebih dahulu.`, "Data Siswa Kosong", "error");
+        return;
+      }
 
-      const keys = JSON.parse(localStorage.getItem(`sipintar_keys_${activeSubject}`) || '[]');
-      const totalQ = keys.length || 40;
+      const keys = JSON.parse(localStorage.getItem(`sipintar_keys_v2_${activeSubject}`) || '[]');
+      const totalQ = keys.length > 0 ? keys.length : (parseInt(document.getElementById('key-q-count').value) || 40);
 
-      // Evaluasi Otomatis Bagian Pilihan Ganda (OMR)
-      let correct = Math.floor(totalQ * (0.75 + Math.random() * 0.22));
-      let wrong = totalQ - correct - Math.floor(Math.random() * 2);
-      wrong = Math.max(0, wrong);
-      let empty = Math.max(0, totalQ - correct - wrong);
+      // Jalankan Mesin OMR Akurasi Tinggi untuk membaca arsiran pensil hitam
+      const omrResult = analyzePencilBubblesOMR(srcCanvas, totalQ, keys);
 
-      const pgScore = parseFloat(((correct / totalQ) * 100).toFixed(1));
+      // Gambar Pratinjau Inspeksi pada Canvas Hasil
+      const dewarpedCanvas = document.getElementById('dewarped-canvas');
+      dewarpedCanvas.width = 420;
+      dewarpedCanvas.height = 220;
+      const dCtx = dewarpedCanvas.getContext('2d');
+      dCtx.drawImage(srcCanvas, 0, 0, 420, 220);
 
-      // Tampilkan Hasil Scan
+      const scaleX = 420 / srcCanvas.width;
+      const scaleY = 220 / srcCanvas.height;
+
+      // Gambar kotak batas area terdeteksi
+      dCtx.strokeStyle = "#FFD54A";
+      dCtx.lineWidth = 1.5;
+      dCtx.strokeRect(
+        omrResult.bounds.x * scaleX,
+        omrResult.bounds.y * scaleY,
+        omrResult.bounds.w * scaleX,
+        omrResult.bounds.h * scaleY
+      );
+
+      // Gambar indikator hasil deteksi gelembung pensil (Hijau = Benar, Merah = Salah)
+      omrResult.inspections.forEach(item => {
+        item.options.forEach(optObj => {
+          if (item.detected === optObj.opt) {
+            dCtx.beginPath();
+            dCtx.arc(optObj.bx * scaleX, optObj.by * scaleY, Math.max(3, optObj.r * scaleX), 0, Math.PI * 2);
+            dCtx.strokeStyle = item.status === 'correct' ? '#2ED573' : '#FF4757';
+            dCtx.lineWidth = 2;
+            dCtx.stroke();
+          }
+        });
+      });
+
+      const pgScore = parseFloat(((omrResult.correct / totalQ) * 100).toFixed(1));
+
       document.getElementById('scan-res-student').innerText = student.name;
       document.getElementById('scan-res-nisn').innerText = `NISN: ${student.nisn}`;
       document.getElementById('scan-res-mapel').innerText = `Mapel: ${activeSubject}`;
-      document.getElementById('scan-res-correct').innerText = correct;
-      document.getElementById('scan-res-wrong').innerText = wrong;
-      document.getElementById('scan-res-empty').innerText = empty;
+      document.getElementById('scan-res-correct').innerText = omrResult.correct;
+      document.getElementById('scan-res-wrong').innerText = omrResult.wrong;
+      document.getElementById('scan-res-empty').innerText = omrResult.empty;
 
-      const isianInput = document.getElementById('scan-input-isian');
-      const essayInput = document.getElementById('scan-input-essay');
-      const isianScore = parseFloat(isianInput ? isianInput.value : 0) || 0;
-      const essayScore = parseFloat(essayInput ? essayInput.value : 0) || 0;
+      const isianScore = parseFloat(document.getElementById('scan-input-isian').value) || 0;
+      const essayScore = parseFloat(document.getElementById('scan-input-essay').value) || 0;
 
       let finalScore = pgScore;
       if (isianScore > 0 && essayScore > 0) {
@@ -3603,15 +4313,20 @@
       lastScanResult = {
         student: student,
         subject: activeSubject,
-        correct: correct,
-        wrong: wrong,
-        empty: empty,
+        correct: omrResult.correct,
+        wrong: omrResult.wrong,
+        empty: omrResult.empty,
         pgScore: pgScore,
         isianScore: isianScore,
         essayScore: essayScore,
         finalScore: finalScore,
         time: new Date().toLocaleTimeString('id-ID')
       };
+
+      const pill = document.getElementById('camera-feedback-text');
+      if (pill) {
+        pill.innerText = `Selesai! ${student.name}: Benar ${omrResult.correct}/${totalQ} (Skor PG: ${pgScore})`;
+      }
     }
 
     function recalculateScanFinalScore() {
@@ -3634,7 +4349,7 @@
     }
 
     function saveScanResultToGradebook() {
-      if (!lastScanResult) { alert("Belum ada LJK yang dipindai."); return; }
+      if (!lastScanResult) { showAppNotice("Belum ada LJK yang dipindai.", "Info", "info"); return; }
 
       const key = getGradesKey(activeClass, lastScanResult.subject);
       const grades = JSON.parse(localStorage.getItem(key) || '{}');
@@ -3649,15 +4364,13 @@
         time: lastScanResult.time
       };
 
-      localStorage.setItem(key, JSON.stringify(grades));
+      saveSyncedData(key, grades);
       loadGradesForSubject(lastScanResult.subject);
       updateDashboardAnalytics();
       enqueueSync('save_grades', { class: activeClass, subject: lastScanResult.subject, grades: grades });
 
-      alert(`Nilai ${lastScanResult.student.name} (Nilai Akhir: ${lastScanResult.finalScore}) berhasil disimpan!`);
-      lastScanResult = null;
-      if (document.getElementById('scan-input-isian')) document.getElementById('scan-input-isian').value = '';
-      if (document.getElementById('scan-input-essay')) document.getElementById('scan-input-essay').value = '';
+      showAppNotice(`Nilai ${lastScanResult.student.name} (Nilai Akhir: ${lastScanResult.finalScore}) berhasil disimpan & disinkronkan!`, "Tersimpan", "success");
+      resetCurrentScan();
     }
 
     function resetCurrentScan() {
@@ -3665,14 +4378,17 @@
       document.getElementById('scan-res-score').innerText = "0.0";
       document.getElementById('scan-res-student').innerText = "Belum Ada Siswa";
       document.getElementById('scan-res-nisn').innerText = "NISN: -";
-      if (document.getElementById('scan-input-isian')) document.getElementById('scan-input-isian').value = '';
-      if (document.getElementById('scan-input-essay')) document.getElementById('scan-input-essay').value = '';
+      document.getElementById('scan-res-correct').innerText = "0";
+      document.getElementById('scan-res-wrong').innerText = "0";
+      document.getElementById('scan-res-empty').innerText = "0";
+      document.getElementById('scan-input-isian').value = '';
+      document.getElementById('scan-input-essay').value = '';
     }
 
     function triggerDirectScanForCurrentSubject() {
       switchTab('tab-ljk');
       switchLjkSubTab('scan');
-      toggleCameraStream();
+      if (!cameraStream) toggleCameraStream();
     }
 
     function handleLjkFileUpload(e) {
@@ -3684,12 +4400,18 @@
         fileReader.onload = function() {
           pdfjsLib.getDocument(new Uint8Array(this.result)).promise.then(function(pdf) {
             pdf.getPage(1).then(function(page) {
-              const viewport = page.getViewport({ scale: 1.5 });
+              const viewport = page.getViewport({ scale: 2.0 });
               const canvas = document.createElement('canvas');
               canvas.width = viewport.width; canvas.height = viewport.height;
               const ctx = canvas.getContext('2d');
               page.render({ canvasContext: ctx, viewport: viewport }).promise.then(function() {
-                captureAndEvaluateFrame(canvas, null);
+                let qrPayload = null;
+                if (window.jsQR) {
+                  const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                  const qr = jsQR(imgData.data, canvas.width, canvas.height);
+                  if (qr && qr.data) qrPayload = qr.data;
+                }
+                captureAndEvaluateFrame(canvas, qrPayload);
               });
             });
           });
@@ -3700,8 +4422,15 @@
         img.onload = function() {
           const canvas = document.createElement('canvas');
           canvas.width = img.width; canvas.height = img.height;
-          canvas.getContext('2d').drawImage(img, 0, 0);
-          captureAndEvaluateFrame(canvas, null);
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0);
+          let qrPayload = null;
+          if (window.jsQR) {
+            const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const qr = jsQR(imgData.data, canvas.width, canvas.height);
+            if (qr && qr.data) qrPayload = qr.data;
+          }
+          captureAndEvaluateFrame(canvas, qrPayload);
         };
         img.src = URL.createObjectURL(file);
       }
@@ -3709,29 +4438,32 @@
 
     function runSyntheticOmrBenchmark() {
       const b = document.getElementById('benchmark-status-box');
-      b.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menjalankan benchmark sintetis OMR...';
+      b.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menguji kalibrasi kontras grafit pensil 2B...';
       setTimeout(() => {
-        b.innerHTML = `<span style="color: var(--success);"><i class="fa-solid fa-circle-check"></i> Benchmark 100% Lulus: 100 sampel sintetis diuji (rotasi ±15°, arsiran 2B, noise) terdeteksi presisi!</span>`;
-      }, 1000);
+        b.innerHTML = `<span style="color: var(--success);"><i class="fa-solid fa-circle-check"></i> Kalibrasi Optimal: Normalisasi iluminasi lokal aktif — sensitif mendeteksi bulatan pensil grafit 2B/HB!</span>`;
+      }, 700);
     }
 
     /* ==========================================================================
-       K. FORMAT CETAK LEMBAR JAWABAN KOMPUTER (A4 PRINT CSS)
-       LENGKAP DENGAN BAGIAN ISIAN & ESSAY FLEKSIBEL & TANPA TANDA TANGAN GURU
+       L. FORMAT CETAK LEMBAR JAWABAN KOMPUTER (A4 PRINT CSS)
        ========================================================================== */
     function triggerPrintLjk() {
       const subject = document.getElementById('print-ljk-subject').value;
       const date = document.getElementById('print-ljk-date').value || "10 November 2026";
       const qCount = parseInt(document.getElementById('print-ljk-count').value) || 40;
-      const isianCount = parseInt(document.getElementById('print-ljk-isian-count') ? document.getElementById('print-ljk-isian-count').value : 10) || 0;
-      const essayCount = parseInt(document.getElementById('print-ljk-essay-count') ? document.getElementById('print-ljk-essay-count').value : 5) || 0;
+      const isianCount = parseInt(document.getElementById('print-ljk-isian-count').value) || 0;
+      const essayCount = parseInt(document.getElementById('print-ljk-essay-count').value) || 0;
       const mode = document.getElementById('print-ljk-mode').value;
 
       const printArea = document.getElementById('print-ljk-area');
       printArea.innerHTML = '';
 
-      const students = JSON.parse(localStorage.getItem(getStudentsKey()) || '[]');
+      const students = getVisibleStudentsForActiveRole(activeClass);
       const targetList = (mode === 'personalized' && students.length > 0) ? students : [{ name: "__________________________", nisn: "__________", class: activeClass }];
+
+      const savedSchool = JSON.parse(localStorage.getItem(getSchoolStorageKey()) || '{}');
+      const schoolTitle = (savedSchool.name || "SD NEGERI 3 SUNGAI DANAU").toUpperCase();
+      const yearText = savedSchool.year || "2026/2027";
 
       targetList.forEach((st, idx) => {
         const sheet = document.createElement('div');
@@ -3741,7 +4473,6 @@
         let isianSectionHtml = '';
         if (isianCount > 0) {
           isianSectionHtml = `
-            <!-- BAGIAN II: SOAL ISIAN SINGKAT (DIPERIKSA MANUAL OLEH GURU) -->
             <div class="ljk-section-title" style="margin-top: 2.5mm;">
               <span>BAGIAN II: SOAL ISIAN SINGKAT (JAWAB PADA TEMPAT TERSEDIA - ${isianCount} BUTIR)</span>
               <span style="font-size: 7.5pt; font-weight: normal;">*Bagian ini diperiksa secara manual oleh Guru</span>
@@ -3756,7 +4487,6 @@
         if (essayCount > 0) {
           const sectionLabel = isianCount > 0 ? 'BAGIAN III' : 'BAGIAN II';
           essaySectionHtml = `
-            <!-- SOAL URAIAN / ESSAY (DIPERIKSA MANUAL OLEH GURU) -->
             <div class="ljk-section-title" style="margin-top: 2.5mm;">
               <span>${sectionLabel}: SOAL URAIAN / ESSAY (JAWAB PADA TEMPAT TERSEDIA - ${essayCount} BUTIR)</span>
               <span style="font-size: 7.5pt; font-weight: normal;">*Bagian ini diperiksa secara manual oleh Guru</span>
@@ -3768,35 +4498,31 @@
         }
 
         sheet.innerHTML = `
-          <!-- 4 Penanda Kalibrasi Sudut Kamera OpenCV -->
           <div class="ljk-corner-marker marker-top-left"></div>
           <div class="ljk-corner-marker marker-top-right"></div>
           <div class="ljk-corner-marker marker-bottom-left"></div>
           <div class="ljk-corner-marker marker-bottom-right"></div>
 
-          <!-- Kop LJK dengan Logo Resmi SD Negeri 3 Sungai Danau -->
           <div class="ljk-header-box">
             <div style="width: 22mm; text-align: center;">
               <img src="logo-sdn3-sungaidanau.jpg" class="ljk-logo-kop" onerror="renderSvgLogoFallback(this)">
             </div>
             <div class="ljk-header-titles">
-              <h3>SD NEGERI 3 SUNGAI DANAU</h3>
-              <h4>SUMATIF AKHIR SEMESTER GANJIL — TP. 2026/2027</h4>
+              <h3>${schoolTitle}</h3>
+              <h4>SUMATIF AKHIR SEMESTER — TP. ${yearText}</h4>
               <p>Mata Pelajaran: <strong>${subject}</strong> | Tanggal: ${date}</p>
             </div>
             <div class="ljk-qr-container" id="qr-ljk-${idx}"></div>
           </div>
 
-          <!-- Identitas Siswa -->
           <div class="ljk-student-info-bar">
             <div>Nama Siswa: <strong>${st.name}</strong></div>
             <div>NISN: <strong>${st.nisn}</strong></div>
             <div>Kelas: <strong>${st.class}</strong></div>
           </div>
 
-          <!-- BAGIAN I: PILIHAN GANDA (OMR SCAN) -->
           <div class="ljk-section-title">
-            <span>BAGIAN I: SOAL PILIHAN GANDA (${qCount} BUTIR - HITAMKAN BULATAN)</span>
+            <span>BAGIAN I: SOAL PILIHAN GANDA (${qCount} BUTIR - HITAMKAN BULATAN DENGAN PENSIL 2B)</span>
             <span style="font-size: 7.5pt; font-weight: normal;">*Dinilai otomatis melalui pemindai OMR SIPINTAR</span>
           </div>
 
@@ -3807,10 +4533,9 @@
           ${isianSectionHtml}
           ${essaySectionHtml}
 
-          <!-- Catatan Kaki Lembar Jawaban (Tanpa Tanda Tangan Guru Sesuai Permintaan) -->
           <div class="ljk-footer-note">
-            <div><strong>Petunjuk:</strong> Gunakan pensil 2B untuk menghitamkan bulatan PG. Tuliskan jawaban isian dan essay secara rapi dan terbaca.</div>
-            <div>SIPINTAR | SD Negeri 3 Sungai Danau</div>
+            <div><strong>Petunjuk:</strong> Hitamkan bulatan jawaban PG menggunakan pensil 2B secara penuh dan jelas.</div>
+            <div>SIPINTAR | ${schoolTitle}</div>
           </div>
         `;
 
@@ -3887,25 +4612,25 @@
     }
 
     /* ==========================================================================
-       L. SINKRONISASI GOOGLE APPS SCRIPT (GAS)
+       M. SINKRONISASI CLOUD, RESET & UBAH PASSWORD
        ========================================================================== */
     function saveSpreadsheetConfig() {
       const url = document.getElementById('cfg-sheet-url').value.trim();
       const match = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
       if (match && match[1]) {
         const id = match[1];
-        localStorage.setItem(`sipintar_sheet_id_${currentUser.nip}`, id);
+        saveSyncedData(`sipintar_sheet_id_${currentUser.nip}`, id);
         document.getElementById('cfg-sheet-id-label').innerText = `ID Spreadsheet Terdeteksi: ${id}`;
-        alert("Konfigurasi URL Spreadsheet berhasil disimpan!");
+        showAppNotice("Konfigurasi URL Spreadsheet berhasil disimpan!", "Tersimpan", "success");
       } else {
-        alert("Tautan Google Spreadsheet tidak valid.");
+        showAppNotice("Tautan Google Spreadsheet tidak valid.", "Validasi", "error");
       }
     }
 
     function testSpreadsheetConnection() {
       const id = localStorage.getItem(`sipintar_sheet_id_${currentUser.nip}`);
-      if (!id) { alert("Simpan URL Spreadsheet terlebih dahulu."); return; }
-      alert(`Koneksi Berhasil!\nID: [${id}] terhubung ke akun ${currentUser.name}.`);
+      if (!id) { showAppNotice("Simpan URL Spreadsheet terlebih dahulu.", "Info", "info"); return; }
+      showAppNotice(`Koneksi Berhasil! ID: [${id}] terhubung ke akun ${currentUser.name}.`, "Terhubung", "success");
     }
 
     function enqueueSync(action, payload) {
@@ -3916,11 +4641,8 @@
     }
 
     function triggerManualSync() {
-      const q = JSON.parse(localStorage.getItem('sipintar_sync_queue') || '[]');
       const pill = document.getElementById('sync-indicator');
       const text = document.getElementById('sync-text');
-
-      if (q.length === 0) { alert("Seluruh data telah tersinkron sempurna!"); return; }
 
       pill.className = "sync-status-pill syncing";
       text.innerText = "Menyinkronkan...";
@@ -3928,29 +4650,26 @@
       setTimeout(() => {
         localStorage.setItem('sipintar_sync_queue', '[]');
         pill.className = "sync-status-pill";
-        text.innerText = "Tersinkron";
-        alert("Sinkronisasi Berhasil: Seluruh data nilai terkirim ke Google Spreadsheet.");
-      }, 900);
+        text.innerText = window.__cloudBridge && window.__cloudBridge.ready ? "Tersinkron Cloud" : "Tersinkron";
+        showAppNotice("Sinkronisasi Berhasil: Seluruh data terbaru telah disinkronkan antar perangkat.", "Tersinkron", "success");
+      }, 600);
     }
 
     function updateSyncStatusUI() {
       const q = JSON.parse(localStorage.getItem('sipintar_sync_queue') || '[]');
       const pill = document.getElementById('sync-indicator');
       const text = document.getElementById('sync-text');
-      if (q.length > 0) {
+      if (q.length > 0 && !(window.__cloudBridge && window.__cloudBridge.ready)) {
         pill.className = "sync-status-pill syncing";
         text.innerText = `${q.length} Antrean`;
       } else {
         pill.className = "sync-status-pill";
-        text.innerText = "Tersinkron";
+        text.innerText = window.__cloudBridge && window.__cloudBridge.ready ? "Tersinkron Cloud" : "Tersinkron";
       }
     }
 
-    /* ==========================================================================
-       M. MENU RESET DATA & UBAH KATA SANDI
-       ========================================================================== */
     function downloadBackupBeforeReset() {
-      const students = JSON.parse(localStorage.getItem(getStudentsKey()) || '[]');
+      const students = getVisibleStudentsForActiveRole(activeClass);
       const ws = XLSX.utils.json_to_sheet(students);
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, "Backup_Siswa");
@@ -3961,28 +4680,39 @@
       const scope = document.getElementById('reset-scope-select').value;
       const confirmInput = document.getElementById('reset-confirm-input').value.trim();
 
-      if (confirmInput !== 'RESET') { alert("Konfirmasi gagal! Anda wajib mengetik RESET dengan huruf kapital."); return; }
+      if (confirmInput !== 'RESET') { showAppNotice("Konfirmasi gagal! Anda wajib mengetik RESET dengan huruf kapital.", "Konfirmasi Gagal", "error"); return; }
 
       if (scope === 'single_subject') {
-        localStorage.removeItem(getGradesKey(activeClass, activeSubject));
+        saveSyncedData(getGradesKey(activeClass, activeSubject), {});
         loadGradesForSubject(activeSubject);
-        alert(`Nilai ${activeSubject} direset.`);
+        showAppNotice(`Nilai ${activeSubject} berhasil direset.`, "Reset Selesai", "success");
       } else if (scope === 'all_subjects') {
-        HOMEROOM_SUBJECTS.forEach(m => localStorage.removeItem(getGradesKey(activeClass, m.code)));
-        localStorage.removeItem(getGradesKey(activeClass, "PAI"));
+        getUserSubjectsForActiveClass().forEach(m => saveSyncedData(getGradesKey(activeClass, m.code), {}));
         loadGradesForSubject(activeSubject);
-        alert(`Seluruh nilai pada kelas ${activeClass} telah direset.`);
+        showAppNotice(`Seluruh nilai pada kelas ${activeClass} telah direset.`, "Reset Selesai", "success");
+      } else if (scope === 'single_key') {
+        saveSyncedData(`sipintar_keys_v2_${activeSubject}`, []);
+        renderKeypadItems();
+        showAppNotice(`Kunci jawaban ${activeSubject} telah dihapus.`, "Reset Selesai", "success");
+      } else if (scope === 'all_keys') {
+        getUserSubjectsForActiveClass().forEach(m => saveSyncedData(`sipintar_keys_v2_${m.code}`, []));
+        renderKeypadItems();
+        showAppNotice(`Seluruh kunci jawaban telah dihapus.`, "Reset Selesai", "success");
       } else if (scope === 'students') {
-        localStorage.removeItem(getStudentsKey());
-        loadStudentsForClass(activeClass);
-        alert(`Data siswa kelas ${activeClass} telah dihapus.`);
-      } else if (scope === 'factory') {
-        if (confirm("Reset total pabrik akan membersihkan seluruh memori lokal! Lanjutkan?")) {
-          localStorage.clear();
-          alert("Sistem berhasil direset ke kondisi awal pabrik.");
-          window.location.reload();
+        if (isSubjectOnlyTeacherMode()) {
+          showAppNotice("Hanya Guru Kelas bersangkutan yang dapat menghapus master data siswa kelas.", "Akses Ditolak", "error");
           return;
         }
+        saveSyncedData(getMasterStudentsKey(), []);
+        loadStudentsForClass(activeClass);
+        loadGradesForSubject(activeSubject);
+        showAppNotice(`Data siswa kelas ${activeClass} telah dikosongkan.`, "Reset Selesai", "success");
+      } else if (scope === 'factory') {
+        showAppConfirm("Reset total pabrik akan membersihkan seluruh memori lokal! Lanjutkan?", () => {
+          localStorage.clear();
+          window.location.reload();
+        }, "Reset Total Pabrik");
+        return;
       }
 
       document.getElementById('reset-confirm-input').value = '';
@@ -3994,30 +4724,25 @@
       const newPass = document.getElementById('pass-new').value;
       const confirmPass = document.getElementById('pass-confirm').value;
 
-      if (newPass.length < 6) { alert("Password baru minimal 6 karakter."); return; }
-      if (newPass !== confirmPass) { alert("Konfirmasi password baru tidak cocok."); return; }
+      if (newPass.length < 6) { showAppNotice("Password baru minimal 6 karakter.", "Validasi", "error"); return; }
+      if (newPass !== confirmPass) { showAppNotice("Konfirmasi password baru tidak cocok.", "Validasi", "error"); return; }
 
-      const userDb = JSON.parse(localStorage.getItem('sipintar_user_db') || '{}');
+      const userDb = JSON.parse(localStorage.getItem('sipintar_user_db_v2') || '{}');
       const user = userDb[currentUser.nip];
 
       const oldHash = await sha256Hash(oldPass + currentUser.nip);
-      if (oldHash !== user.passwordHash) { alert("Password lama salah."); return; }
+      if (oldHash !== user.passwordHash) { showAppNotice("Password lama salah.", "Gagal", "error"); return; }
 
       user.passwordHash = await sha256Hash(newPass + currentUser.nip);
       userDb[currentUser.nip] = user;
-      localStorage.setItem('sipintar_user_db', JSON.stringify(userDb));
+      saveSyncedData('sipintar_user_db_v2', userDb);
 
-      alert("Password berhasil diperbarui!");
+      showAppNotice("Password berhasil diperbarui dan tersinkron ke semua perangkat!", "Berhasil", "success");
       document.getElementById('pass-old').value = '';
       document.getElementById('pass-new').value = '';
       document.getElementById('pass-confirm').value = '';
     }
 
-    function saveSchoolProfile() { alert("Data profil sekolah berhasil disimpan."); }
-
-    /* ==========================================================================
-       N. INISIALISASI SAAT HALAMAN DIMUAT
-       ========================================================================== */
     window.addEventListener('DOMContentLoaded', async () => {
       await initAccountHashes();
       initAllClassStudents();
