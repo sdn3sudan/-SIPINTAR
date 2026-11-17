@@ -339,6 +339,19 @@
       .btn-act { padding: 10px 14px; }
       .sync-status-pill span { display: none; }
     }
+
+    /* ===== Tambahan: peringatan kelengkapan data, Database Cloud admin ===== */
+    #modal-ready { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.72); z-index: 320; align-items: center; justify-content: center; }
+    #modal-ready .box { background: #0A1F6B; border: 1.5px solid var(--warning); border-radius: 20px; width: 92%; max-width: 520px; padding: 22px; max-height: 92vh; overflow-y: auto; }
+    #modal-ready h3 { font-size: 1.15rem; margin-bottom: 10px; }
+    #modal-ready p { font-size: .88rem; line-height: 1.5; margin-bottom: 10px; }
+    .ready-block { background: rgba(255,255,255,.07); border: 1px solid var(--glass-border); border-radius: 12px; padding: 10px 12px; margin-bottom: 10px; font-size: .84rem; }
+    .ready-block b.t { display: block; margin-bottom: 6px; color: var(--gold-light); }
+    .ready-chip { display: inline-block; background: rgba(255,165,2,.18); border: 1px solid var(--warning); border-radius: 999px; padding: 2px 9px; margin: 2px 3px 2px 0; font-size: .74rem; }
+    #ljk-ready-banner .info-box { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    #ljk-ready-banner .info-box span { flex: 1; min-width: 200px; }
+    .gas-code { width: 100%; min-height: 280px; max-height: 420px; font: 12px/1.45 ui-monospace, Consolas, Menlo, monospace; background: rgba(0,0,0,.35); color: #DDE8FF; border: 1px solid var(--glass-border); border-radius: 12px; padding: 12px; resize: vertical; white-space: pre; overflow: auto; }
+    .step-list { margin: 8px 0 0 18px; font-size: .84rem; line-height: 1.6; }
   </style>
   <script>
     function renderSvgLogoFallback(imgEl) {
@@ -433,6 +446,7 @@
           <li data-tab="tab-ljk"><a href="javascript:void(0)" onclick="switchTab('tab-ljk')"><i class="fa-solid fa-camera"></i><span>Lembar Jawaban Komputer</span></a></li>
           <li data-tab="tab-reset"><a href="javascript:void(0)" onclick="switchTab('tab-reset')"><i class="fa-solid fa-arrows-rotate"></i><span>Reset</span></a></li>
           <li data-tab="tab-pengaturan"><a href="javascript:void(0)" onclick="switchTab('tab-pengaturan')"><i class="fa-solid fa-gear"></i><span>Pengaturan</span></a></li>
+          <li data-tab="tab-cloud" id="menu-cloud" style="display:none;"><a href="javascript:void(0)" onclick="switchTab('tab-cloud')"><i class="fa-solid fa-database"></i><span>Database Cloud</span></a></li>
         </ul>
       </div>
       <div class="sidebar-footer-badge">
@@ -606,6 +620,7 @@
 
         <!-- LJK -->
         <section id="tab-ljk" class="tab-section">
+          <div id="ljk-ready-banner"></div>
           <div class="sub-tabs-header">
             <button class="sub-tab-btn active" id="btn-subljk-scan" onclick="switchLjkSubTab('scan')"><i class="fa-solid fa-camera"></i> 3. Scan LJK</button>
             <button class="sub-tab-btn" id="btn-subljk-kunci" onclick="switchLjkSubTab('kunci')"><i class="fa-solid fa-key"></i> 2. Kunci Jawaban</button>
@@ -672,7 +687,7 @@
                 <div class="ans-grid" id="scan-ans-grid"></div>
                 <div style="text-align:center;margin-bottom:14px;">
                   <div style="font-size:.78rem;color:var(--text-sub);margin-bottom:4px;">Pratinjau area pilihan ganda (hijau benar, merah salah, kuning kunci yang terlewat):</div>
-                  <canvas id="dewarped-canvas" width="696" height="272" style="max-width:100%;border-radius:12px;border:1px solid var(--glass-border);background:#000;"></canvas>
+                  <canvas id="dewarped-canvas" width="696" height="272" style="max-width:100%;height:auto;border-radius:12px;border:1px solid var(--glass-border);background:#000;"></canvas>
                 </div>
                 <div style="display:flex;gap:10px;">
                   <button class="btn-act success" style="flex:1;justify-content:center;" onclick="saveScanResultToGradebook()"><i class="fa-solid fa-floppy-disk"></i> Simpan Nilai</button>
@@ -716,12 +731,13 @@
                 </div>
                 <div class="form-control-box"><label>Jumlah Soal Pilihan Ganda (5–40)</label><input type="number" id="print-ljk-count" min="5" max="40" value="40"></div>
                 <div class="form-control-box"><label>Jumlah Soal Isian Singkat</label>
-                  <select id="print-ljk-isian-count"><option value="0">0 (tidak ada)</option><option value="5">5</option><option value="10" selected>10</option><option value="15">15</option><option value="20">20</option></select>
+                  <select id="print-ljk-isian-count" onchange="updatePrintLayoutNote()"><option value="0">0 (tidak ada)</option><option value="5">5</option><option value="10" selected>10</option><option value="15">15</option><option value="20">20</option></select>
                 </div>
                 <div class="form-control-box"><label>Jumlah Soal Uraian / Essay</label>
-                  <select id="print-ljk-essay-count"><option value="0">0 (tidak ada)</option><option value="3">3</option><option value="5" selected>5</option><option value="8">8</option><option value="10">10</option></select>
+                  <select id="print-ljk-essay-count" onchange="updatePrintLayoutNote()"><option value="0">0 (tidak ada)</option><option value="3">3</option><option value="5" selected>5</option><option value="8">8</option><option value="10">10</option></select>
                 </div>
               </div>
+              <div class="info-box" id="print-layout-note"></div>
               <div class="info-box">
                 <i class="fa-solid fa-circle-info"></i> Cetak skala <b>100%</b> (jangan “fit to page”), kertas A4, warna hitam penuh. Bagian I dibaca otomatis lewat 4 kotak hitam di sudut dan QR siswa; Bagian II (isian) dan III (essay) diperiksa guru lalu nilainya dimasukkan manual. Siswa mengisi bulatan dengan pensil 2B secara penuh.
               </div>
@@ -753,23 +769,252 @@
           </div>
         </section>
 
-        <!-- PENGATURAN -->
-        <section id="tab-pengaturan" class="tab-section">
+        <!-- DATABASE CLOUD (khusus admin) -->
+        <section id="tab-cloud" class="tab-section">
           <div class="module-card">
             <div class="module-title-bar">
-              <h2><i class="fa-solid fa-database" style="color:var(--success);"></i> Database Cloud (Google Sheet)</h2>
+              <h2><i class="fa-solid fa-database" style="color:var(--success);"></i> Database Cloud (Apps Script) — Admin</h2>
               <div class="action-btn-group">
                 <button class="btn-act success" onclick="testCloudConnection()"><i class="fa-solid fa-plug"></i> Tes Koneksi</button>
                 <button class="btn-act primary" onclick="saveCloudConfig()"><i class="fa-solid fa-floppy-disk"></i> Simpan</button>
                 <button class="btn-act gold" onclick="syncNow(true)"><i class="fa-solid fa-rotate"></i> Sinkronkan</button>
               </div>
             </div>
+            <div class="info-box"><i class="fa-solid fa-lock"></i> Menu ini hanya tampil untuk akun admin. Tautan deploy sudah tertanam di file ini sehingga semua guru otomatis terhubung tanpa mengisi apa pun.</div>
             <div class="form-grid-2">
               <div class="form-control-box"><label>URL Web App (Apps Script)</label><input type="url" id="cfg-cloud-url" placeholder="https://script.google.com/macros/s/.../exec"></div>
               <div class="form-control-box"><label>Token Rahasia</label><input type="text" id="cfg-cloud-token" placeholder="Sama dengan TOKEN di Code.gs" autocomplete="off"></div>
             </div>
             <div id="cloud-status-box" style="font-size:.85rem;color:var(--gold-light);"></div>
-            <div class="info-box" style="margin-top:12px;margin-bottom:0;"><i class="fa-solid fa-circle-info"></i> Isi sekali saja. Agar semua guru otomatis terhubung tanpa mengisi di tiap HP, tempel URL dan token pada konstanta <code>DEFAULT_CLOUD_URL</code> dan <code>DEFAULT_CLOUD_TOKEN</code> di bagian atas skrip file ini. Panduan pemasangan ada di komentar <code>Code.gs</code>.</div>
+            <div style="margin-top:10px;"><button class="btn-act glass" onclick="resetCloudConfig()"><i class="fa-solid fa-rotate-left"></i> Pulihkan URL &amp; token bawaan file</button></div>
+          </div>
+
+          <div class="module-card">
+            <div class="module-title-bar">
+              <h2><i class="fa-solid fa-code" style="color:var(--gold-accent);"></i> Kode Apps Script (Code.gs)</h2>
+              <div class="action-btn-group"><button class="btn-act gold" onclick="copyGasCode()"><i class="fa-solid fa-copy"></i> Salin Kode</button></div>
+            </div>
+            <div class="info-box">
+              <i class="fa-solid fa-circle-info"></i> Kode di bawah adalah satu-satunya kode server yang dibutuhkan, disimpan di dalam file ini. Pasang/perbarui dengan langkah:
+              <ol class="step-list">
+                <li>Buka <b>script.google.com</b> &rarr; buka proyek yang dipakai (atau buat proyek baru).</li>
+                <li>Hapus isi <b>Code.gs</b>, tempel kode ini (tombol Salin Kode), lalu <b>Simpan</b>.</li>
+                <li><b>Deploy &rarr; Kelola deployment &rarr; ikon pensil &rarr; Versi: Versi baru &rarr; Deploy</b> (URL tidak berubah). Untuk deploy baru: jenis <b>Aplikasi Web</b>, jalankan sebagai <b>Saya</b>, akses <b>Siapa saja</b>, lalu tempel URL <code>/exec</code> ke konstanta <code>DEFAULT_CLOUD_URL</code> di file ini.</li>
+                <li>Setujui izin akses Spreadsheet saat diminta. Guru yang mengisi link spreadsheet harus membagikan sheet-nya (Editor) ke akun pemilik script ini.</li>
+              </ol>
+            </div>
+            <textarea id="gas-code-view" class="gas-code" readonly spellcheck="false"></textarea>
+            <script type="text/plain" id="gas-code">
+/**
+ * SIPINTAR - Database Cloud (Google Apps Script)
+ * SD Negeri 3 Sungai Danau
+ *
+ * Fungsi:
+ *  1) Menyimpan & menyinkronkan data seluruh guru (siswa, nilai, kunci, profil sekolah) ke lembar "DB".
+ *  2) Mengekspor data ke SPREADSHEET MASING-MASING GURU (link diisi guru di menu Pengaturan).
+ *
+ * TOKEN di bawah HARUS sama dengan DEFAULT_CLOUD_TOKEN di file index.html.
+ */
+var TOKEN = 'SIPINTAR-SDN3-2026-Bungas';
+var DB_SHEET = 'DB';
+var CHUNK = 45000;          // batas aman karakter per sel (maks. Google Sheets 50.000)
+var MAX_EXPORT_SHEETS = 40;
+var MAX_EXPORT_ROWS = 6000;
+
+function doGet() {
+  return out_({ ok: true, message: 'SIPINTAR cloud aktif', time: Date.now() });
+}
+
+function doPost(e) {
+  try {
+    var req = JSON.parse(e.postData.contents);
+    if (req.token !== TOKEN) return out_({ ok: false, error: 'Token salah' });
+    switch (req.action) {
+      case 'ping':
+        return out_({ ok: true, message: 'Server aktif', owner: owner_(), serverTime: Date.now() });
+      case 'get':
+        return out_(actGet_(req));
+      case 'sync':
+        return out_(actSync_(req));
+      case 'exportSheet':
+        return out_(actExport_(req));
+      default:
+        return out_({ ok: false, error: 'Aksi tidak dikenal: ' + req.action });
+    }
+  } catch (err) {
+    return out_({ ok: false, error: String(err && err.message ? err.message : err) });
+  }
+}
+
+function out_(obj) {
+  return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
+}
+
+function owner_() {
+  try { return Session.getEffectiveUser().getEmail() || ''; } catch (e) { return ''; }
+}
+
+/* ---------------- Basis data (lembar "DB") ---------------- */
+function getDb_() {
+  var props = PropertiesService.getScriptProperties();
+  var id = props.getProperty('DB_ID'), ss;
+  if (id) {
+    ss = SpreadsheetApp.openById(id);
+  } else {
+    ss = SpreadsheetApp.getActiveSpreadsheet();
+    if (!ss) ss = SpreadsheetApp.create('SIPINTAR Database');
+    props.setProperty('DB_ID', ss.getId());
+  }
+  var sh = ss.getSheetByName(DB_SHEET);
+  if (!sh) sh = ss.insertSheet(DB_SHEET);
+  if (sh.getLastRow() === 0) sh.appendRow(['key', 'mode', 'ts', 'updated', 'value (dipecah per sel)']);
+  return sh;
+}
+
+// Muat seluruh baris: { key: { row, mode, ts, updated, value } }
+function loadAll_(sh) {
+  var map = {}, last = sh.getLastRow();
+  if (last < 2) return map;
+  var vals = sh.getRange(2, 1, last - 1, sh.getLastColumn()).getValues();
+  for (var i = 0; i < vals.length; i++) {
+    var r = vals[i], key = String(r[0]);
+    if (!key) continue;
+    var json = '';
+    for (var c = 4; c < r.length; c++) if (r[c] !== '' && r[c] !== null) json += String(r[c]);
+    var value = null;
+    try { value = json ? JSON.parse(json) : null; } catch (e) { value = null; }
+    map[key] = { row: i + 2, mode: String(r[1] || 'lww'), ts: Number(r[2]) || 0, updated: Number(r[3]) || 0, value: value };
+  }
+  return map;
+}
+
+function writeRow_(sh, existing, key, mode, ts, value, now) {
+  var json = JSON.stringify(value === undefined ? null : value), chunks = [], i;
+  for (i = 0; i < json.length; i += CHUNK) chunks.push(json.substr(i, CHUNK));
+  if (!chunks.length) chunks.push('null');
+  var row = [key, mode, ts, now].concat(chunks);
+  var rowNum = existing ? existing.row : sh.getLastRow() + 1;
+  if (sh.getMaxColumns() < row.length) sh.insertColumnsAfter(sh.getMaxColumns(), row.length - sh.getMaxColumns());
+  if (existing) sh.getRange(rowNum, 5, 1, sh.getMaxColumns() - 4).clearContent();
+  var rg = sh.getRange(rowNum, 1, 1, row.length);
+  rg.setNumberFormat('@');         // simpan sebagai teks agar angka/JSON tidak diubah Sheets
+  rg.setValues([row]);
+  return rowNum;
+}
+
+function mergeMaps_(a, b) {
+  var r = {}, k;
+  a = a || {}; b = b || {};
+  for (k in a) r[k] = a[k];
+  for (k in b) if (!r[k] || (b[k] && (b[k].ts || 0) > (r[k].ts || 0))) r[k] = b[k];
+  return r;
+}
+
+// Data pribadi guru lain tidak dikirim ke perangkat lain
+function visibleTo_(key, nip) {
+  var priv = ['pw:', 'school:', 'sheet:'];
+  for (var i = 0; i < priv.length; i++) if (key.indexOf(priv[i]) === 0) return key === priv[i] + nip;
+  return true;
+}
+
+function actGet_(req) {
+  var sh = getDb_(), all = loadAll_(sh), rows = [];
+  (req.keys || []).forEach(function (k) {
+    var r = all[k];
+    if (r) rows.push({ key: k, value: r.value, ts: r.ts, mode: r.mode });
+  });
+  return { ok: true, rows: rows, serverTime: Date.now() };
+}
+
+function actSync_(req) {
+  var lock = LockService.getScriptLock();
+  lock.waitLock(25000);
+  try {
+    var sh = getDb_(), all = loadAll_(sh), now = Date.now(), nip = String(req.nip || ''), since = Number(req.since) || 0;
+    (req.items || []).forEach(function (it) {
+      if (!it || !it.key) return;
+      var ex = all[it.key], mode = it.mode === 'map' ? 'map' : 'lww', ts = Number(it.ts) || now;
+      if (mode === 'map') {
+        var merged = mergeMaps_(ex ? ex.value : {}, it.value || {});
+        if (!ex || JSON.stringify(merged) !== JSON.stringify(ex.value)) {
+          var row = writeRow_(sh, ex, it.key, 'map', Math.max(ts, ex ? ex.ts : 0), merged, now);
+          all[it.key] = { row: row, mode: 'map', ts: Math.max(ts, ex ? ex.ts : 0), updated: now, value: merged };
+        }
+      } else if (!ex || ts > ex.ts) {
+        var row2 = writeRow_(sh, ex, it.key, 'lww', ts, it.value, now);
+        all[it.key] = { row: row2, mode: 'lww', ts: ts, updated: now, value: it.value };
+      }
+    });
+    var rows = [];
+    for (var k in all) {
+      if (all[k].updated > since && visibleTo_(k, nip)) rows.push({ key: k, value: all[k].value, ts: all[k].ts, mode: all[k].mode });
+    }
+    return { ok: true, rows: rows, serverTime: now };
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+/* ---------------- Ekspor ke spreadsheet milik guru ---------------- */
+function actExport_(req) {
+  var id = String(req.sheetId || '');
+  if (!/^[A-Za-z0-9_-]{20,}$/.test(id)) return { ok: false, error: 'ID spreadsheet tidak valid' };
+  var ss;
+  try {
+    ss = SpreadsheetApp.openById(id);
+  } catch (e) {
+    return { ok: false, code: 'noaccess', owner: owner_(), error: 'Spreadsheet tidak bisa dibuka. Bagikan spreadsheet sebagai Editor ke ' + (owner_() || 'akun pemilik Apps Script') };
+  }
+  var sheets = req.sheets || [], done = [];
+  if (sheets.length > MAX_EXPORT_SHEETS) return { ok: false, error: 'Terlalu banyak lembar' };
+  sheets.forEach(function (s) {
+    var name = String(s.name || 'Data').replace(/[\[\]\*\?\/\\:]/g, ' ').substr(0, 90).trim() || 'Data';
+    var rows = (s.rows || []).slice(0, MAX_EXPORT_ROWS);
+    var sh = ss.getSheetByName(name) || ss.insertSheet(name);
+    sh.clearContents();
+    if (!rows.length) return;
+    var width = 1, i, j;
+    for (i = 0; i < rows.length; i++) if (rows[i].length > width) width = rows[i].length;
+    var grid = [];
+    for (i = 0; i < rows.length; i++) {
+      var line = [];
+      for (j = 0; j < width; j++) { var v = rows[i][j]; line.push(v === undefined || v === null ? '' : v); }
+      grid.push(line);
+    }
+    // Kolom identitas (NISN/NIP) dipaksa teks agar angka 0 di depan tidak hilang; kolom nilai tetap angka
+    (s.textCols || []).forEach(function (c) { sh.getRange(1, Number(c) + 1, grid.length, 1).setNumberFormat('@'); });
+    sh.getRange(1, 1, grid.length, width).setValues(grid);
+    sh.setFrozenRows(1);
+    done.push(name);
+  });
+  return { ok: true, sheets: done, url: ss.getUrl(), serverTime: Date.now() };
+}
+</script>
+          </div>
+        </section>
+
+        <!-- PENGATURAN -->
+        <section id="tab-pengaturan" class="tab-section">
+          <div class="module-card">
+            <div class="module-title-bar">
+              <h2><i class="fa-solid fa-table" style="color:var(--success);"></i> Spreadsheet Saya (Google Sheets)</h2>
+              <div class="action-btn-group">
+                <button class="btn-act primary" onclick="saveSheetLink()"><i class="fa-solid fa-floppy-disk"></i> Simpan Link</button>
+                <button class="btn-act success" onclick="exportToMySheet()"><i class="fa-solid fa-cloud-arrow-up"></i> Kirim Data</button>
+                <button class="btn-act glass" onclick="openMySheet()"><i class="fa-solid fa-arrow-up-right-from-square"></i> Buka</button>
+              </div>
+            </div>
+            <div class="form-control-box"><label>Link Spreadsheet Google Anda</label><input type="url" id="cfg-sheet-url" placeholder="https://docs.google.com/spreadsheets/d/.../edit" autocomplete="off"></div>
+            <div id="sheet-status-box" style="font-size:.85rem;color:var(--gold-light);"></div>
+            <div class="info-box" style="margin-top:12px;margin-bottom:0;">
+              <i class="fa-solid fa-circle-info"></i> Setiap guru memakai spreadsheet sendiri. Cara pakai:
+              <ol class="step-list">
+                <li>Buat spreadsheet kosong di Google Drive Anda.</li>
+                <li>Klik <b>Bagikan</b>, tambahkan akun <b id="sheet-share-email">(akun pemilik database — tanyakan admin)</b> sebagai <b>Editor</b>.</li>
+                <li>Tempel link spreadsheet di atas, klik <b>Simpan Link</b>, lalu <b>Kirim Data</b>.</li>
+              </ol>
+              <div style="margin-top:6px;">Yang dikirim: Data Sekolah, Siswa, Nilai, dan Rekap sesuai kelas &amp; mapel Anda. Link tersimpan di akun Anda sehingga ikut ke perangkat lain.</div>
+            </div>
           </div>
 
           <div class="module-card">
@@ -821,6 +1066,14 @@
     </div>
   </div>
 
+  <div id="modal-ready">
+    <div class="box">
+      <h3 id="ready-title"><i class="fa-solid fa-triangle-exclamation" style="color:var(--warning);"></i> Data Belum Lengkap</h3>
+      <div id="ready-body"></div>
+      <div id="ready-actions" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;"></div>
+    </div>
+  </div>
+
   <!-- ===================================================================
        MESIN OMR (murni fungsi, tanpa DOM — juga dipakai untuk uji simulasi)
        =================================================================== -->
@@ -830,9 +1083,18 @@
       MARK: [[14,14],[196,14],[196,283],[14,283]],   // pusat 4 kotak hitam: KA-atas, KN-atas, KN-bawah, KA-bawah (searah jarum jam)
       X0: 20, COLW: 42.5, BX0: 11, BPITCH: 8, Y0: 58, PITCH: 6, R: 2.3, RING: 2.125
     };
-    function bubbleXY(q, o) {
-      var c = (q / 10) | 0, r = q % 10;
-      return [OMR.X0 + c * OMR.COLW + OMR.BX0 + o * OMR.BPITCH, OMR.Y0 + r * OMR.PITCH];
+    // Tata letak kolom jawaban. 'C' = ringkas (ada isian/essay di bawahnya, 4 kolom x 10 baris).
+    // 'F' = penuh (tanpa isian/essay: 2 kolom, jarak antarbaris diperbesar agar kertas terpakai penuh). Ukuran bulatan TIDAK berubah.
+    function ljkLayout(q, full) {
+      if (!full) return { id: 'C', cols: 4, rows: 10, x0: OMR.X0, colw: OMR.COLW, bx0: OMR.BX0, bp: OMR.BPITCH, y0: OMR.Y0, pitch: OMR.PITCH, boxW: 41, boxH: 65.5 };
+      var rows = Math.max(1, Math.ceil(q / 2)), pitch = rows > 1 ? Math.min(10.5, 212 / (rows - 1)) : 10.5;
+      return { id: 'F', cols: 2, rows: rows, x0: 20, colw: 85, bx0: 24, bp: 14, y0: 58, pitch: pitch, boxW: 83, boxH: (rows - 1) * pitch + 15 };
+    }
+    var LAY_C = ljkLayout(40, false);
+    function bubbleXY(q, o, L) {
+      L = L || LAY_C;
+      var c = (q / L.rows) | 0, r = q % L.rows;
+      return [L.x0 + c * L.colw + L.bx0 + o * L.bp, L.y0 + r * L.pitch];
     }
     var DISC = [], ANN = [], RINGP = [];
     (function () {
@@ -966,10 +1228,10 @@
       return best && bs < 0.5 ? orderQuad(best) : null;
     }
     // skor kesejajaran: kontras cincin bulatan vs kertas di sekitarnya
-    function alignScore(g, W, Hh, H, nq) {
+    function alignScore(g, W, Hh, H, nq, L) {
       var tot = 0, n = 0, q, o, k, r, a, xy;
       for (q = 0; q < nq; q += 2) for (o = 0; o < 4; o++) {
-        xy = bubbleXY(q, o); r = 0; a = 0;
+        xy = bubbleXY(q, o, L); r = 0; a = 0;
         for (k = 0; k < RINGP.length; k++) r += sm(g, W, Hh, H, xy[0] + RINGP[k][0], xy[1] + RINGP[k][1]);
         r /= RINGP.length;
         for (k = 0; k < ANN.length; k += 2) a += sm(g, W, Hh, H, xy[0] + ANN[k][0], xy[1] + ANN[k][1]);
@@ -978,19 +1240,23 @@
       }
       return tot / n;
     }
-    // pilih orientasi (4 rotasi) terbaik
-    function omrLocate(g, W, Hh, qHint) {
+    // pilih orientasi (4 rotasi) dan tata letak ('C'/'F'; bila tidak diketahui dicoba keduanya) terbaik
+    function omrLocate(g, W, Hh, qHint, Lid) {
       var mk = findMarkers(g, W, Hh);
       if (!mk.quad) return { ok: false, count: mk.count };
-      var best = null, k, i, dst, H, sc;
+      var lays = Lid === 'F' ? [ljkLayout(qHint, true)] : Lid === 'C' ? [ljkLayout(qHint, false)] : [ljkLayout(qHint, false), ljkLayout(qHint, true)];
+      var best = null, rots = [], k, i, dst, H, sc;
       for (k = 0; k < 4; k++) {
         dst = [0, 1, 2, 3].map(function (z) { return mk.quad[(z + k) % 4]; });
         H = solveH(OMR.MARK, dst); if (!H) continue;
-        sc = alignScore(g, W, Hh, H, qHint);
-        if (!best || sc > best.score) best = { H: H, score: sc, k: k };
+        rots.push(H);
+        for (i = 0; i < lays.length; i++) {
+          sc = alignScore(g, W, Hh, H, qHint, lays[i]);
+          if (!best || sc > best.score) best = { H: H, score: sc, k: k, L: lays[i] };
+        }
       }
       if (!best) return { ok: false, count: 4 };
-      return { ok: true, H: best.H, quality: best.score, quad: mk.quad, count: mk.count, est: !!mk.est };
+      return { ok: true, H: best.H, quality: best.score, quad: mk.quad, count: mk.count, est: !!mk.est, layout: best.L, rots: rots };
     }
 
     function bubbleMeasure(g, W, Hh, H, cx, cy) {
@@ -1024,10 +1290,10 @@
       var base = Math.min(all.length ? all[all.length >> 1] : 0, 0.1);
       return fills.map(function (f) { return f.map(function (v) { return Math.max(0, v - base); }); });
     }
-    function readAll(g, W, Hh, H, q, thr) {
+    function readAll(g, W, Hh, H, q, thr, L) {
       var fills = [], i, o, f;
       for (i = 0; i < q; i++) {
-        f = []; for (o = 0; o < 4; o++) { var xy = bubbleXY(i, o); f.push(bubbleMeasure(g, W, Hh, H, xy[0], xy[1])); }
+        f = []; for (o = 0; o < 4; o++) { var xy = bubbleXY(i, o, L); f.push(bubbleMeasure(g, W, Hh, H, xy[0], xy[1])); }
         fills.push(f);
       }
       fills = normFills(fills);
@@ -1042,7 +1308,8 @@
 
     // ---------- Simulasi LJK sintetis (untuk uji akurasi) ----------
     function mulberry32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
-    function synthPage(W, Hh, q, seed, rotDeg) {
+    function synthPage(W, Hh, q, seed, rotDeg, L) {
+      L = L || LAY_C;
       var rnd = mulberry32(seed), truth = [], marks = [], i;
       for (i = 0; i < q; i++) {
         if (rnd() < 0.06) { truth.push('-'); marks.push(null); }
@@ -1059,10 +1326,10 @@
         else {
           val = 240;
           for (i = 0; i < 4; i++) if (Math.abs(u - OMR.MARK[i][0]) < 6 && Math.abs(v - OMR.MARK[i][1]) < 6) val = 22;
-          if (v > OMR.Y0 - 3.5 && v < OMR.Y0 + 9 * OMR.PITCH + 3.5 && u > OMR.X0 && u < OMR.X0 + 4 * OMR.COLW) {
-            var c = Math.floor((u - OMR.X0) / OMR.COLW), lx = u - OMR.X0 - c * OMR.COLW - OMR.BX0, o2 = Math.round(lx / OMR.BPITCH), r = Math.round((v - OMR.Y0) / OMR.PITCH);
-            if (o2 >= 0 && o2 < 4 && r >= 0 && r < 10 && c * 10 + r < q) {
-              var qq = c * 10 + r, bc = bubbleXY(qq, o2), dx = u - bc[0], dy = v - bc[1], d = Math.sqrt(dx * dx + dy * dy);
+          if (v > L.y0 - 3.5 && v < L.y0 + (L.rows - 1) * L.pitch + 3.5 && u > L.x0 && u < L.x0 + L.cols * L.colw) {
+            var c = Math.floor((u - L.x0) / L.colw), lx = u - L.x0 - c * L.colw - L.bx0, o2 = Math.round(lx / L.bp), r = Math.round((v - L.y0) / L.pitch);
+            if (o2 >= 0 && o2 < 4 && r >= 0 && r < L.rows && c * L.rows + r < q) {
+              var qq = c * L.rows + r, bc = bubbleXY(qq, o2, L), dx = u - bc[0], dy = v - bc[1], d = Math.sqrt(dx * dx + dy * dy);
               val = Math.min(val, 240 - 210 * Math.max(0, 1 - Math.abs(d - OMR.RING) / 0.3));
               var m = marks[qq];
               if (m && m.o === o2) {
@@ -1080,14 +1347,16 @@
       return { g: g, truth: truth };
     }
     function omrBenchmark(n, W, Hh, q, rot) {
-      var okB = 0, tot = 0, fail = 0, i, j, t0 = Date.now();
+      var okB = 0, tot = 0, fail = 0, i, j, t0 = Date.now(), byL = { C: [0, 0], F: [0, 0] }, wrongLayout = 0;
       for (i = 0; i < n; i++) {
-        var s = synthPage(W, Hh, q, 1000 + i * 37, rot), loc = omrLocate(s.g, W, Hh, q);
-        if (!loc.ok) { fail++; tot += q; continue; }
-        var rd = readAll(s.g, W, Hh, loc.H, q, sensToThr(6));
-        for (j = 0; j < q; j++) { tot++; if (rd.ans[j] === s.truth[j]) okB++; }
+        var full = i % 2 === 1, L = ljkLayout(q, full);
+        var s = synthPage(W, Hh, q, 1000 + i * 37, rot, L), loc = omrLocate(s.g, W, Hh, q);   // tata letak dideteksi otomatis
+        if (!loc.ok || (loc.est && loc.quality < 0.07)) { fail++; tot += q; byL[L.id][1] += q; continue; }
+        if (loc.layout.id !== L.id) wrongLayout++;
+        var rd = readAll(s.g, W, Hh, loc.H, q, sensToThr(6), loc.layout);
+        for (j = 0; j < q; j++) { tot++; byL[L.id][1]++; if (rd.ans[j] === s.truth[j]) { okB++; byL[L.id][0]++; } }
       }
-      return { sheets: n, failed: fail, correct: okB, total: tot, acc: tot ? okB / tot : 0, ms: Date.now() - t0 };
+      return { sheets: n, failed: fail, correct: okB, total: tot, acc: tot ? okB / tot : 0, ms: Date.now() - t0, byL: byL, wrongLayout: wrongLayout };
     }
   </script>
 
@@ -1095,9 +1364,9 @@
        LOGIKA APLIKASI
        =================================================================== -->
   <script>
-    /* ===== KONFIGURASI CLOUD (isi setelah deploy Code.gs agar semua perangkat otomatis terhubung) ===== */
+    /* ===== KONFIGURASI CLOUD — tertanam di file ini; hanya admin yang melihat/mengubahnya (menu Database Cloud) ===== */
     var DEFAULT_CLOUD_URL = 'https://script.google.com/macros/s/AKfycbxj34lHjD_PWRjl_SsyHWSj29wwsPQzRbHLQBY4sJ4wCPrHCIbQYifObhMZOkbaYnH8BA/exec';
-    var DEFAULT_CLOUD_TOKEN = 'SIPINTAR-2026'; // HARUS sama persis dengan TOKEN di Code.gs
+    var DEFAULT_CLOUD_TOKEN = 'SIPINTAR-SDN3-2026-Bungas'; // HARUS sama persis dengan TOKEN di Code.gs
 
     var $ = function (id) { return document.getElementById(id); };
     function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
@@ -1232,9 +1501,9 @@
       return changed;
     }
     function cloudCfg() {
-      var c = lsGet('cfg', null) || {};
-      var tk = String(c.token || '').trim(); if (/^https?:/i.test(tk)) tk = ''; // token keliru (berisi URL) diabaikan
-      return { url: String(c.url || DEFAULT_CLOUD_URL || '').trim(), token: tk || String(DEFAULT_CLOUD_TOKEN || '').trim() };
+      var c = lsGet('cfg', null) || {}, ov = c.override === true;   // konfigurasi lama (tanpa penanda admin) diabaikan
+      var tk = ov ? String(c.token || '').trim() : ''; if (/^https?:/i.test(tk)) tk = '';
+      return { url: String((ov && c.url) || DEFAULT_CLOUD_URL || '').trim(), token: tk || String(DEFAULT_CLOUD_TOKEN || '').trim() };
     }
     async function cloudCall(body, timeout) {
       var cfg = cloudCfg(); if (!cfg.url) throw new Error('nocfg');
@@ -1255,7 +1524,7 @@
       var box = $('cloud-status-box');
       if (box) { var ls = lsGet('lastSyncAt', 0); box.textContent = (cloudCfg().url ? 'Status: ' + map[st] : 'Status: belum terhubung (data hanya di perangkat ini)') + (ls ? ' • sinkron terakhir ' + new Date(ls).toLocaleTimeString('id-ID') : '') + ' • antrean ' + queueCount() + (syncErr ? ' • ' + syncErr : ''); }
     }
-    function onSyncPillClick() { if (!cloudCfg().url) { switchTab('tab-pengaturan'); toast('Isi URL database cloud dahulu.'); } else syncNow(true); }
+    function onSyncPillClick() { syncNow(true); }
     async function syncNow(manual) {
       if (syncing) return;
       if (!cloudCfg().url) { setSyncUI(); if (manual) toast('Database cloud belum diatur.', 'err'); return; }
@@ -1376,7 +1645,7 @@
         // Belum ada password kustom yang tersimpan di perangkat/cloud: pakai password bawaan.
         // Bila cloud gagal dihubungi, tetap boleh masuk dengan password bawaan (mode lokal) agar tidak terkunci.
         valid = inHash === await sha256Hash(DEFAULT_PASS + nip);
-        if (valid && st.cloudFailed) toast(st.cloudFailed === 'network' ? 'Masuk mode lokal: server database tidak terjangkau.' : 'Masuk mode lokal: database menolak (' + st.cloudFailed + '). Periksa URL/Token di Pengaturan.', 'err');
+        if (valid && st.cloudFailed) toast(st.cloudFailed === 'network' ? 'Masuk mode lokal: server database tidak terjangkau.' : 'Masuk mode lokal: database menolak (' + st.cloudFailed + '). Hubungi admin sekolah.', 'err');
       }
       if (!valid) {
         failedAttempts++;
@@ -1403,7 +1672,7 @@
       $('header-user-name').innerText = currentUser.name;
       fillClassOptions($('class-switcher'), allowedClasses(currentUser)); $('class-switcher').value = activeClass;
       var subs = getSubjectsFor(currentUser, activeClass); activeSubject = subs.length ? subs[0].code : '';
-      loadSchoolForm(); fillCloudForm(); refreshAll(); startClock(); startSyncLoop(); setSyncUI(); syncNow();
+      loadSchoolForm(); fillCloudForm(); fillSheetForm(); fillGasCode(); $('menu-cloud').style.display = currentUser.admin ? '' : 'none'; refreshAll(); startClock(); startSyncLoop(); setSyncUI(); syncNow();
       $('print-ljk-date').value = new Date().toISOString().slice(0, 10);
       if (currentUser.head) {
         ['tab-ljk', 'tab-reset'].forEach(function (t) { var li = document.querySelector('.sidebar-menu li[data-tab="' + t + '"]'); if (li) li.style.display = 'none'; });
@@ -1430,6 +1699,7 @@
       $('key-class-label').innerText = activeClass; $('stat-nilai-count').innerText = subs.length;
     }
     function switchTab(tabId) {
+      if (tabId === 'tab-cloud' && !(currentUser && currentUser.admin)) { toast('Menu ini khusus admin.', 'err'); return; }
       if (tabId !== 'tab-ljk') stopCamera();
       document.querySelectorAll('.tab-section').forEach(function (el) { el.classList.remove('active'); });
       document.querySelectorAll('.sidebar-menu li').forEach(function (el) { el.classList.remove('active'); });
@@ -1437,7 +1707,8 @@
       var li = document.querySelector('.sidebar-menu li[data-tab="' + tabId + '"]'); if (li) li.classList.add('active');
       $('app-sidebar').classList.remove('open'); $('drawer-backdrop').classList.remove('show'); $('user-dropdown-menu').classList.remove('show');
       if (tabId === 'tab-beranda') updateDashboard();
-      if (tabId === 'tab-pengaturan') setSyncUI();
+      if (tabId === 'tab-pengaturan') { setSyncUI(); refreshOwnerEmail(); }
+      if (tabId === 'tab-cloud') setSyncUI();
       window.scrollTo(0, 0);
     }
     function toggleSidebarDrawer() { $('app-sidebar').classList.toggle('open'); $('drawer-backdrop').classList.toggle('show'); }
@@ -1473,6 +1744,7 @@
     function openClassFromMonitor(cls) { $('class-switcher').value = cls; switchActiveClass(cls); switchTab('tab-nilai'); }
     function updateDashboard() {
       if (!currentUser) return;
+      updateReadyBanner();
       renderHeadMonitor();
       var cls = activeClass, subs = getSubjectsFor(currentUser, cls), scope = studentScope(cls);
       var all = getStudents(cls), vis = scope === 'islam' ? all.filter(isMuslim) : all;
@@ -1664,6 +1936,61 @@
       printHtml('<div class="rekap-print"><h3 style="text-align:center;margin-bottom:2mm;">' + esc($('rekap-title').innerText) + '</h3><p style="text-align:center;font-size:10pt;margin-bottom:5mm;">' + esc(sch.name || '') + (sch.year ? ' — TP. ' + esc(sch.year) : '') + '</p>' + $('table-recap').outerHTML + '<p style="margin-top:8mm;font-size:9pt;">Guru: ' + esc(currentUser.name) + '</p></div>');
     }
 
+
+    /* ==========================================================================
+       K0. PENJAGA KELENGKAPAN DATA (wajib sebelum cetak & scan LJK)
+       ========================================================================== */
+    var SCHOOL_LABELS = { name: 'Nama Sekolah', npsn: 'NPSN', street: 'Alamat Jalan', village: 'Desa / Kelurahan', district: 'Kecamatan', regency: 'Kabupaten', province: 'Provinsi', postal: 'Kode Pos', headmaster: 'Nama Kepala Sekolah', headNip: 'NIP Kepala Sekolah', year: 'Tahun Pelajaran', semester: 'Semester' };
+    function missingSchool() { var d = schoolInfo(), out = []; for (var k in SCHOOL_LABELS) if (!String(d[k] || '').trim()) out.push(SCHOOL_LABELS[k]); return out; }
+    function studentProblems(s) { var p = []; if (!s.name) p.push('nama'); if (!/^\d{10}$/.test(s.nisn || '')) p.push('NISN'); if (!s.gender) p.push('jenis kelamin'); if (!s.religion) p.push('agama'); return p; }
+    function readiness(cls) {
+      var all = getStudents(cls), bad = all.filter(function (s) { return studentProblems(s).length; }), sc = missingSchool();
+      return { ok: !sc.length && all.length > 0 && !bad.length, school: sc, total: all.length, bad: bad };
+    }
+    function waliName(cls) { var w = USERS.filter(function (u) { return u.homeroom.indexOf(cls) >= 0; })[0]; return w ? w.name : 'wali kelas ' + cls; }
+    function updateReadyBanner() {
+      var box = $('ljk-ready-banner'); if (!box) return;
+      if (!currentUser || currentUser.head) { box.innerHTML = ''; return; }
+      var r = readiness(activeClass);
+      if (r.ok) { box.innerHTML = ''; return; }
+      var parts = [];
+      if (r.school.length) parts.push('Data sekolah: ' + r.school.length + ' isian belum terisi');
+      if (!r.total) parts.push('Data siswa kelas ' + activeClass + ' masih kosong'); else if (r.bad.length) parts.push('Data siswa: ' + r.bad.length + ' dari ' + r.total + ' siswa belum lengkap');
+      box.innerHTML = '<div class="info-box warn"><i class="fa-solid fa-triangle-exclamation"></i> <span><b>Cetak &amp; Scan LJK terkunci</b> sampai data sekolah dan data siswa lengkap. ' + esc(parts.join(' • ')) + '.</span><button class="btn-act gold" onclick="showReadyModal(\'scan\', activeClass, readiness(activeClass))">Lihat Rincian</button></div>';
+    }
+    function ensureReady(action, cls) {
+      cls = cls || activeClass; var r = readiness(cls);
+      if (r.ok) return true;
+      showReadyModal(action, cls, r); playSound('warn'); return false;
+    }
+    function showReadyModal(action, cls, r) {
+      var verb = action === 'print' ? 'mencetak LJK' : 'memindai (scan) LJK', h = '', acts = '';
+      h += '<p>Sebelum ' + verb + ', Anda <b>wajib mengisi data sekolah dan data siswa secara lengkap</b>.</p>';
+      h += '<div class="ready-block"><b class="t">' + (r.school.length ? '✗' : '✓') + ' Data Sekolah</b>' + (r.school.length ? 'Belum diisi: ' + r.school.map(function (x) { return '<span class="ready-chip">' + esc(x) + '</span>'; }).join('') : 'Lengkap.') + '</div>';
+      var stu = '';
+      if (!r.total) stu = 'Data siswa Kelas ' + cls + ' masih kosong.';
+      else if (r.bad.length) stu = r.bad.length + ' dari ' + r.total + ' siswa belum lengkap:<br>' + r.bad.slice(0, 8).map(function (s) { return '<span class="ready-chip">' + esc(s.name || '(tanpa nama)') + ' — ' + esc(studentProblems(s).join(', ')) + '</span>'; }).join('') + (r.bad.length > 8 ? ' <i>dan ' + (r.bad.length - 8) + ' lainnya…</i>' : '');
+      else stu = 'Lengkap (' + r.total + ' siswa).';
+      var stuOk = r.total > 0 && !r.bad.length;
+      h += '<div class="ready-block"><b class="t">' + (stuOk ? '✓' : '✗') + ' Data Siswa Kelas ' + esc(cls) + ' (nama, NISN 10 digit, jenis kelamin, agama)</b>' + stu;
+      var canEdit = canEditStudents(cls);
+      if (!stuOk && !canEdit) h += '<div style="margin-top:6px;color:var(--gold-light);">Data siswa diisi oleh <b>' + esc(waliName(cls)) + '</b>. Mohon minta beliau melengkapinya; data akan otomatis tersinkron ke akun Anda.</div>';
+      h += '</div>';
+      if (r.school.length) acts += '<button class="btn-act primary" onclick="closeReadyModal();switchTab(\'tab-sekolah\')"><i class="fa-solid fa-school"></i> Lengkapi Data Sekolah</button>';
+      if (!stuOk && canEdit) acts += '<button class="btn-act gold" onclick="closeReadyModal();if(activeClass!==\'' + cls + '\'){$(\'class-switcher\').value=\'' + cls + '\';switchActiveClass(\'' + cls + '\');}switchTab(\'tab-siswa\')"><i class="fa-solid fa-users"></i> Lengkapi Data Siswa</button>';
+      acts += '<button class="btn-act glass" onclick="closeReadyModal()">Tutup</button>';
+      $('ready-body').innerHTML = h; $('ready-actions').innerHTML = acts; $('modal-ready').style.display = 'flex';
+    }
+    function closeReadyModal() { $('modal-ready').style.display = 'none'; }
+    function updatePrintLayoutNote() {
+      var el = $('print-layout-note'); if (!el) return;
+      var full = (parseInt($('print-ljk-isian-count').value) || 0) === 0 && (parseInt($('print-ljk-essay-count').value) || 0) === 0;
+      el.innerHTML = full
+        ? '<i class="fa-solid fa-expand"></i> <b>Tata letak penuh:</b> karena tidak ada soal Isian maupun Essay, kolom jawaban A–D otomatis diperbesar (2 kolom, jarak antarbaris lebih lebar) agar halaman terpakai penuh dan tidak boros kertas. Ukuran bulatan tidak berubah.'
+        : '<i class="fa-solid fa-compress"></i> <b>Tata letak ringkas:</b> kolom jawaban A–D di bagian atas, soal Isian/Essay di bawahnya (satu lembar A4).';
+      el.className = 'info-box';
+    }
+
     /* ==========================================================================
        K. LJK — KUNCI, CETAK
        ========================================================================== */
@@ -1694,10 +2021,10 @@
       var miss = 0; for (var i = 0; i < keyDraft.q; i++) if (!keyDraft.a[i]) miss++;
       persistKey(); toast(miss ? 'Tersimpan, tetapi ' + miss + ' nomor belum ada kuncinya.' : 'Kunci jawaban tersimpan.', miss ? 'err' : 'ok'); syncNow();
     }
-    function onPrintSubjectChange() { var s = $('print-ljk-subject').value; if (s) $('print-ljk-count').value = getQ(activeClass, s); }
+    function onPrintSubjectChange() { var s = $('print-ljk-subject').value; if (s) $('print-ljk-count').value = getQ(activeClass, s); updatePrintLayoutNote(); }
 
     function ljkSheetHtml(o) {
-      var q = o.q, cols = Math.ceil(q / 10), i, c, r, html = '';
+      var q = o.q, L = ljkLayout(q, o.full), cols = Math.ceil(q / L.rows), i, c, r, html = '';
       html += '<div class="ljk-marker" style="left:8mm;top:8mm"></div><div class="ljk-marker" style="left:190mm;top:8mm"></div><div class="ljk-marker" style="left:190mm;top:277mm"></div><div class="ljk-marker" style="left:8mm;top:277mm"></div>';
       html += '<div class="abs" style="left:22mm;top:10mm;width:18mm;height:18mm;"><img src="logo-sdn3-sungaidanau.jpg" style="width:18mm;height:18mm;object-fit:contain" onerror="this.style.display=\'none\'"></div>';
       html += '<div class="abs ljk-title-box" style="left:42mm;top:9.5mm;width:121mm;text-align:center;"><h3>' + esc(o.school || '.....................................') + '</h3><h4>SUMATIF ' + (o.sem === '2' ? 'AKHIR SEMESTER GENAP' : o.sem === '1' ? 'AKHIR SEMESTER GANJIL' : 'AKHIR SEMESTER') + (o.year ? ' — TP. ' + esc(o.year) : '') + '</h4><p>Mata Pelajaran: <b>' + esc(o.subjectName) + '</b></p><p>Tanggal: ' + esc(o.date) + '</p></div>';
@@ -1705,14 +2032,14 @@
       html += '<div class="abs" style="left:20mm;top:34mm;width:170mm;height:8mm;border:.25mm solid #333;background:#F7F7F7;box-sizing:border-box;display:grid;grid-template-columns:2fr 1fr 1fr;font-size:9pt;align-items:center;padding:0 2.5mm;"><div>Nama: <b>' + esc(o.name) + '</b></div><div>NISN: <b>' + esc(o.nisn) + '</b></div><div>Kelas: <b>' + esc(o.cls) + '</b></div></div>';
       html += '<div class="abs ljk-sec" style="left:20mm;top:44mm;width:170mm;box-sizing:border-box;"><span>BAGIAN I: PILIHAN GANDA (' + q + ' BUTIR) — HITAMKAN BULATAN</span><small>*Dinilai otomatis (OMR)</small></div>';
       for (c = 0; c < cols; c++) {
-        var x0 = OMR.X0 + c * OMR.COLW;
-        html += '<div class="ljk-col" style="left:' + (x0 - 1) + 'mm;top:50.5mm;width:41mm;height:65.5mm;"></div>';
-        for (var op = 0; op < 4; op++) html += '<div class="ljk-opt" style="left:' + (x0 + OMR.BX0 + op * OMR.BPITCH - 2) + 'mm;top:51.5mm;">' + 'ABCD'.charAt(op) + '</div>';
+        var x0 = L.x0 + c * L.colw;
+        html += '<div class="ljk-col" style="left:' + (x0 - 1) + 'mm;top:50.5mm;width:' + L.boxW + 'mm;height:' + L.boxH + 'mm;"></div>';
+        for (var op = 0; op < 4; op++) html += '<div class="ljk-opt" style="left:' + (x0 + L.bx0 + op * L.bp - 2) + 'mm;top:51.5mm;">' + 'ABCD'.charAt(op) + '</div>';
       }
       for (i = 0; i < q; i++) {
-        var xy0 = bubbleXY(i, 0), cx0 = OMR.X0 + Math.floor(i / 10) * OMR.COLW;
+        var xy0 = bubbleXY(i, 0, L), cx0 = L.x0 + Math.floor(i / L.rows) * L.colw;
         html += '<div class="ljk-qnum" style="left:' + cx0 + 'mm;top:' + (xy0[1] - 1.7) + 'mm;">' + (i + 1) + '.</div>';
-        for (var o2 = 0; o2 < 4; o2++) { var xy = bubbleXY(i, o2); html += '<div class="ljk-bubble" style="left:' + (xy[0] - OMR.R) + 'mm;top:' + (xy[1] - OMR.R) + 'mm;"></div>'; }
+        for (var o2 = 0; o2 < 4; o2++) { var xy = bubbleXY(i, o2, L); html += '<div class="ljk-bubble" style="left:' + (xy[0] - OMR.R) + 'mm;top:' + (xy[1] - OMR.R) + 'mm;"></div>'; }
       }
       var cur = 118, flow = '', bottom = 279;
       if (o.isian > 0) {
@@ -1732,6 +2059,7 @@
       return html;
     }
     function triggerPrintLjk() {
+      if (!ensureReady('print')) return;
       var subj = $('print-ljk-subject').value, sj = subjectByCode(subj), q = Math.max(5, Math.min(40, parseInt($('print-ljk-count').value) || 40));
       var isian = parseInt($('print-ljk-isian-count').value) || 0, essay = parseInt($('print-ljk-essay-count').value) || 0, mode = $('print-ljk-mode').value;
       var date = $('print-ljk-date').value ? new Date($('print-ljk-date').value).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '...................';
@@ -1741,11 +2069,11 @@
       var area = $('print-ljk-area'); area.innerHTML = '';
       list.forEach(function (st, idx) {
         var sheet = document.createElement('div'); sheet.className = 'ljk-sheet-a4';
-        sheet.innerHTML = ljkSheetHtml({ idx: idx, q: q, isian: isian, essay: essay, school: sch.name, sem: sch.semester, year: sch.year, subjectName: sj.name, date: date, name: st.name, nisn: st.nisn, cls: activeClass });
+        sheet.innerHTML = ljkSheetHtml({ idx: idx, q: q, isian: isian, essay: essay, school: sch.name, sem: sch.semester, year: sch.year, subjectName: sj.name, date: date, full: !(isian > 0 || essay > 0), name: st.name, nisn: st.nisn, cls: activeClass });
         area.appendChild(sheet);
         var box = sheet.querySelector('#qr-ljk-' + idx);
         if (box && window.QRCode) {
-          var payload = (st._blank ? '0000000000' : st.nisn) + '|' + subj + '|' + q + '|' + activeClass;
+          var payload = (st._blank ? '0000000000' : st.nisn) + '|' + subj + '|' + q + '|' + activeClass + '|' + ((isian > 0 || essay > 0) ? 'C' : 'F');
           new QRCode(box, { text: payload, width: 190, height: 190, correctLevel: QRCode.CorrectLevel.L });
           box.querySelectorAll('img,canvas').forEach(function (el) { el.style.width = '19mm'; el.style.height = '19mm'; el.style.imageRendering = 'pixelated'; });
         }
@@ -1773,7 +2101,7 @@
       for (y = 0; y < h; y++) for (x = 0; x < w; x++) { var v = sm(gr.g, gr.w, gr.h, H, 163 + x / pm, 8 + y / pm), k = (y * w + x) * 4; data[k] = data[k + 1] = data[k + 2] = v; data[k + 3] = 255; }
       var res = jsQR(data, w, h, { inversionAttempts: 'dontInvert' }); return res ? res.data : null;
     }
-    function parsePayload(t) { if (!t) return null; var p = t.split('|'); if (p.length < 4) return null; return { nisn: p[0], subject: p[1], q: parseInt(p[2]) || 0, cls: p[3] }; }
+    function parsePayload(t) { if (!t) return null; var p = t.split('|'); if (p.length < 4) return null; return { nisn: p[0], subject: p[1], q: parseInt(p[2]) || 0, cls: p[3], layout: p[4] === 'F' ? 'F' : 'C', hasLayout: p.length >= 5 }; }
     function canGrade(cls, code) { return !isReadOnly() && allowedClasses(currentUser).indexOf(cls) >= 0 && getSubjectsFor(currentUser, cls).some(function (s) { return s.code === code; }); }
     function sensThr() { return sensToThr(parseInt($('opt-sens').value) || 6); }
     $('opt-sens').addEventListener('input', function () { $('opt-sens-val').innerText = this.value; });
@@ -1801,15 +2129,21 @@
       var loc = omrLocate(gr.g, gr.w, gr.h, qHint);
       if (!loc.ok) return { error: 'Penanda sudut tidak lengkap (' + loc.count + '/4 terdeteksi)' };
       if (loc.est && loc.quality < 0.07) return { error: 'Hanya 3 penanda terlihat dan penyelarasan kurang yakin — mundurkan kamera agar 4 kotak hitam terlihat' };
-      var payload = parsePayload(qrFromGray(gr, loc.H));
+      var H = loc.H, payload = parsePayload(qrFromGray(gr, H));
+      // Bila QR belum terbaca, coba tiga orientasi lain: QR yang terbaca memastikan arah kertas yang benar
+      for (var ri = 0; ri < loc.rots.length && !payload; ri++) { if (loc.rots[ri] === H) continue; var pl = parsePayload(qrFromGray(gr, loc.rots[ri])); if (pl) { payload = pl; H = loc.rots[ri]; } }
       var cls = payload ? payload.cls : activeClass, subject = payload ? payload.subject : $('scan-subject-select').value;
       if (!canGrade(cls, subject)) return { error: 'Anda tidak punya akses menilai ' + subjectByCode(subject).name + ' kelas ' + cls };
+      if (cls !== activeClass && !readiness(cls).ok) return { error: 'Data sekolah/siswa untuk kelas ' + cls + ' belum lengkap' };
       var key = getKey(cls, subject), q = (payload && payload.q) || (key && key.q) || qHint;
-      var rd = readAll(gr.g, gr.w, gr.h, loc.H, q, sensThr());
+      // Tata letak (ringkas/penuh) dibaca dari QR; bila QR tak terbaca, dipakai hasil deteksi otomatis
+      var L = ljkLayout(q, payload && payload.hasLayout ? payload.layout === 'F' : loc.layout.id === 'F');
+      var quality = alignScore(gr.g, gr.w, gr.h, H, q, L);
+      var rd = readAll(gr.g, gr.w, gr.h, H, q, sensThr(), L);
       var student = null;
       if (payload && payload.nisn !== '0000000000') student = getStudents(cls).filter(function (s) { return s.nisn === payload.nisn; })[0] || null;
       if (!student && !payload) { var sv = $('scan-student-select').value; if (sv) student = getStudents(cls).filter(function (s) { return s.nisn === sv; })[0] || null; }
-      return { cls: cls, subject: subject, q: q, key: key, student: student, answers: rd.ans, fills: rd.fills, quality: loc.quality, est: loc.est, qr: !!payload, gr: gr, H: loc.H, isian: 0, essay: 0 };
+      return { cls: cls, subject: subject, q: q, key: key, student: student, answers: rd.ans, fills: rd.fills, quality: quality, est: loc.est, qr: !!payload, gr: gr, H: H, layout: L, isian: 0, essay: 0 };
     }
     function recomputeScan() {
       var st = scanState; if (!st) return;
@@ -1828,15 +2162,16 @@
     }
     function cycleAnswer(i) { var order = ['-', 'A', 'B', 'C', 'D'], cur = scanState.answers[i], n = order.indexOf(cur); scanState.answers[i] = order[(n + 1) % 5]; recomputeScan(); }
     function drawPreview() {
-      var st = scanState, cv = $('dewarped-canvas'), ctx = cv.getContext('2d'), W = cv.width, Hh = cv.height, S = 4, x0 = 18, y0 = 48;
+      var st = scanState, cv = $('dewarped-canvas'), ctx = cv.getContext('2d'), L = st.layout || LAY_C, W = 696, S = 4, x0 = 18, y0 = 48, Hh = Math.ceil((L.y0 + (L.rows - 1) * L.pitch + 6 - y0) * S);
+      if (cv.width !== W || cv.height !== Hh) { cv.width = W; cv.height = Hh; }
       var img = ctx.createImageData(W, Hh), x, y, v, p, k;
       for (y = 0; y < Hh; y++) for (x = 0; x < W; x++) { v = sm(st.gr.g, st.gr.w, st.gr.h, st.H, x0 + x / S, y0 + y / S); k = (y * W + x) * 4; img.data[k] = img.data[k + 1] = img.data[k + 2] = v; img.data[k + 3] = 255; }
       ctx.putImageData(img, 0, 0); ctx.lineWidth = 3;
       var key = st.key && st.key.a ? st.key.a : [];
       st.answers.forEach(function (a, i) {
         var ki = 'ABCD'.indexOf(key[i]), ai = 'ABCD'.indexOf(a);
-        if (ai >= 0) { var xy = bubbleXY(i, ai); ctx.strokeStyle = a === key[i] ? '#2ED573' : '#FF4757'; ctx.beginPath(); ctx.arc((xy[0] - x0) * S, (xy[1] - y0) * S, 2.9 * S, 0, 6.283); ctx.stroke(); }
-        else if (ki >= 0) { var z = bubbleXY(i, ki); ctx.strokeStyle = '#FFA502'; ctx.setLineDash([5, 4]); ctx.beginPath(); ctx.arc((z[0] - x0) * S, (z[1] - y0) * S, 2.9 * S, 0, 6.283); ctx.stroke(); ctx.setLineDash([]); }
+        if (ai >= 0) { var xy = bubbleXY(i, ai, L); ctx.strokeStyle = a === key[i] ? '#2ED573' : '#FF4757'; ctx.beginPath(); ctx.arc((xy[0] - x0) * S, (xy[1] - y0) * S, 2.9 * S, 0, 6.283); ctx.stroke(); }
+        else if (ki >= 0) { var z = bubbleXY(i, ki, L); ctx.strokeStyle = '#FFA502'; ctx.setLineDash([5, 4]); ctx.beginPath(); ctx.arc((z[0] - x0) * S, (z[1] - y0) * S, 2.9 * S, 0, 6.283); ctx.stroke(); ctx.setLineDash([]); }
       });
     }
     function showScan(st) {
@@ -1866,6 +2201,7 @@
     // Unggah file / PDF / foto HP (banyak halaman)
     async function handleLjkFileUpload(e) {
       var files = Array.from(e.target.files || []); if (!files.length) return;
+      if (!ensureReady('scan')) { e.target.value = ''; return; }
       var canvases = [];
       for (var f = 0; f < files.length; f++) {
         var file = files[f];
@@ -1929,7 +2265,7 @@
       }
       if (!runs.length) return first;
       runs.sort(function (a, b) { return b.quality - a.quality; });
-      var base = runs[0], use = runs.filter(function (x) { return x.q === base.q && x.quality >= base.quality * 0.6; });
+      var base = runs[0], use = runs.filter(function (x) { return x.q === base.q && x.layout.id === base.layout.id && x.quality >= base.quality * 0.6; });
       if (use.length > 1) { var m = mergeReads(use, sensThr()); base.fills = m.fills; base.answers = m.ans; }
       base.frames = use.length; return base;
     }
@@ -1941,6 +2277,7 @@
     function setCamMsg(t, ok) { $('camera-feedback-text').innerText = t; $('camera-feedback-pill').classList.toggle('ok', !!ok); }
     async function startCamera() {
       if (cam.stream) return;
+      if (!ensureReady('scan')) return;
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { toast('Kamera tidak tersedia (butuh HTTPS). Gunakan tombol "Foto HP" atau "Unggah".', 'err'); return; }
       ensureAudio();
       var st, portrait = window.innerHeight > window.innerWidth;
@@ -2078,17 +2415,100 @@
       dbSet('pw:' + currentUser.nip, await sha256Hash(n + currentUser.nip), 'lww'); syncNow();
       toast('Password diperbarui.', 'ok'); ['pass-old', 'pass-new', 'pass-confirm'].forEach(function (i) { $(i).value = ''; });
     }
+    /* ---- Database cloud (khusus admin) ---- */
     function fillCloudForm() { var c = cloudCfg(); $('cfg-cloud-url').value = c.url; $('cfg-cloud-token').value = c.token; }
     function saveCloudConfig() {
+      if (!currentUser || !currentUser.admin) { toast('Khusus admin.', 'err'); return; }
       var url = $('cfg-cloud-url').value.trim(), tok = $('cfg-cloud-token').value.trim();
       if (url && !/^https:\/\/script\.google\.com\/.+\/exec/.test(url)) { toast('URL harus berupa Web App Apps Script yang berakhir /exec.', 'err'); return; }
-      lsSet('cfg', { url: url, token: tok }); lsSet('lastPull', 0); toast('Konfigurasi disimpan.', 'ok'); setSyncUI(); syncNow(true);
+      if (url === DEFAULT_CLOUD_URL && (!tok || tok === DEFAULT_CLOUD_TOKEN)) localStorage.removeItem(P + 'cfg');
+      else lsSet('cfg', { url: url, token: tok, override: true });
+      lsSet('lastPull', 0); toast('Konfigurasi disimpan.', 'ok'); setSyncUI(); syncNow(true);
     }
+    function resetCloudConfig() { localStorage.removeItem(P + 'cfg'); lsSet('lastPull', 0); fillCloudForm(); toast('URL & token dipulihkan ke bawaan file.', 'ok'); setSyncUI(); syncNow(true); }
     async function testCloudConnection() {
       var url = $('cfg-cloud-url').value.trim(), tok = $('cfg-cloud-token').value.trim(); if (!url) { toast('Isi URL dahulu.', 'err'); return; }
-      var old = lsGet('cfg', null); lsSet('cfg', { url: url, token: tok });
-      try { var r = await cloudCall({ action: 'ping' }, 15000); toast('Terhubung ✓ ' + (r.message || ''), 'ok'); } catch (e) { toast('Gagal: ' + e.message, 'err'); if (old) lsSet('cfg', old); else localStorage.removeItem(P + 'cfg'); }
+      var old = lsGet('cfg', null); lsSet('cfg', { url: url, token: tok, override: true });
+      try { var r = await cloudCall({ action: 'ping' }, 15000); toast('Terhubung ✓ ' + (r.message || '') + (r.owner ? ' • akun: ' + r.owner : ''), 'ok'); } catch (e) { toast('Gagal: ' + e.message, 'err'); }
+      if (old) lsSet('cfg', old); else localStorage.removeItem(P + 'cfg');
     }
+    function fillGasCode() { var el = $('gas-code'), v = $('gas-code-view'); if (el && v) v.value = el.textContent.replace(/^\s*\n/, ''); }
+    function copyGasCode() {
+      var v = $('gas-code-view'), txt = v.value;
+      function fb() { v.focus(); v.select(); try { document.execCommand('copy'); toast('Kode Code.gs disalin.', 'ok'); } catch (e) { toast('Salin manual: blok semua teks lalu Ctrl+C.', 'err'); } }
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(function () { toast('Kode Code.gs disalin.', 'ok'); }, fb); else fb();
+    }
+
+    /* ---- Spreadsheet milik masing-masing guru ---- */
+    function sheetInfo() { return dbGet('sheet:' + currentUser.nip, {}); }
+    function parseSheetId(v) {
+      v = String(v || '').trim(); var m = v.match(/\/spreadsheets\/d\/([a-zA-Z0-9_-]{20,})/); if (m) return m[1];
+      return /^[a-zA-Z0-9_-]{25,}$/.test(v) ? v : '';
+    }
+    function fillSheetForm() { $('cfg-sheet-url').value = sheetInfo().url || ''; updateSheetStatus(); }
+    function updateSheetStatus(msg) {
+      var d = sheetInfo(), b = $('sheet-status-box'); if (!b) return;
+      b.textContent = msg || (d.id ? 'Link tersimpan • ' + (d.lastExport ? 'terakhir dikirim ' + new Date(d.lastExport).toLocaleString('id-ID') : 'data belum pernah dikirim') : 'Belum ada link spreadsheet.');
+    }
+    function saveSheetLink() {
+      var url = $('cfg-sheet-url').value.trim(), nip = currentUser.nip;
+      if (!url) { dbSet('sheet:' + nip, {}, 'lww'); toast('Link spreadsheet dihapus.', 'ok'); updateSheetStatus(); return; }
+      var id = parseSheetId(url); if (!id) { toast('Link tidak valid. Tempel link Google Sheets (…/spreadsheets/d/…).', 'err'); return; }
+      var old = sheetInfo();
+      dbSet('sheet:' + nip, { url: url, id: id, lastExport: old.id === id ? old.lastExport || 0 : 0 }, 'lww');
+      toast('Link spreadsheet tersimpan.', 'ok'); updateSheetStatus();
+    }
+    function openMySheet() { var d = sheetInfo(); if (!d.url) { toast('Belum ada link spreadsheet.', 'err'); return; } window.open(d.url, '_blank', 'noopener'); }
+    var ownerEmail = '';
+    function refreshOwnerEmail() {
+      var set = function (e) { if (e) $('sheet-share-email').textContent = e; };
+      if (ownerEmail) { set(ownerEmail); return; }
+      if (!navigator.onLine) return;
+      cloudCall({ action: 'ping' }, 9000).then(function (r) { ownerEmail = r.owner || ''; set(ownerEmail); }).catch(function () { });
+    }
+    function genderText(g) { return g === 'L' ? 'Laki-laki' : g === 'P' ? 'Perempuan' : ''; }
+    // Susun isi spreadsheet guru: hanya kelas & mapel yang menjadi tanggung jawab guru tersebut
+    function buildSheetExport() {
+      var u = currentUser, sch = schoolInfo(), sheets = [], now = new Date().toLocaleString('id-ID', { hour12: false });
+      sheets.push({ name: 'Data Sekolah', textCols: [1], rows: [['Isian', 'Nilai'], ['Nama Sekolah', sch.name || ''], ['NPSN', sch.npsn || ''], ['Alamat', [sch.street, sch.village, sch.district, sch.regency, sch.province, sch.postal].filter(Boolean).join(', ')], ['Kepala Sekolah', sch.headmaster || ''], ['NIP Kepala Sekolah', sch.headNip || ''], ['Tahun Pelajaran', sch.year || ''], ['Semester', sch.semester === '1' ? 'Ganjil' : sch.semester === '2' ? 'Genap' : ''], ['Guru', u.name], ['NIP', u.nip], ['Dikirim', now]] });
+      var classes = allowedClasses(u), sis = [['Kelas', 'No', 'Nama Lengkap', 'NISN', 'Jenis Kelamin', 'Agama']], nil = [['Kelas', 'Mata Pelajaran', 'Nama', 'NISN', 'Benar', 'Salah', 'Kosong', 'Nilai PG', 'Isian', 'Essay', 'Nilai Akhir', 'Waktu']];
+      classes.forEach(function (cls) {
+        var all = getStudents(cls), list = studentScope(cls) === 'islam' ? all.filter(isMuslim) : all;
+        list.forEach(function (st, i) { sis.push([cls, i + 1, st.name, st.nisn, genderText(st.gender), st.religion || '']); });
+        getSubjectsFor(u, cls).forEach(function (sj) {
+          var g = getGrades(cls, sj.code);
+          studentsForSubject(cls, sj.code).forEach(function (st) { var x = g[st.nisn]; if (x) nil.push([cls, sj.name, st.name, st.nisn, x.correct || 0, x.wrong || 0, x.empty || 0, x.pgScore || 0, x.isianScore || 0, x.essayScore || 0, x.finalScore || 0, x.time || '']); });
+        });
+      });
+      sheets.push({ name: 'Siswa', textCols: [3], rows: sis });
+      sheets.push({ name: 'Nilai', textCols: [3], rows: nil });
+      (u.homeroom || []).forEach(function (cls) {
+        var gs = {}; HOMEROOM_SUBJECTS.forEach(function (m) { gs[m.code] = getGrades(cls, m.code); });
+        var rows = getStudents(cls).map(function (st) {
+          var sum = 0, sc = HOMEROOM_SUBJECTS.map(function (m) { var v = gs[m.code][st.nisn] ? gs[m.code][st.nisn].finalScore || 0 : 0; sum += v; return v; });
+          return { st: st, sc: sc, total: +sum.toFixed(1), avg: +(sum / HOMEROOM_SUBJECTS.length).toFixed(1) };
+        }).sort(function (a, b) { return b.total - a.total; });
+        var out = [['No', 'Nama', 'NISN'].concat(HOMEROOM_SUBJECTS.map(function (m) { return m.name; }), ['Jumlah', 'Rata-rata', 'Peringkat'])];
+        rows.forEach(function (r, i) { out.push([i + 1, r.st.name, r.st.nisn].concat(r.sc, [r.total, r.avg, i + 1])); });
+        sheets.push({ name: 'Rekap ' + cls, textCols: [2], rows: out });
+      });
+      return sheets;
+    }
+    async function exportToMySheet() {
+      var d = sheetInfo();
+      if (!d.id) { toast('Isi dan simpan link spreadsheet Anda dahulu.', 'err'); return; }
+      if (!navigator.onLine) { toast('Perangkat sedang offline.', 'err'); return; }
+      updateSheetStatus('Mengirim data ke spreadsheet...');
+      try {
+        var r = await cloudCall({ action: 'exportSheet', nip: currentUser.nip, sheetId: d.id, sheets: buildSheetExport() }, 90000);
+        d.lastExport = Date.now(); dbSet('sheet:' + currentUser.nip, d, 'lww');
+        toast('Data terkirim ke spreadsheet Anda ✓ (' + (r.sheets || []).length + ' lembar).', 'ok'); updateSheetStatus();
+      } catch (e) {
+        var m = e.name === 'AbortError' ? 'koneksi lambat, coba lagi' : /Aksi tidak dikenal/.test(e.message) ? 'server cloud belum memakai Code.gs terbaru — hubungi admin (menu Database Cloud)' : e.message;
+        toast('Gagal mengirim: ' + m, 'err'); updateSheetStatus('Gagal: ' + m);
+      }
+    }
+
     function runSyntheticOmrBenchmark() {
       var b = $('benchmark-status-box'); b.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menjalankan simulasi (±10 detik)...';
       setTimeout(function () {
