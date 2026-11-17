@@ -339,6 +339,14 @@
       .sync-status-pill span { display: none; }
     }
   </style>
+  <script>
+    function renderSvgLogoFallback(imgEl) {
+      var w = document.createElement('div'); w.className = imgEl.className;
+      w.style.cssText = 'width:' + (imgEl.width || 60) + 'px;height:' + (imgEl.height || 60) + 'px;display:inline-block';
+      w.innerHTML = '<svg viewBox="0 0 100 100" style="width:100%;height:100%"><polygon points="50,4 94,26 84,78 50,96 16,78 6,26" fill="#138837" stroke="#0D5C24" stroke-width="2"/><circle cx="50" cy="50" r="32" fill="#fff" stroke="#000" stroke-width="1.5"/><path d="M 18,50 A 32,32 0 0,1 82,50 Z" fill="#D32F2F"/><polygon points="50,33 34,60 66,60" fill="#1565C0"/><polygon points="50,22 55,38 72,38 58,48 63,64 50,54 37,64 42,48 28,38 45,38" fill="#FFD600" stroke="#F57F17" stroke-width=".8"/><text x="50" y="72" font-size="7.5" font-weight="900" text-anchor="middle" font-family="Arial">SATUI</text></svg>';
+      if (imgEl.parentNode) imgEl.parentNode.replaceChild(w, imgEl);
+    }
+  </script>
 </head>
 <body>
 
@@ -1043,8 +1051,8 @@
        =================================================================== -->
   <script>
     /* ===== KONFIGURASI CLOUD (isi setelah deploy Code.gs agar semua perangkat otomatis terhubung) ===== */
-    var DEFAULT_CLOUD_URL = 'https://script.google.com/macros/s/AKfycbyqXd9dQURvgZ5th9ZWMypUq8mJ0U4tTUFDzxU1rLMwzfz1Xm9ClGQk1a5IRKC-Wljbcg/exec';
-    var DEFAULT_CLOUD_TOKEN = 'https://script.google.com/macros/s/AKfycbyqXd9dQURvgZ5th9ZWMypUq8mJ0U4tTUFDzxU1rLMwzfz1Xm9ClGQk1a5IRKC-Wljbcg/exec';
+    var DEFAULT_CLOUD_URL = 'https://script.google.com/macros/s/AKfycbzu6DPEY-oBivnHGmznNVZpYjYhSfDIsGHR2Wir45AQlh1VVAhuE999fbG19neq5oAC9g/exec';
+    var DEFAULT_CLOUD_TOKEN = 'SIPINTAR-SDN3-2026-Bungas'; // HARUS sama persis dengan TOKEN di Code.gs
 
     var $ = function (id) { return document.getElementById(id); };
     function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
@@ -1175,7 +1183,8 @@
     }
     function cloudCfg() {
       var c = lsGet('cfg', null) || {};
-      return { url: String(c.url || DEFAULT_CLOUD_URL || '').trim(), token: String(c.token || DEFAULT_CLOUD_TOKEN || '').trim() };
+      var tk = String(c.token || '').trim(); if (/^https?:/i.test(tk)) tk = ''; // token keliru (berisi URL) diabaikan
+      return { url: String(c.url || DEFAULT_CLOUD_URL || '').trim(), token: tk || String(DEFAULT_CLOUD_TOKEN || '').trim() };
     }
     async function cloudCall(body, timeout) {
       var cfg = cloudCfg(); if (!cfg.url) throw new Error('nocfg');
@@ -1248,12 +1257,6 @@
     /* ==========================================================================
        C. LOGO FALLBACK + SHA-256
        ========================================================================== */
-    function renderSvgLogoFallback(imgEl) {
-      var w = document.createElement('div'); w.className = imgEl.className;
-      w.style.cssText = 'width:' + (imgEl.width || 60) + 'px;height:' + (imgEl.height || 60) + 'px;display:inline-block';
-      w.innerHTML = '<svg viewBox="0 0 100 100" style="width:100%;height:100%"><polygon points="50,4 94,26 84,78 50,96 16,78 6,26" fill="#138837" stroke="#0D5C24" stroke-width="2"/><circle cx="50" cy="50" r="32" fill="#fff" stroke="#000" stroke-width="1.5"/><path d="M 18,50 A 32,32 0 0,1 82,50 Z" fill="#D32F2F"/><polygon points="50,33 34,60 66,60" fill="#1565C0"/><polygon points="50,22 55,38 72,38 58,48 63,64 50,54 37,64 42,48 28,38 45,38" fill="#FFD600" stroke="#F57F17" stroke-width=".8"/><text x="50" y="72" font-size="7.5" font-weight="900" text-anchor="middle" font-family="Arial">SATUI</text></svg>';
-      if (imgEl.parentNode) imgEl.parentNode.replaceChild(w, imgEl);
-    }
     async function sha256Hash(message) {
       if (window.crypto && crypto.subtle) { try { var b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(message)); return Array.from(new Uint8Array(b)).map(function (x) { return x.toString(16).padStart(2, '0'); }).join(''); } catch (e) { } }
       return jsSha256(unescape(encodeURIComponent(message)));
@@ -1305,7 +1308,7 @@
         try {
           var r = await cloudCall({ action: 'get', keys: ['pw:' + nip] }, 9000), row = (r.rows || [])[0];
           if (row) { lsSet('d:pw:' + nip, { v: row.value, ts: row.ts || 0, m: 'lww' }); h = row.value; }
-        } catch (e) { cloudFailed = true; }
+        } catch (e) { cloudFailed = e.message === 'Failed to fetch' || e.name === 'AbortError' || e.name === 'TypeError' ? 'network' : (e.message || 'galat'); }
       }
       return { hash: h, cloudFailed: cloudFailed };
     }
@@ -1319,8 +1322,12 @@
       btn.disabled = true; $('btn-login-text').innerText = 'Memproses...';
       var st = await getStoredHash(nip), inHash = await sha256Hash(pass + nip), valid;
       if (st.hash) valid = inHash === st.hash;
-      else if (st.cloudFailed) { btn.disabled = false; $('btn-login-text').innerText = 'Login'; showLoginAlert('Tidak dapat memverifikasi password (cek koneksi internet).'); return; }
-      else valid = inHash === await sha256Hash(DEFAULT_PASS + nip);
+      else {
+        // Belum ada password kustom yang tersimpan di perangkat/cloud: pakai password bawaan.
+        // Bila cloud gagal dihubungi, tetap boleh masuk dengan password bawaan (mode lokal) agar tidak terkunci.
+        valid = inHash === await sha256Hash(DEFAULT_PASS + nip);
+        if (valid && st.cloudFailed) toast(st.cloudFailed === 'network' ? 'Masuk mode lokal: server database tidak terjangkau.' : 'Masuk mode lokal: database menolak (' + st.cloudFailed + '). Periksa URL/Token di Pengaturan.', 'err');
+      }
       if (!valid) {
         failedAttempts++;
         if (failedAttempts >= 5) { showLoginAlert('Password salah 5 kali. Tunggu 3 detik...'); setTimeout(function () { failedAttempts = 0; btn.disabled = false; $('btn-login-text').innerText = 'Login'; }, 3000); return; }
