@@ -410,7 +410,7 @@
               <label>Password</label>
               <div class="input-field-wrap">
                 <i class="fa-solid fa-lock field-icon"></i>
-                <input type="password" id="login-pass" placeholder="Password (default: 30303570)" autocomplete="current-password" required>
+                <input type="password" id="login-pass" placeholder="Password" autocomplete="current-password" required>
                 <i class="fa-solid fa-eye toggle-eye" id="toggle-pass-eye" onclick="togglePassVisibility()"></i>
               </div>
             </div>
@@ -424,7 +424,7 @@
             <button type="submit" id="btn-login-submit" class="btn-login"><i class="fa-solid fa-right-to-bracket"></i><span id="btn-login-text">Login</span></button>
           </form>
           <p class="login-quote">“Mari bersama wujudkan pendidikan yang lebih baik”</p>
-          <p class="forgot-pass-text"><i class="fa-regular fa-circle-question"></i> Lupa password? Hubungi Admin untuk reset ke 30303570.</p>
+          <p class="forgot-pass-text"><i class="fa-regular fa-circle-question"></i> Lupa password? Hubungi Admin untuk reset password.</p>
         </div>
       </div>
     </div>
@@ -832,15 +832,22 @@
  *  2) Mengekspor data ke SPREADSHEET MASING-MASING GURU (link diisi guru di menu Pengaturan).
  *
  * TOKEN di bawah HARUS sama dengan DEFAULT_CLOUD_TOKEN di file index.html.
+ *
+ * Versi v3 (keamanan):
+ *  - Hash password TIDAK PERNAH dikirim ke perangkat (aksi 'get' dan 'sync' tidak mengembalikan kunci pw:).
+ *  - Login memakai aksi 'pwcheck': server yang membandingkan, perangkat hanya menerima ya/tidak.
+ *  - Percobaan password salah dibatasi (maks. MAX_FAILS kali per NIP, lalu dikunci LOCK_SEC detik).
  */
-var TOKEN = '30303570';
+var TOKEN = '9GiZvrvRD8BoLJWb';
 var DB_SHEET = 'DB';
 var CHUNK = 45000;          // batas aman karakter per sel (maks. Google Sheets 50.000)
 var MAX_EXPORT_SHEETS = 40;
 var MAX_EXPORT_ROWS = 6000;
+var MAX_FAILS = 8;          // batas salah password per NIP
+var LOCK_SEC = 300;         // lama penguncian (detik)
 
 function doGet() {
-  return out_({ ok: true, message: 'SIPINTAR cloud aktif', version: 'v2-token-30303570', time: Date.now() });
+  return out_({ ok: true, message: 'SIPINTAR cloud aktif', version: 'v3-aman', time: Date.now() });
 }
 
 function doPost(e) {
@@ -852,6 +859,8 @@ function doPost(e) {
         return out_({ ok: true, message: 'Server aktif', owner: owner_(), serverTime: Date.now() });
       case 'get':
         return out_(actGet_(req));
+      case 'pwcheck':
+        return out_(actPwCheck_(req));
       case 'sync':
         return out_(actSync_(req));
       case 'exportSheet':
@@ -930,7 +939,8 @@ function mergeMaps_(a, b) {
 
 // Data pribadi guru lain tidak dikirim ke perangkat lain
 function visibleTo_(key, nip) {
-  var priv = ['pw:', 'school:', 'sheet:'];
+  if (key.indexOf('pw:') === 0) return false;   // hash password tidak pernah dikirim ke perangkat
+  var priv = ['school:', 'sheet:'];
   for (var i = 0; i < priv.length; i++) if (key.indexOf(priv[i]) === 0) return key === priv[i] + nip;
   return true;
 }
@@ -938,10 +948,40 @@ function visibleTo_(key, nip) {
 function actGet_(req) {
   var sh = getDb_(), all = loadAll_(sh), rows = [];
   (req.keys || []).forEach(function (k) {
+    if (String(k).indexOf('pw:') === 0) return;   // hash password tidak boleh diambil lewat 'get'
     var r = all[k];
     if (r) rows.push({ key: k, value: r.value, ts: r.ts, mode: r.mode });
   });
   return { ok: true, rows: rows, serverTime: Date.now() };
+}
+
+// Cek password di server: perangkat mengirim hash masukan, server hanya menjawab cocok / tidak.
+function actPwCheck_(req) {
+  var nip = String(req.nip || '').replace(/[^0-9A-Za-z]/g, '').substr(0, 30), cand = String(req.hash || '');
+  if (!nip) return { ok: false, error: 'NIP kosong' };
+  var cache = CacheService.getScriptCache(), fk = 'pwf:' + nip, fails = Number(cache.get(fk)) || 0;
+  if (fails >= MAX_FAILS) return { ok: true, locked: true };
+  var sh = getDb_(), row = readOne_(sh, 'pw:' + nip);
+  if (!row || !row.value) return { ok: true, custom: false };       // belum ada password kustom -> pakai bawaan
+  var match = String(row.value) === cand;
+  if (match) cache.remove(fk); else cache.put(fk, String(fails + 1), LOCK_SEC);
+  return { ok: true, custom: true, match: match };
+}
+
+// Baca satu baris saja (lebih ringan daripada memuat seluruh lembar)
+function readOne_(sh, key) {
+  var last = sh.getLastRow();
+  if (last < 2) return null;
+  var keys = sh.getRange(2, 1, last - 1, 1).getValues();
+  for (var i = 0; i < keys.length; i++) {
+    if (String(keys[i][0]) !== key) continue;
+    var r = sh.getRange(i + 2, 1, 1, sh.getLastColumn()).getValues()[0], json = '';
+    for (var c = 4; c < r.length; c++) if (r[c] !== '' && r[c] !== null) json += String(r[c]);
+    var value = null;
+    try { value = json ? JSON.parse(json) : null; } catch (e) { value = null; }
+    return { row: i + 2, value: value };
+  }
+  return null;
 }
 
 function actSync_(req) {
@@ -1384,7 +1424,7 @@ function actExport_(req) {
   <script>
     /* ===== KONFIGURASI CLOUD — tertanam di file ini; hanya admin yang melihat/mengubahnya (menu Database Cloud) ===== */
     var DEFAULT_CLOUD_URL = 'https://script.google.com/macros/s/AKfycbx_QwKC_uM86xGouQ0ltd9mgNb2NALYMULHilCI7afWsaKijltmpC_fwss34KTQNPE4Yw/exec';
-    var DEFAULT_CLOUD_TOKEN = '30303570'; // HARUS sama persis dengan TOKEN di Code.gs
+    var DEFAULT_CLOUD_TOKEN = '9GiZvrvRD8BoLJWb'; // HARUS sama persis dengan TOKEN di Code.gs
 
     var $ = function (id) { return document.getElementById(id); };
     function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
@@ -1639,15 +1679,17 @@ function actExport_(req) {
     function togglePassVisibility() { var p = $('login-pass'), e = $('toggle-pass-eye'); if (p.type === 'password') { p.type = 'text'; e.classList.replace('fa-eye', 'fa-eye-slash'); } else { p.type = 'password'; e.classList.replace('fa-eye-slash', 'fa-eye'); } }
     function showLoginAlert(msg, ok) { var b = $('login-alert-box'); $('login-alert-msg').innerText = msg; b.className = 'login-alert show ' + (ok ? 'success' : 'error'); }
 
-    async function getStoredHash(nip) {
-      var h = dbGet('pw:' + nip, null), cloudFailed = false;
+    async function getStoredHash(nip, cand) {
+      // Hash password tidak lagi diunduh dari server: server membandingkan hash masukan lalu menjawab cocok / tidak.
+      var h = dbGet('pw:' + nip, null), cloudFailed = false, locked = false;
       if (cloudCfg().url) {
         try {
-          var r = await cloudCall({ action: 'get', keys: ['pw:' + nip] }, 9000), row = (r.rows || [])[0];
-          if (row) { lsSet('d:pw:' + nip, { v: row.value, ts: row.ts || 0, m: 'lww' }); h = row.value; }
+          var r = await cloudCall({ action: 'pwcheck', nip: nip, hash: cand || '' }, 9000);
+          if (r.locked) locked = true;
+          else if (r.custom) { if (r.match) { lsSet('d:pw:' + nip, { v: cand, ts: Date.now(), m: 'lww' }); h = cand; } else h = '!tidak-cocok'; }
         } catch (e) { cloudFailed = e.message === 'Failed to fetch' || e.name === 'AbortError' || e.name === 'TypeError' ? 'network' : (e.message || 'galat'); }
       }
-      return { hash: h, cloudFailed: cloudFailed };
+      return { hash: h, cloudFailed: cloudFailed, locked: locked };
     }
     async function handleLoginSubmit(ev) {
       ev.preventDefault();
@@ -1657,7 +1699,8 @@ function actExport_(req) {
       if (!cls) { showLoginAlert('Pilih kelas terlebih dahulu.'); return; }
       if (allowedClasses(u).indexOf(cls) < 0) { showLoginAlert('Akses ditolak: Anda tidak memiliki akses ke Kelas ' + cls + '.'); return; }
       btn.disabled = true; $('btn-login-text').innerText = 'Memproses...';
-      var st = await getStoredHash(nip), inHash = await sha256Hash(pass + nip), valid;
+      var inHash = await sha256Hash(pass + nip), st = await getStoredHash(nip, inHash), valid;
+      if (st.locked) { btn.disabled = false; $('btn-login-text').innerText = 'Login'; showLoginAlert('Terlalu banyak percobaan password salah. Coba lagi sekitar 5 menit.'); return; }
       if (st.hash) valid = inHash === st.hash;
       else {
         // Belum ada password kustom yang tersimpan di perangkat/cloud: pakai password bawaan.
@@ -2454,7 +2497,8 @@ function actExport_(req) {
       var o = $('pass-old').value, n = $('pass-new').value, c = $('pass-confirm').value;
       if (n.length < 6) { toast('Password baru minimal 6 karakter.', 'err'); return; }
       if (n !== c) { toast('Konfirmasi password tidak cocok.', 'err'); return; }
-      var st = await getStoredHash(currentUser.nip), oh = await sha256Hash(o + currentUser.nip), ok = st.hash ? oh === st.hash : oh === await sha256Hash(DEFAULT_PASS + currentUser.nip);
+      var oh = await sha256Hash(o + currentUser.nip), st = await getStoredHash(currentUser.nip, oh), ok = st.locked ? false : st.hash ? oh === st.hash : oh === await sha256Hash(DEFAULT_PASS + currentUser.nip);
+      if (st.locked) { toast('Terlalu banyak percobaan salah. Coba lagi sekitar 5 menit.', 'err'); return; }
       if (!ok) { toast('Password lama salah.', 'err'); return; }
       dbSet('pw:' + currentUser.nip, await sha256Hash(n + currentUser.nip), 'lww'); syncNow();
       toast('Password diperbarui.', 'ok'); ['pass-old', 'pass-new', 'pass-confirm'].forEach(function (i) { $(i).value = ''; });
