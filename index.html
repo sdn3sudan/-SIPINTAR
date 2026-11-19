@@ -2232,7 +2232,7 @@ function actExport_(req) {
         var r = scanSource(canvases[i], {});
         if (r.error) { bad.push(i + 1); if (!batch) { toast(r.error + '. Pastikan 4 kotak hitam sudut terlihat utuh.', 'err'); playSound('err'); } continue; }
         ok++; showScan(r); if (!batch) playSound('ok');
-        if (batch && r.student && r.qr && r.quality >= 0.08 && r.key && r.key.a && r.key.a.length) { if (saveScanResultToGradebook(true)) saved++; else bad.push(i + 1); } else if (batch) bad.push(i + 1);
+        if (batch && r.student && r.qr && r.quality >= 0.08 && r.key && r.key.a && r.key.a.length === r.q && r.answers.indexOf('*') < 0) { if (saveScanResultToGradebook(true)) saved++; else bad.push(i + 1); } else if (batch) bad.push(i + 1);
       }
       if (batch) playSound(bad.length ? 'warn' : 'ok');
       if (batch) toast(ok + ' halaman terbaca, ' + saved + ' tersimpan otomatis' + (bad.length ? '; perlu cek manual: halaman ' + bad.join(', ') : '') + '.', bad.length ? 'err' : 'ok');
@@ -2287,7 +2287,7 @@ function actExport_(req) {
     var cam = { stream: null, facing: 'environment', timer: null, stable: 0, prev: null, busy: false, locked: false, lost: 0 };
     function setCamMsg(t, ok) { $('camera-feedback-text').innerText = t; $('camera-feedback-pill').classList.toggle('ok', !!ok); }
     async function startCamera() {
-      if (cam.stream) return;
+      if (cam.stream || cam.starting) return;
       if (!ensureReady('scan')) return;
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { toast('Kamera tidak tersedia (butuh HTTPS). Gunakan tombol "Foto HP" atau "Unggah".', 'err'); return; }
       ensureAudio();
@@ -2299,8 +2299,13 @@ function actExport_(req) {
         { video: { facingMode: { ideal: cam.facing } }, audio: false },
         { video: true, audio: false }
       ], lastErr = null;
-      for (var ti = 0; ti < tries.length && !st; ti++) { try { st = await navigator.mediaDevices.getUserMedia(tries[ti]); } catch (e1) { lastErr = e1; } }
-      if (!st) { toast('Gagal membuka kamera: ' + (lastErr ? lastErr.message : 'tidak diketahui'), 'err'); return; }
+      cam.starting = true;
+      for (var ti = 0; ti < tries.length && !st; ti++) { try { st = await navigator.mediaDevices.getUserMedia(tries[ti]); } catch (e1) { lastErr = e1; if (e1 && (e1.name === 'NotAllowedError' || e1.name === 'SecurityError')) break; } }
+      cam.starting = false;
+      if (!st) {
+        var nm = lastErr && lastErr.name, msg = nm === 'NotAllowedError' || nm === 'SecurityError' ? 'Izin kamera ditolak. Izinkan kamera pada ikon gembok di address bar / pengaturan browser, lalu coba lagi.' : nm === 'NotFoundError' ? 'Kamera tidak ditemukan di perangkat ini.' : nm === 'NotReadableError' ? 'Kamera sedang dipakai aplikasi lain. Tutup aplikasi itu lalu coba lagi.' : 'Gagal membuka kamera: ' + (lastErr ? lastErr.message : 'tidak diketahui');
+        toast(msg + ' Atau gunakan tombol "Foto HP" / "Unggah".', 'err'); return;
+      }
       cam.stream = st; var v = $('camera-video'); v.srcObject = st;
       try { await v.play(); } catch (e) { }
       fitCameraBox();
@@ -2333,6 +2338,7 @@ function actExport_(req) {
     }
     window.addEventListener('resize', function () { if (cam.stream) fitCameraBox(); else layoutGuide(); });
     window.addEventListener('orientationchange', function () { setTimeout(function () { if (cam.stream) fitCameraBox(); }, 300); });
+    document.addEventListener('visibilitychange', function () { if (document.hidden && cam.stream) stopCamera(); });
     function toggleCameraStream() { if (cam.stream) stopCamera(); else startCamera(); }
     async function switchCameraFacing() { cam.facing = cam.facing === 'environment' ? 'user' : 'environment'; if (cam.stream) { stopCamera(); await sleep(150); startCamera(); } }
     function drawOverlay(quad, w, h, color) {
@@ -2345,6 +2351,7 @@ function actExport_(req) {
     function camTick() {
       cam.timer = null; if (!cam.stream) return;
       var t0 = performance.now(), v = $('camera-video'), wait = 150;
+      try {
       if (v.readyState >= 2 && v.videoWidth && !cam.busy) {
         var gr = grabGray(v, 640), mk = findMarkers(gr.g, gr.w, gr.h);
         if (mk.quad) {
@@ -2362,6 +2369,7 @@ function actExport_(req) {
           camMsg(mk.count > 0 ? 'Penanda belum lengkap — mundurkan kamera sedikit, ratakan kertas, cahaya merata' : 'Arahkan kamera ke 4 kotak hitam di sudut LJK');
         }
       }
+      } catch (err) { cam.busy = false; console.error('camTick', err); }
       wait = Math.max(60, 150 - (performance.now() - t0));
       cam.timer = setTimeout(camTick, wait);
     }
@@ -2375,9 +2383,10 @@ function actExport_(req) {
       showScan(r);
       cam.locked = true; cam.stable = 0;
       var saved = false;
-      if ($('opt-autosave').checked && r.student && r.qr && r.key && r.key.a && r.key.a.length) saved = saveScanResultToGradebook(true);
       var ambiguous = r.answers.filter(function (a) { return a === '*'; }).length;
-      setCamMsg((r.student ? r.student.name : 'Siswa belum dikenali') + ' — nilai ' + r.finalScore + (saved ? ' ✓ tersimpan' : '') + (ambiguous ? ' • ' + ambiguous + ' nomor ganda, cek' : ''), true);
+      var keyOk = r.key && r.key.a && r.key.a.length === r.q;
+      if ($('opt-autosave').checked && r.student && r.qr && keyOk && r.quality >= 0.08 && !ambiguous) saved = saveScanResultToGradebook(true);
+      setCamMsg((r.student ? r.student.name : 'Siswa belum dikenali') + ' — nilai ' + r.finalScore + (saved ? ' ✓ tersimpan' : ' • belum tersimpan, cek hasil lalu simpan') + (ambiguous ? ' • ' + ambiguous + ' nomor ganda, cek' : '') + (r.key && r.key.a && r.key.a.length !== r.q ? ' • jumlah kunci tidak sama dengan jumlah soal' : ''), true);
       playSound(ambiguous || !r.student ? 'warn' : 'ok');
       if (navigator.vibrate) navigator.vibrate(ambiguous ? [60, 60, 60] : 60);
     }
