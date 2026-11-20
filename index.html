@@ -1113,7 +1113,7 @@ function actExport_(req) {
       <h3 id="modal-student-title" style="font-size:1.2rem;margin-bottom:16px;"><i class="fa-solid fa-user-plus" style="color:var(--gold-accent);"></i> Tambah Siswa</h3>
       <div class="form-control-box"><label>Nama Lengkap Siswa</label><input type="text" id="modal-student-name" placeholder="Contoh: MUHAMMAD RIZKY" style="text-transform:uppercase;"></div>
       <div class="form-control-box"><label>NISN (10 digit angka)</label><input type="text" id="modal-student-nisn" placeholder="0123456789" maxlength="10" inputmode="numeric"></div>
-      <div class="form-control-box"><label>NIS (opsional, angka)</label><input type="text" id="modal-student-nis" placeholder="Nomor Induk Siswa sekolah" maxlength="20" inputmode="numeric"></div>
+      <div class="form-control-box"><label>NIS (opsional, otomatis berformat 03. 1309)</label><input type="text" id="modal-student-nis" placeholder="Contoh: 03. 1309" maxlength="24" inputmode="numeric" onblur="this.value = formatNis(this.value)"></div>
       <div class="form-grid-2" style="gap:12px;">
         <div class="form-control-box"><label>Jenis Kelamin</label><select id="modal-student-gender"><option value="">— Pilih —</option><option value="L">Laki-laki</option><option value="P">Perempuan</option></select></div>
         <div class="form-control-box"><label>Agama</label><select id="modal-student-religion"><option value="">— Pilih —</option><option>Islam</option><option>Kristen</option><option>Katolik</option><option>Hindu</option><option>Buddha</option><option>Konghucu</option></select></div>
@@ -1865,32 +1865,36 @@ function actExport_(req) {
       $('thead-students').innerHTML = '<tr><th style="width:50px;">No</th><th>Nama Lengkap</th><th style="width:130px;">NISN</th><th style="width:130px;">NIS</th><th style="width:130px;">Jenis Kelamin</th><th style="width:130px;">Agama</th>' + (edit ? '<th style="width:110px;text-align:center;">Aksi</th>' : '') + '</tr>';
       $('tbody-students').innerHTML = list.map(function (s, i) {
         var g = edit ? '<select class="mini-select' + (s.gender ? '' : ' need') + '" onchange="setStudentField(\'' + s.nisn + '\',\'gender\',this.value)"><option value="">—</option><option value="L"' + (s.gender === 'L' ? ' selected' : '') + '>Laki-laki</option><option value="P"' + (s.gender === 'P' ? ' selected' : '') + '>Perempuan</option></select>' : (s.gender === 'L' ? 'Laki-laki' : s.gender === 'P' ? 'Perempuan' : '—');
-        var nis = edit ? '<input type="text" value="' + esc(s.nis || '') + '" maxlength="20" inputmode="numeric" placeholder="—" style="width:100%;min-width:90px;padding:6px 8px;border-radius:8px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#fff;font:inherit;" onchange="setStudentNis(\'' + s.nisn + '\',this.value)">' : esc(s.nis || '—');
+        var nis = edit ? '<input type="text" value="' + esc(formatNis(s.nis)) + '" maxlength="24" inputmode="numeric" placeholder="—" style="width:100%;min-width:90px;padding:6px 8px;border-radius:8px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#fff;font:inherit;" onchange="setStudentNis(\'' + s.nisn + '\',this.value)">' : esc(formatNis(s.nis) || '—');
         var r = edit ? '<select class="mini-select' + (s.religion ? '' : ' need') + '" onchange="setStudentField(\'' + s.nisn + '\',\'religion\',this.value)"><option value="">—</option>' + RELIGIONS.map(function (x) { return '<option' + (s.religion === x ? ' selected' : '') + '>' + x + '</option>'; }).join('') + '</select>' : esc(s.religion || '—');
-        return '<tr data-search="' + esc((s.name + ' ' + s.nisn + ' ' + (s.nis || '')).toLowerCase()) + '"><td>' + (i + 1) + '</td><td style="font-weight:600;color:#fff;">' + esc(s.name) + '</td><td><code>' + esc(s.nisn) + '</code></td><td>' + nis + '</td><td>' + g + '</td><td>' + r + '</td>' + (edit ? '<td style="text-align:center;white-space:nowrap;"><button class="btn-act glass" style="padding:5px 9px;" onclick="openStudentModal(\'' + s.nisn + '\')"><i class="fa-solid fa-pen"></i></button> <button class="btn-act danger" style="padding:5px 9px;" onclick="deleteStudent(\'' + s.nisn + '\')"><i class="fa-solid fa-trash"></i></button></td>' : '') + '</tr>';
+        return '<tr data-search="' + esc((s.name + ' ' + s.nisn + ' ' + formatNis(s.nis)).toLowerCase()) + '"><td>' + (i + 1) + '</td><td style="font-weight:600;color:#fff;">' + esc(s.name) + '</td><td><code>' + esc(s.nisn) + '</code></td><td>' + nis + '</td><td>' + g + '</td><td>' + r + '</td>' + (edit ? '<td style="text-align:center;white-space:nowrap;"><button class="btn-act glass" style="padding:5px 9px;" onclick="openStudentModal(\'' + s.nisn + '\')"><i class="fa-solid fa-pen"></i></button> <button class="btn-act danger" style="padding:5px 9px;" onclick="deleteStudent(\'' + s.nisn + '\')"><i class="fa-solid fa-trash"></i></button></td>' : '') + '</tr>';
       }).join('') || '<tr><td colspan="7" style="text-align:center;padding:24px;">Belum ada data siswa.</td></tr>';
       $('scan-batch-counter').innerText = list.length + ' siswa di kelas ' + cls;
       filterStudentsTable();
     }
     function filterStudentsTable() { var q = $('search-student-input').value.toLowerCase(); document.querySelectorAll('#tbody-students tr[data-search]').forEach(function (r) { r.style.display = r.getAttribute('data-search').indexOf(q) >= 0 ? '' : 'none'; }); }
     function setStudentField(nisn, f, v) { if (!canEditStudents(activeClass)) return; var a = getStudents(activeClass); a.forEach(function (s) { if (s.nisn === nisn) s[f] = v; }); saveStudents(activeClass, a); renderStudents(); updateDashboard(); }
+    // Format NIS: dua digit awal, titik, spasi, lalu sisanya (031309 / 03.1309 / 03. 1309 -> 03. 1309)
+    function formatNis(v) { var d = String(v == null ? '' : v).replace(/\D/g, ''); return d.length <= 2 ? d : d.slice(0, 2) + '. ' + d.slice(2); }
+    function validNis(v) { v = String(v || '').trim(); return !v || (/^[\d.\s]+$/.test(v) && v.replace(/\D/g, '').length <= 20); }
     function setStudentNis(nisn, v) {
       if (!canEditStudents(activeClass)) return; v = String(v || '').trim();
-      if (v && !/^\d{1,20}$/.test(v)) { toast('NIS hanya boleh angka (maks. 20 digit).', 'err'); renderStudents(); return; }
-      var a = getStudents(activeClass); a.forEach(function (s) { if (s.nisn === nisn) s.nis = v; }); saveStudents(activeClass, a); renderStudents();
+      if (!validNis(v)) { toast('NIS hanya boleh angka (maks. 20 digit). Contoh: 03. 1309', 'err'); renderStudents(); return; }
+      v = formatNis(v); var a = getStudents(activeClass); a.forEach(function (s) { if (s.nisn === nisn) s.nis = v; }); saveStudents(activeClass, a); renderStudents();
     }
     function openStudentModal(nisn) {
       if (!canEditStudents(activeClass)) return;
       modalEditNisn = nisn || null; var s = nisn ? getStudents(activeClass).filter(function (x) { return x.nisn === nisn; })[0] : null;
       $('modal-student-title').innerHTML = '<i class="fa-solid fa-user-pen" style="color:var(--gold-accent);"></i> ' + (s ? 'Ubah Siswa' : 'Tambah Siswa');
-      $('modal-student-name').value = s ? s.name : ''; $('modal-student-nisn').value = s ? s.nisn : ''; $('modal-student-nis').value = s ? s.nis || '' : '';
+      $('modal-student-name').value = s ? s.name : ''; $('modal-student-nisn').value = s ? s.nisn : ''; $('modal-student-nis').value = s ? formatNis(s.nis) : '';
       $('modal-student-gender').value = s ? s.gender || '' : ''; $('modal-student-religion').value = s ? s.religion || '' : '';
       $('modal-student').style.display = 'flex';
     }
     function closeStudentModal() { $('modal-student').style.display = 'none'; }
     function submitStudentModal() {
       var name = $('modal-student-name').value.trim().toUpperCase(), nisn = $('modal-student-nisn').value.trim(), g = $('modal-student-gender').value, r = $('modal-student-religion').value, nis = $('modal-student-nis').value.trim();
-      if (nis && !/^\d{1,20}$/.test(nis)) { toast('NIS hanya boleh angka (maks. 20 digit).', 'err'); return; }
+      if (!validNis(nis)) { toast('NIS hanya boleh angka (maks. 20 digit). Contoh: 03. 1309', 'err'); return; }
+      nis = formatNis(nis);
       if (!name) { toast('Nama siswa wajib diisi.', 'err'); return; }
       if (!/^\d{10}$/.test(nisn)) { toast('NISN wajib 10 digit angka.', 'err'); return; }
       if (!g || !r) { toast('Pilih jenis kelamin dan agama.', 'err'); return; }
@@ -1919,9 +1923,9 @@ function actExport_(req) {
             var name = String(pickCol(r, ['nama', 'namasiswa', 'namalengkap', 'namalengkapsiswa'])).trim().toUpperCase();
             var nisn = String(pickCol(r, ['nisn', 'nomorinduk'])).trim(); if (/^\d{1,9}$/.test(nisn)) nisn = nisn.padStart(10, '0');
             var g = normGender(pickCol(r, ['jeniskelamin', 'jk', 'lp', 'kelamin', 'gender'])), rel = normReligion(pickCol(r, ['agama']));
-            var nis = String(pickCol(r, ['nis', 'nomorinduksiswa'])).trim(); if (!/^\d{1,20}$/.test(nis)) nis = '';
+            var nis = String(pickCol(r, ['nis', 'nomorinduksiswa'])).trim(); nis = validNis(nis) ? formatNis(nis) : '';
             var ex = a.filter(function (s) { return s.nisn === nisn; })[0];
-            if (ex) { if (nis && ex.nis !== nis) { ex.nis = nis; nisUpd++; } else skip++; }
+            if (ex) { if (nis && formatNis(ex.nis) !== nis) { ex.nis = nis; nisUpd++; } else skip++; }
             else if (name && /^\d{10}$/.test(nisn)) { a.push({ name: name, nisn: nisn, nis: nis, gender: g, religion: rel }); added++; if (!g || !rel) incomplete++; } else skip++;
           });
           saveStudents(activeClass, a); refreshAll();
@@ -1932,7 +1936,7 @@ function actExport_(req) {
       rd.readAsArrayBuffer(file);
     }
     function downloadStudentTemplate() {
-      var ws = XLSX.utils.aoa_to_sheet([['Nama Lengkap', 'NISN', 'NIS', 'Jenis Kelamin (L/P)', 'Agama'], ['AHMAD DHANI', '0123456781', '1001', 'L', 'Islam'], ['AISYAH NUR', '0123456782', '1002', 'P', 'Islam']]);
+      var ws = XLSX.utils.aoa_to_sheet([['Nama Lengkap', 'NISN', 'NIS', 'Jenis Kelamin (L/P)', 'Agama'], ['AHMAD DHANI', '0123456781', '03. 1309', 'L', 'Islam'], ['AISYAH NUR', '0123456782', '03. 1310', 'P', 'Islam']]);
       var wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Template_Siswa'); XLSX.writeFile(wb, 'Template_Siswa_' + activeClass + '.xlsx');
     }
 
@@ -2480,7 +2484,7 @@ function actExport_(req) {
        ========================================================================== */
     function downloadBackupBeforeReset() {
       var wb = XLSX.utils.book_new(), cls = activeClass;
-      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(getStudents(cls).map(function (s) { return { Nama: s.name, NISN: s.nisn, NIS: s.nis || '', JK: s.gender, Agama: s.religion }; })), 'Siswa');
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(getStudents(cls).map(function (s) { return { Nama: s.name, NISN: s.nisn, NIS: formatNis(s.nis), JK: s.gender, Agama: s.religion }; })), 'Siswa');
       getSubjectsFor(currentUser, cls).forEach(function (sj) { var g = getGrades(cls, sj.code), rows = Object.keys(g).map(function (n) { var x = g[n]; return { NISN: n, Benar: x.correct, Salah: x.wrong, Kosong: x.empty, PG: x.pgScore, Isian: x.isianScore, Essay: x.essayScore, Akhir: x.finalScore }; }); if (rows.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), sj.code.slice(0, 28)); });
       XLSX.writeFile(wb, 'Cadangan_SIPINTAR_' + cls + '_' + Date.now() + '.xlsx');
     }
@@ -2578,7 +2582,7 @@ function actExport_(req) {
       var classes = allowedClasses(u), sis = [['Kelas', 'No', 'Nama Lengkap', 'NISN', 'NIS', 'Jenis Kelamin', 'Agama']], nil = [['Kelas', 'Mata Pelajaran', 'Nama', 'NISN', 'Benar', 'Salah', 'Kosong', 'Nilai PG', 'Isian', 'Essay', 'Nilai Akhir', 'Waktu']];
       classes.forEach(function (cls) {
         var all = getStudents(cls), list = studentScope(cls) === 'islam' ? all.filter(isMuslim) : all;
-        list.forEach(function (st, i) { sis.push([cls, i + 1, st.name, st.nisn, st.nis || '', genderText(st.gender), st.religion || '']); });
+        list.forEach(function (st, i) { sis.push([cls, i + 1, st.name, st.nisn, formatNis(st.nis), genderText(st.gender), st.religion || '']); });
         getSubjectsFor(u, cls).forEach(function (sj) {
           var g = getGrades(cls, sj.code);
           studentsForSubject(cls, sj.code).forEach(function (st) { var x = g[st.nisn]; if (x) nil.push([cls, sj.name, st.name, st.nisn, x.correct || 0, x.wrong || 0, x.empty || 0, x.pgScore || 0, x.isianScore || 0, x.essayScore || 0, x.finalScore || 0, x.time || '']); });
