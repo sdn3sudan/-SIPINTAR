@@ -591,7 +591,7 @@
             <div class="table-responsive">
               <table class="custom-table" style="min-width:880px;">
                 <thead><tr>
-                  <th style="width:45px;">No</th><th>Nama Siswa</th><th style="width:110px;">NISN</th>
+                  <th style="width:45px;">No</th><th>Nama Siswa</th><th style="width:110px;">NISN</th><th style="width:110px;">NIS</th>
                   <th style="text-align:center;">Benar PG</th><th style="text-align:center;">Salah PG</th><th style="text-align:center;">Kosong</th>
                   <th style="text-align:center;">Nilai PG</th><th style="text-align:center;">Nilai Isian</th><th style="text-align:center;">Nilai Essay</th>
                   <th style="text-align:center;color:var(--gold-light);">Nilai Akhir</th><th>Waktu</th>
@@ -1952,8 +1952,8 @@ function actExport_(req) {
       $('tbody-grades').innerHTML = list.map(function (s, i) {
         var r = g[s.nisn] || { correct: 0, wrong: 0, empty: q, pgScore: 0, isianScore: 0, essayScore: 0, finalScore: 0, time: '' };
         function inp(f, mx) { return '<td style="text-align:center;"><input type="number" min="0" max="' + mx + '" value="' + (r[f] || 0) + '"' + (isReadOnly() ? ' disabled' : '') + ' onchange="updateRowGrade(\'' + s.nisn + '\',\'' + f + '\',this.value)"></td>'; }
-        return '<tr><td>' + (i + 1) + '</td><td style="font-weight:600;color:#fff;">' + esc(s.name) + '</td><td><code>' + s.nisn + '</code></td>' + inp('correct', 40) + inp('wrong', 40) + inp('empty', 40) + '<td style="text-align:center;font-weight:700;" id="pg-' + s.nisn + '">' + (r.pgScore || 0) + '</td>' + inp('isianScore', 100) + inp('essayScore', 100) + '<td style="text-align:center;font-weight:800;color:var(--gold-light);" id="fin-' + s.nisn + '">' + (r.finalScore || 0) + '</td><td style="font-size:.74rem;">' + esc(r.time || '-') + '</td></tr>';
-      }).join('') || '<tr><td colspan="11" style="text-align:center;padding:24px;">Belum ada siswa. Data siswa diisi oleh Wali Kelas.</td></tr>';
+        return '<tr><td>' + (i + 1) + '</td><td style="font-weight:600;color:#fff;">' + esc(s.name) + '</td><td><code>' + s.nisn + '</code></td><td>' + esc(formatNis(s.nis) || '—') + '</td>' + inp('correct', 40) + inp('wrong', 40) + inp('empty', 40) + '<td style="text-align:center;font-weight:700;" id="pg-' + s.nisn + '">' + (r.pgScore || 0) + '</td>' + inp('isianScore', 100) + inp('essayScore', 100) + '<td style="text-align:center;font-weight:800;color:var(--gold-light);" id="fin-' + s.nisn + '">' + (r.finalScore || 0) + '</td><td style="font-size:.74rem;">' + esc(r.time || '-') + '</td></tr>';
+      }).join('') || '<tr><td colspan="12" style="text-align:center;padding:24px;">Belum ada siswa. Data siswa diisi oleh Wali Kelas.</td></tr>';
     }
     function updateRowGrade(nisn, field, value) {
       if (isReadOnly()) return;
@@ -1986,21 +1986,21 @@ function actExport_(req) {
       if (!scope) { th.innerHTML = ''; tb.innerHTML = '<tr><td style="padding:20px;">Tidak ada mapel.</td></tr>'; return; }
       if (scope === 'HOMEROOM') {
         $('rekap-title').innerText = 'Rekapitulasi ' + HOMEROOM_SUBJECTS.length + ' Mata Pelajaran Kelas ' + cls;
-        th.innerHTML = '<tr><th>No</th><th>Nama Siswa</th><th>NISN</th>' + HOMEROOM_SUBJECTS.map(function (m) { return '<th style="text-align:center;">' + m.short + '</th>'; }).join('') + '<th style="text-align:center;">Jumlah</th><th style="text-align:center;color:var(--gold-light);">Rata-rata</th><th style="text-align:center;">Peringkat</th></tr>';
+        th.innerHTML = '<tr><th>No</th><th>Nama Siswa</th><th>NISN</th><th>NIS</th>' + HOMEROOM_SUBJECTS.map(function (m) { return '<th style="text-align:center;">' + m.short + '</th>'; }).join('') + '<th style="text-align:center;">Jumlah</th><th style="text-align:center;color:var(--gold-light);">Rata-rata</th><th style="text-align:center;">Peringkat</th></tr>';
         var gs = {}; HOMEROOM_SUBJECTS.forEach(function (m) { gs[m.code] = getGrades(cls, m.code); });
         var rows = getStudents(cls).map(function (s) {
           var sum = 0, sc = {}; HOMEROOM_SUBJECTS.forEach(function (m) { var v = gs[m.code][s.nisn] ? gs[m.code][s.nisn].finalScore || 0 : 0; sc[m.code] = v; sum += v; });
           return { s: s, sc: sc, total: +sum.toFixed(1), avg: +(sum / HOMEROOM_SUBJECTS.length).toFixed(1) };
         });
         var ts = rows.map(function (r) { return r.total; }).sort(function (a, b) { return b - a; });
-        tb.innerHTML = rows.map(function (r, i) { return '<tr><td>' + (i + 1) + '</td><td style="font-weight:600;color:#fff;">' + esc(r.s.name) + '</td><td><code>' + r.s.nisn + '</code></td>' + HOMEROOM_SUBJECTS.map(function (m) { return '<td style="text-align:center;">' + r.sc[m.code] + '</td>'; }).join('') + '<td style="text-align:center;font-weight:700;color:#fff;">' + r.total + '</td><td style="text-align:center;font-weight:800;color:var(--gold-light);">' + r.avg + '</td><td style="text-align:center;"><span class="status-badge badge-done">#' + rankOf(ts, r.total) + '</span></td></tr>'; }).join('') || '<tr><td colspan="13" style="padding:20px;text-align:center;">Belum ada data siswa.</td></tr>';
+        tb.innerHTML = rows.map(function (r, i) { return '<tr><td>' + (i + 1) + '</td><td style="font-weight:600;color:#fff;">' + esc(r.s.name) + '</td><td><code>' + r.s.nisn + '</code></td><td>' + esc(formatNis(r.s.nis) || '—') + '</td>' + HOMEROOM_SUBJECTS.map(function (m) { return '<td style="text-align:center;">' + r.sc[m.code] + '</td>'; }).join('') + '<td style="text-align:center;font-weight:700;color:#fff;">' + r.total + '</td><td style="text-align:center;font-weight:800;color:var(--gold-light);">' + r.avg + '</td><td style="text-align:center;"><span class="status-badge badge-done">#' + rankOf(ts, r.total) + '</span></td></tr>'; }).join('') || '<tr><td colspan="14" style="padding:20px;text-align:center;">Belum ada data siswa.</td></tr>';
       } else {
         var sj = subjectByCode(scope), list = studentsForSubject(cls, scope), g = getGrades(cls, scope);
         $('rekap-title').innerText = 'Rekapitulasi ' + sj.name + ' — Kelas ' + cls;
-        th.innerHTML = '<tr><th>No</th><th>Nama Siswa</th><th>NISN</th><th style="text-align:center;">Benar PG</th><th style="text-align:center;">Salah PG</th><th style="text-align:center;">Nilai PG</th><th style="text-align:center;">Isian</th><th style="text-align:center;">Essay</th><th style="text-align:center;color:var(--gold-light);">Nilai Akhir</th><th style="text-align:center;">Predikat</th><th style="text-align:center;">Peringkat</th></tr>';
+        th.innerHTML = '<tr><th>No</th><th>Nama Siswa</th><th>NISN</th><th>NIS</th><th style="text-align:center;">Benar PG</th><th style="text-align:center;">Salah PG</th><th style="text-align:center;">Nilai PG</th><th style="text-align:center;">Isian</th><th style="text-align:center;">Essay</th><th style="text-align:center;color:var(--gold-light);">Nilai Akhir</th><th style="text-align:center;">Predikat</th><th style="text-align:center;">Peringkat</th></tr>';
         var rr = list.map(function (s) { var x = g[s.nisn] || {}; return { s: s, c: x.correct || 0, w: x.wrong || 0, pg: x.pgScore || 0, i: x.isianScore || 0, e: x.essayScore || 0, f: x.finalScore || 0 }; });
         var fs = rr.map(function (r) { return r.f; }).sort(function (a, b) { return b - a; });
-        tb.innerHTML = rr.map(function (r, i) { return '<tr><td>' + (i + 1) + '</td><td style="font-weight:600;color:#fff;">' + esc(r.s.name) + '</td><td><code>' + r.s.nisn + '</code></td><td style="text-align:center;">' + r.c + '</td><td style="text-align:center;">' + r.w + '</td><td style="text-align:center;">' + r.pg + '</td><td style="text-align:center;">' + r.i + '</td><td style="text-align:center;">' + r.e + '</td><td style="text-align:center;font-weight:800;color:var(--gold-light);">' + r.f + '</td><td style="text-align:center;"><span class="status-badge badge-done">' + predikat(r.f) + '</span></td><td style="text-align:center;"><span class="status-badge badge-done">#' + rankOf(fs, r.f) + '</span></td></tr>'; }).join('') || '<tr><td colspan="11" style="padding:20px;text-align:center;">Belum ada siswa.</td></tr>';
+        tb.innerHTML = rr.map(function (r, i) { return '<tr><td>' + (i + 1) + '</td><td style="font-weight:600;color:#fff;">' + esc(r.s.name) + '</td><td><code>' + r.s.nisn + '</code></td><td>' + esc(formatNis(r.s.nis) || '—') + '</td><td style="text-align:center;">' + r.c + '</td><td style="text-align:center;">' + r.w + '</td><td style="text-align:center;">' + r.pg + '</td><td style="text-align:center;">' + r.i + '</td><td style="text-align:center;">' + r.e + '</td><td style="text-align:center;font-weight:800;color:var(--gold-light);">' + r.f + '</td><td style="text-align:center;"><span class="status-badge badge-done">' + predikat(r.f) + '</span></td><td style="text-align:center;"><span class="status-badge badge-done">#' + rankOf(fs, r.f) + '</span></td></tr>'; }).join('') || '<tr><td colspan="12" style="padding:20px;text-align:center;">Belum ada siswa.</td></tr>';
       }
     }
     function exportRecapToExcel() { var wb = XLSX.utils.table_to_book($('table-recap'), { sheet: 'Rekap' }); XLSX.writeFile(wb, 'Rekap_' + activeClass + '_' + ($('rekap-scope').value || 'nilai') + '.xlsx'); }
@@ -2103,7 +2103,7 @@ function actExport_(req) {
       html += '<div class="abs" style="left:22mm;top:10mm;width:18mm;height:18mm;"><img src="' + LOGO_SRC + '" style="width:18mm;height:18mm;object-fit:contain"></div>';
       html += '<div class="abs ljk-title-box" style="left:42mm;top:9.5mm;width:121mm;text-align:center;"><h3>' + esc(o.school || '.....................................') + '</h3><h4>SUMATIF ' + (o.sem === '2' ? 'AKHIR SEMESTER GENAP' : o.sem === '1' ? 'AKHIR SEMESTER GANJIL' : 'AKHIR SEMESTER') + (o.year ? ' — TP. ' + esc(o.year) : '') + '</h4><p>Mata Pelajaran: <b>' + esc(o.subjectName) + '</b></p><p>Tanggal: ' + esc(o.date) + '</p></div>';
       html += '<div class="abs" style="left:165mm;top:9mm;width:22mm;height:22mm;background:#fff;padding:1.5mm;box-sizing:border-box;" id="qr-ljk-' + o.idx + '"></div>';
-      html += '<div class="abs" style="left:20mm;top:34mm;width:170mm;height:8mm;border:.25mm solid #333;background:#F7F7F7;box-sizing:border-box;display:grid;grid-template-columns:2fr 1fr 1fr;font-size:9pt;align-items:center;padding:0 2.5mm;"><div>Nama: <b>' + esc(o.name) + '</b></div><div>NISN: <b>' + esc(o.nisn) + '</b></div><div>Kelas: <b>' + esc(o.cls) + '</b></div></div>';
+      html += '<div class="abs" style="left:20mm;top:34mm;width:170mm;height:8mm;border:.25mm solid #333;background:#F7F7F7;box-sizing:border-box;display:grid;grid-template-columns:1.7fr 1.7fr .6fr;font-size:9pt;align-items:center;padding:0 2.5mm;"><div>Nama: <b>' + esc(o.name) + '</b></div><div>NIS/NISN: <b>' + esc(o.nis || '-') + '/' + esc(o.nisn) + '</b></div><div>Kelas: <b>' + esc(o.cls) + '</b></div></div>';
       html += '<div class="abs ljk-sec" style="left:20mm;top:44mm;width:170mm;box-sizing:border-box;"><span>BAGIAN I: PILIHAN GANDA (' + q + ' BUTIR) — HITAMKAN BULATAN</span><small>*Dinilai otomatis (OMR)</small></div>';
       for (c = 0; c < cols; c++) {
         var x0 = L.x0 + c * L.colw;
@@ -2139,11 +2139,11 @@ function actExport_(req) {
       var date = $('print-ljk-date').value ? new Date($('print-ljk-date').value).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '...................';
       var sch = schoolInfo(), students = studentsForSubject(activeClass, subj);
       if (mode === 'personalized' && !students.length) { toast('Data siswa kosong. Pilih mode "LJK Kosong" atau isi data siswa dahulu.', 'err'); return; }
-      var list = mode === 'personalized' ? students : [{ name: '____________________________', nisn: '__________', _blank: true }];
+      var list = mode === 'personalized' ? students : [{ name: '____________________________', nisn: '__________', nis: '_______', _blank: true }];
       var area = $('print-ljk-area'); area.innerHTML = '';
       list.forEach(function (st, idx) {
         var sheet = document.createElement('div'); sheet.className = 'ljk-sheet-a4';
-        sheet.innerHTML = ljkSheetHtml({ idx: idx, q: q, isian: isian, essay: essay, school: sch.name, sem: sch.semester, year: sch.year, subjectName: sj.name, date: date, full: !(isian > 0 || essay > 0), name: st.name, nisn: st.nisn, cls: activeClass });
+        sheet.innerHTML = ljkSheetHtml({ idx: idx, q: q, isian: isian, essay: essay, school: sch.name, sem: sch.semester, year: sch.year, subjectName: sj.name, date: date, full: !(isian > 0 || essay > 0), name: st.name, nisn: st.nisn, nis: st._blank ? st.nis : formatNis(st.nis), cls: activeClass });
         area.appendChild(sheet);
         var box = sheet.querySelector('#qr-ljk-' + idx);
         if (box && window.QRCode) {
@@ -2579,17 +2579,17 @@ function actExport_(req) {
     function buildSheetExport() {
       var u = currentUser, sch = schoolInfo(), sheets = [], now = new Date().toLocaleString('id-ID', { hour12: false });
       sheets.push({ name: 'Data Sekolah', textCols: [1], rows: [['Isian', 'Nilai'], ['Nama Sekolah', sch.name || ''], ['NPSN', sch.npsn || ''], ['Alamat', [sch.street, sch.village, sch.district, sch.regency, sch.province, sch.postal].filter(Boolean).join(', ')], ['Kepala Sekolah', sch.headmaster || ''], ['NIP Kepala Sekolah', sch.headNip || ''], ['Tahun Pelajaran', sch.year || ''], ['Semester', sch.semester === '1' ? 'Ganjil' : sch.semester === '2' ? 'Genap' : ''], ['Guru', u.name], ['NIP', u.nip], ['Dikirim', now]] });
-      var classes = allowedClasses(u), sis = [['Kelas', 'No', 'Nama Lengkap', 'NISN', 'NIS', 'Jenis Kelamin', 'Agama']], nil = [['Kelas', 'Mata Pelajaran', 'Nama', 'NISN', 'Benar', 'Salah', 'Kosong', 'Nilai PG', 'Isian', 'Essay', 'Nilai Akhir', 'Waktu']];
+      var classes = allowedClasses(u), sis = [['Kelas', 'No', 'Nama Lengkap', 'NISN', 'NIS', 'Jenis Kelamin', 'Agama']], nil = [['Kelas', 'Mata Pelajaran', 'Nama', 'NISN', 'NIS', 'Benar', 'Salah', 'Kosong', 'Nilai PG', 'Isian', 'Essay', 'Nilai Akhir', 'Waktu']];
       classes.forEach(function (cls) {
         var all = getStudents(cls), list = studentScope(cls) === 'islam' ? all.filter(isMuslim) : all;
         list.forEach(function (st, i) { sis.push([cls, i + 1, st.name, st.nisn, formatNis(st.nis), genderText(st.gender), st.religion || '']); });
         getSubjectsFor(u, cls).forEach(function (sj) {
           var g = getGrades(cls, sj.code);
-          studentsForSubject(cls, sj.code).forEach(function (st) { var x = g[st.nisn]; if (x) nil.push([cls, sj.name, st.name, st.nisn, x.correct || 0, x.wrong || 0, x.empty || 0, x.pgScore || 0, x.isianScore || 0, x.essayScore || 0, x.finalScore || 0, x.time || '']); });
+          studentsForSubject(cls, sj.code).forEach(function (st) { var x = g[st.nisn]; if (x) nil.push([cls, sj.name, st.name, st.nisn, formatNis(st.nis), x.correct || 0, x.wrong || 0, x.empty || 0, x.pgScore || 0, x.isianScore || 0, x.essayScore || 0, x.finalScore || 0, x.time || '']); });
         });
       });
       sheets.push({ name: 'Siswa', textCols: [3, 4], rows: sis });
-      sheets.push({ name: 'Nilai', textCols: [3], rows: nil });
+      sheets.push({ name: 'Nilai', textCols: [3, 4], rows: nil });
       (u.homeroom || []).forEach(function (cls) {
         var gs = {}; HOMEROOM_SUBJECTS.forEach(function (m) { gs[m.code] = getGrades(cls, m.code); });
         var rows = getStudents(cls).map(function (st) {
@@ -2597,9 +2597,9 @@ function actExport_(req) {
           return { st: st, sc: sc, total: +sum.toFixed(1), avg: +(sum / HOMEROOM_SUBJECTS.length).toFixed(1) };
         });
         var tots = rows.map(function (r) { return r.total; }).sort(function (a, b) { return b - a; });
-        var out = [['No', 'Nama', 'NISN'].concat(HOMEROOM_SUBJECTS.map(function (m) { return m.name; }), ['Jumlah', 'Rata-rata', 'Peringkat'])];
-        rows.forEach(function (r, i) { out.push([i + 1, r.st.name, r.st.nisn].concat(r.sc, [r.total, r.avg, rankOf(tots, r.total)])); });
-        sheets.push({ name: 'Rekap ' + cls, textCols: [2], rows: out });
+        var out = [['No', 'Nama', 'NISN', 'NIS'].concat(HOMEROOM_SUBJECTS.map(function (m) { return m.name; }), ['Jumlah', 'Rata-rata', 'Peringkat'])];
+        rows.forEach(function (r, i) { out.push([i + 1, r.st.name, r.st.nisn, formatNis(r.st.nis)].concat(r.sc, [r.total, r.avg, rankOf(tots, r.total)])); });
+        sheets.push({ name: 'Rekap ' + cls, textCols: [2, 3], rows: out });
       });
       return sheets;
     }
