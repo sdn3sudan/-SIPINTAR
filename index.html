@@ -1909,7 +1909,12 @@ function actExport_(req) {
       saveStudents(activeClass, getStudents(activeClass).filter(function (s) { return s.nisn !== nisn; })); refreshAll();
     }
     function normGender(v) { v = String(v || '').trim().toLowerCase(); if (!v) return ''; if (v[0] === 'l' || v.indexOf('laki') === 0 || v === 'pria') return 'L'; if (v[0] === 'p' || v.indexOf('perem') === 0 || v === 'wanita') return 'P'; return ''; }
-    function normReligion(v) { v = String(v || '').trim().toLowerCase(); if (!v) return ''; if (v.indexOf('islam') >= 0 || v === 'muslim') return 'Islam'; if (v.indexOf('kristen') >= 0 || v.indexOf('protestan') >= 0) return 'Kristen'; if (v.indexOf('katol') >= 0) return 'Katolik'; if (v.indexOf('hindu') >= 0) return 'Hindu'; if (v.indexOf('bud') >= 0) return 'Buddha'; if (v.indexOf('konghucu') >= 0 || v.indexOf('khonghucu') >= 0) return 'Konghucu'; return ''; }
+    function normReligion(v) { v = String(v || '').trim().toLowerCase(); if (!v) return ''; if (v.indexOf('islam') >= 0 || v === 'muslim') return 'Islam'; if (v.indexOf('kristen') >= 0 || v.indexOf('protestan') >= 0) return 'Kristen'; if (v.indexOf('katol') >= 0 || v.indexOf('katho') >= 0) return 'Katolik'; if (v.indexOf('hindu') >= 0) return 'Hindu'; if (v.indexOf('bud') >= 0) return 'Buddha'; if (v.indexOf('konghucu') >= 0 || v.indexOf('khonghucu') >= 0) return 'Konghucu'; return ''; }
+    function pickColHas(r, names, subs) {
+      var v = pickCol(r, names); if (String(v).trim() !== '') return v;
+      for (var k in r) { var kk = k.toLowerCase().replace(/[^a-z]/g, ''); for (var i = 0; i < subs.length; i++) if (kk.indexOf(subs[i]) >= 0 && String(r[k]).trim() !== '') return r[k]; }
+      return '';
+    }
     function pickCol(r, names) { for (var k in r) { var kk = k.toLowerCase().replace(/[^a-z]/g, ''); if (names.indexOf(kk) >= 0) return r[k]; } return ''; }
     function handleExcelStudentUpload(e) {
       var file = e.target.files[0]; if (!file || !canEditStudents(activeClass)) return;
@@ -1922,14 +1927,14 @@ function actExport_(req) {
           rows.forEach(function (r) {
             var name = String(pickCol(r, ['nama', 'namasiswa', 'namalengkap', 'namalengkapsiswa'])).trim().toUpperCase();
             var nisn = String(pickCol(r, ['nisn', 'nomorinduk'])).trim(); if (/^\d{1,9}$/.test(nisn)) nisn = nisn.padStart(10, '0');
-            var g = normGender(pickCol(r, ['jeniskelamin', 'jk', 'lp', 'kelamin', 'gender'])), rel = normReligion(pickCol(r, ['agama']));
+            var g = normGender(pickColHas(r, ['jeniskelamin', 'jk', 'lp', 'kelamin', 'gender', 'l/p', 'sex'], ['kelamin', 'gender'])), rel = normReligion(pickColHas(r, ['agama'], ['agama']));
             var nis = String(pickCol(r, ['nis', 'nomorinduksiswa'])).trim(); nis = validNis(nis) ? formatNis(nis) : '';
             var ex = a.filter(function (s) { return s.nisn === nisn; })[0];
-            if (ex) { if (nis && formatNis(ex.nis) !== nis) { ex.nis = nis; nisUpd++; } else skip++; }
+            if (ex) { var upd = false; if (nis && formatNis(ex.nis) !== nis) { ex.nis = nis; upd = true; } if (g && !ex.gender) { ex.gender = g; upd = true; } if (rel && !ex.religion) { ex.religion = rel; upd = true; } if (upd) nisUpd++; else skip++; }
             else if (name && /^\d{10}$/.test(nisn)) { a.push({ name: name, nisn: nisn, nis: nis, gender: g, religion: rel }); added++; if (!g || !rel) incomplete++; } else skip++;
           });
           saveStudents(activeClass, a); refreshAll();
-          toast('Impor: ' + added + ' siswa ditambahkan, ' + nisUpd + ' NIS diperbarui, ' + skip + ' dilewati' + (incomplete ? ', ' + incomplete + ' belum lengkap JK/agama' : '') + '.', (added || nisUpd) ? 'ok' : 'err');
+          toast('Impor: ' + added + ' siswa ditambahkan, ' + nisUpd + ' data diperbarui, ' + skip + ' dilewati' + (incomplete ? ', ' + incomplete + ' belum lengkap JK/agama' : '') + '.', (added || nisUpd) ? 'ok' : 'err');
         } catch (err) { toast('Gagal membaca Excel: ' + err.message, 'err'); }
         e.target.value = '';
       };
