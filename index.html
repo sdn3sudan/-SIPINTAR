@@ -299,9 +299,14 @@
     .ljk-essay-item .ln { border-bottom: .2mm dotted #666; height: 4.3mm; }
     .ljk-footer-note { font-size: 7pt; color: #444; border-top: .2mm solid #AAA; padding-top: 1mm; display: flex; justify-content: space-between; }
     .rekap-print { padding: 12mm; color: #000; background: #FFF; font-family: Arial, sans-serif; }
-    .rekap-print table { width: 100%; border-collapse: collapse; font-size: 9pt; }
-    .rekap-print th, .rekap-print td { border: .3mm solid #444; padding: 1.2mm 1.6mm; }
-    .rekap-print th { background: #E8EEFF; }
+    .rekap-print, .rekap-print * { color: #000 !important; text-shadow: none !important; opacity: 1 !important; }
+    .rekap-print table { width: 100%; min-width: 0 !important; border-collapse: collapse; font-size: 10pt; background: #FFF; }
+    .rekap-print th, .rekap-print td { border: .3mm solid #000 !important; padding: 1.4mm 1.8mm; background: #FFF !important; font-weight: 400; vertical-align: middle; }
+    .rekap-print th { background: #E6E6E6 !important; font-weight: 700 !important; text-transform: none; letter-spacing: 0; white-space: normal; }
+    .rekap-print td:nth-child(2) { font-weight: 700; }
+    .rekap-print code { font-family: Arial, sans-serif; font-size: inherit; background: none !important; padding: 0; border: 0; }
+    .rekap-print thead { display: table-header-group; }
+    .rekap-print tr { page-break-inside: avoid; }
     @media print {
       * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
       html, body { background: #FFF !important; }
@@ -2012,7 +2017,11 @@ function actExport_(req) {
     function printHtml(html) { var a = $('print-ljk-area'); a.innerHTML = html; setTimeout(function () { window.print(); }, 300); }
     function printRecapReport() {
       var sch = schoolInfo();
-      printHtml('<div class="rekap-print"><h3 style="text-align:center;margin-bottom:2mm;">' + esc($('rekap-title').innerText) + '</h3><p style="text-align:center;font-size:10pt;margin-bottom:5mm;">' + esc(sch.name || '') + (sch.year ? ' — TP. ' + esc(sch.year) : '') + '</p>' + $('table-recap').outerHTML + '<p style="margin-top:8mm;font-size:9pt;">Guru: ' + esc(currentUser.name) + '</p></div>');
+      // Salin tabel lalu buang gaya layar (teks putih/biru muda, latar gelap) agar cetakan hitam dan jelas
+      var tbl = $('table-recap').cloneNode(true); tbl.removeAttribute('id'); tbl.removeAttribute('class'); tbl.style.minWidth = '0';
+      var els = tbl.querySelectorAll('[style]'); for (var ei = 0; ei < els.length; ei++) { els[ei].style.color = ''; els[ei].style.background = ''; els[ei].style.textShadow = ''; }
+      var cols = tbl.querySelectorAll('thead th').length, page = cols > 10 ? '<style>@page { size: A4 landscape; margin: 0; }</style>' : '';
+      printHtml(page + '<div class="rekap-print"><h3 style="text-align:center;margin-bottom:2mm;">' + esc($('rekap-title').innerText) + '</h3><p style="text-align:center;font-size:10pt;margin-bottom:5mm;">' + esc(sch.name || '') + (sch.year ? ' — TP. ' + esc(sch.year) : '') + '</p>' + tbl.outerHTML + '<p style="margin-top:8mm;font-size:9pt;">Guru: ' + esc(currentUser.name) + '</p></div>');
     }
 
 
