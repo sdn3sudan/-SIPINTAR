@@ -647,6 +647,9 @@
                 <button class="btn-act gold" onclick="document.getElementById('excel-student-input').click()"><i class="fa-solid fa-file-excel"></i> Unggah Excel</button>
                 <input type="file" id="excel-student-input" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleExcelStudentUpload(event)">
                 <button class="btn-act glass" onclick="downloadStudentTemplate()"><i class="fa-solid fa-download"></i> Unduh Template</button>
+                <button class="btn-act success" onclick="spdManual()" title="Kirim data siswa kelas ini ke SIPANDA e-Rapor"><i class="fa-solid fa-rotate"></i> Sinkron ke SIPANDA</button>
+                <button class="btn-act success" id="btn-spd-all" style="display:none" onclick="spdManualAll()" title="Admin: kirim semua kelas yang sudah ada datanya"><i class="fa-solid fa-rotate"></i> Sinkron Semua Kelas</button>
+                <span id="spd-status" style="font-size:.78rem;opacity:.85;align-self:center;"></span>
               </div>
             </div>
             <div id="siswa-banner"></div>
@@ -1702,7 +1705,7 @@ function actExport_(req) {
 
     // Akses data terstruktur
     function getStudents(cls) { return dbGet('students:' + cls, []); }
-    function saveStudents(cls, arr) { dbSet('students:' + cls, arr, 'lww'); }
+    function saveStudents(cls, arr) { dbSet('students:' + cls, arr, 'lww'); if (window.scheduleSipandaSync) scheduleSipandaSync(cls); }
     function studentsForSubject(cls, code) { var all = getStudents(cls); return code === 'PAI' ? all.filter(isMuslim) : all; }
     function gKey(c, s) { return 'grades:' + c + ':' + s; }
     function getGrades(c, s) { var m = dbGet(gKey(c, s), {}), o = {}; for (var n in m) if (!m[n].deleted) o[n] = m[n]; return o; }
@@ -1822,7 +1825,7 @@ function actExport_(req) {
       $('header-user-name').innerText = currentUser.name;
       fillClassOptions($('class-switcher'), allowedClasses(currentUser)); $('class-switcher').value = activeClass;
       var subs = getSubjectsFor(currentUser, activeClass); activeSubject = subs.length ? subs[0].code : '';
-      loadSchoolForm(); fillCloudForm(); fillSheetForm(); fillGasCode(); $('menu-cloud').style.display = currentUser.admin ? '' : 'none'; refreshAll(); startClock(); startSyncLoop(); setSyncUI(); syncNow();
+      loadSchoolForm(); fillCloudForm(); fillSheetForm(); fillGasCode(); $('menu-cloud').style.display = currentUser.admin ? '' : 'none'; $('btn-spd-all').style.display = currentUser.admin ? '' : 'none'; refreshAll(); startClock(); startSyncLoop(); setSyncUI(); syncNow();
       $('print-ljk-date').value = new Date().toISOString().slice(0, 10);
       if (currentUser.head) {
         ['tab-ljk', 'tab-reset'].forEach(function (t) { var li = document.querySelector('.sidebar-menu li[data-tab="' + t + '"]'); if (li) li.style.display = 'none'; });
@@ -1944,7 +1947,7 @@ function actExport_(req) {
       var cls = activeClass, all = getStudents(cls), edit = canEditStudents(cls), scope = studentScope(cls);
       var list = scope === 'islam' ? all.filter(isMuslim) : all;
       $('siswa-active-class-title').innerText = 'Kelas ' + cls;
-      $('siswa-actions').style.display = edit ? '' : 'none';
+      $('siswa-actions').style.display = edit ? '' : 'none'; if (window.spdShowStatus) spdShowStatus();
       var ban = '';
       if (!edit) ban = '<div class="info-box"><i class="fa-solid fa-link"></i> Data siswa dikelola oleh Wali Kelas ' + cls + ' dan tersinkron otomatis ke akun Anda (hanya baca).' + (scope === 'islam' ? ' Ditampilkan hanya siswa beragama Islam: <b>' + list.length + '</b> dari ' + all.length + ' siswa.' : '') + '</div>';
       else if (!all.length) ban = '<div class="info-box warn"><i class="fa-solid fa-circle-info"></i> Data siswa kelas ' + cls + ' masih kosong. Tambah siswa satu per satu atau unggah Excel (kolom: Nama Lengkap, NISN, NIS, Jenis Kelamin, Agama).</div>';
@@ -2734,6 +2737,7 @@ function actExport_(req) {
       $('portal-user-role').innerText = roleText(currentUser, activeClass) + ' • ' + activeClass;
       $('portal-page').style.display = 'block';
       setSipandaBusy(false);
+      if (SESSION_HASH && !spdSync.booted) { spdSync.booted = true; setTimeout(spdAutoAll, 800); }
       window.scrollTo(0, 0);
     }
     function setSipandaBusy(b, txt) {
@@ -2816,6 +2820,127 @@ function actExport_(req) {
         mountSipanda(true);
       }
     });
+
+
+    /* ==========================================================================
+       Q. SINKRONISASI DATA SISWA: SIPINTAR -> SIPANDA e-Rapor (otomatis)
+       Sumber data = SIPINTAR (diisi wali kelas). Dikirim lewat aksi siswa.import SIPANDA yang sudah ada:
+       hanya menambah/memperbarui (tidak menghapus siswa atau nilai di SIPANDA). Tidak perlu mengubah Code.gs.
+       Pemicu: (1) login SIPINTAR, (2) setiap data siswa kelas berubah, (3) tombol "Sinkron ke SIPANDA".
+       ========================================================================== */
+    var spdSync = { chain: Promise.resolve(), timers: {}, status: {}, errShown: {}, booted: false };
+    function spdDigits(v) { return String(v == null ? '' : v).replace(/\D/g, ''); }
+    function spdHash(str) { var h = 5381, i; for (i = 0; i < str.length; i++) h = ((h << 5) + h + str.charCodeAt(i)) | 0; return String(h); }
+    function spdCached(cls) { try { var c = JSON.parse(sessionStorage.getItem('sp') || 'null'); return c && c.token && (c.kelas === cls || (c.caps && c.caps.indexOf('admin') >= 0)) ? c.token : ''; } catch (e) { return ''; } }
+    function spdCanAuth(cls) { return !!(SESSION_HASH || spdCached(cls)); }
+    async function spdToken(cls, fresh) {
+      var t = fresh ? '' : spdCached(cls); if (t) return t;
+      if (!SESSION_HASH) throw new Error('perlu login ulang di SIPINTAR');
+      return (await sipandaLoginAs(cls)).token;
+    }
+    function spdRows(cls) {      // hanya siswa lengkap (nama, NISN 10 digit, JK, agama) dan ber-NIS (SIPANDA mewajibkan NIS)
+      var rows = [], skip = 0, noNis = 0, dup = 0, seen = {};
+      getStudents(cls).forEach(function (s) {
+        if (studentProblems(s).length) { skip++; return; }
+        var nis = String(s.nis || '').replace(/\s+/g, ''), d = spdDigits(nis);
+        if (!d) { noNis++; return; }
+        if (seen[d]) { dup++; return; }
+        seen[d] = 1;
+        rows.push({ nama: String(s.name).trim().toUpperCase(), nis: nis, nisn: String(s.nisn), jk: s.gender, agama: s.religion });
+      });
+      return { rows: rows, skip: skip, noNis: noNis, dup: dup };
+    }
+    function spdFx(s) { var a = spdDigits(s.nis), b = spdDigits(s.nisn); return a.length === 10 && b.length !== 10 ? { nis: b, nisn: a } : { nis: a, nisn: b }; }
+    async function spdPush(cls, manual) {
+      var st = spdRows(cls), rows = st.rows, ex = { skip: st.skip, noNis: st.noNis, dup: st.dup };
+      if (!rows.length) return Object.assign({ empty: true }, ex);
+      var sig = spdHash(JSON.stringify(rows)), meta = lsGet('spdsync:' + cls, null);
+      if (!manual && meta && meta.sig === sig && Date.now() - meta.at < 12 * 3600 * 1000) return Object.assign({ same: true }, ex);
+      var token = await spdToken(cls, false), exist;
+      try { exist = await sipandaCall('siswa.list', { kelas: cls }, token); }
+      catch (e) { if (!/Sesi/i.test(e.message)) throw e; token = await spdToken(cls, true); exist = await sipandaCall('siswa.list', { kelas: cls }, token); }
+      var map = {}; (exist || []).forEach(function (e) { var f = spdFx(e); if (f.nisn) map[f.nisn] = e; if (f.nis) map[f.nis] = e; });
+      var send = [], ren = [], added = 0, upd = 0;
+      rows.forEach(function (r) {
+        var e = map[spdDigits(r.nisn)] || map[spdDigits(r.nis)];
+        if (!e) { r.alamat = ''; send.push(r); added++; return; }
+        var f = spdFx(e), nisSame = spdDigits(r.nis) === f.nis;
+        var diff = String(e.nama || '').toUpperCase() !== r.nama || e.jk !== r.jk || e.agama !== r.agama || f.nisn !== spdDigits(r.nisn) || !nisSame;
+        if (!diff) return;
+        r.alamat = e.alamat || '';                 // jangan menghapus alamat yang sudah diisi di SIPANDA
+        if (nisSame) { if (e.nis) r.nis = e.nis; send.push(r); }          // pakai NIS yang sudah ada agar tidak terduplikasi
+        else { r.id = e.id; ren.push(r); }         // NIS berubah: siswa.save (berdasar id) memindahkan nilai/absensi ke NIS baru
+        upd++;
+      });
+      if (send.length) {
+        var v = await sipandaCall('siswa.import', { kelas: cls, rows: send, dryRun: true }, token);
+        if (v && v.errors && v.errors.length) throw new Error('SIPANDA menolak data: ' + v.errors.slice(0, 3).join('; '));
+        await sipandaCall('siswa.import', { kelas: cls, rows: send }, token);
+      }
+      var bad = [];
+      for (var i = 0; i < ren.length; i++) {
+        var r2 = ren[i];
+        try { await sipandaCall('siswa.save', { kelas: cls, siswa: { id: r2.id, nis: r2.nis, nisn: r2.nisn, nama: r2.nama, jk: r2.jk, agama: r2.agama, alamat: r2.alamat } }, token); }
+        catch (e2) { bad.push(r2.nama + ' (' + e2.message + ')'); }
+      }
+      if (bad.length) throw new Error('perubahan NIS gagal: ' + bad.slice(0, 2).join('; '));
+      lsSet('spdsync:' + cls, { sig: sig, at: Date.now(), n: rows.length });
+      return Object.assign({ added: added, upd: upd, total: rows.length }, ex);
+    }
+    function spdNotes(r) {
+      var n = []; if (r.skip) n.push(r.skip + ' belum lengkap'); if (r.noNis) n.push(r.noNis + ' belum ber-NIS'); if (r.dup) n.push(r.dup + ' NIS ganda');
+      return n.join(', ');
+    }
+    async function spdRun(cls, manual) {
+      spdSync.status[cls] = 'SIPANDA: mengirim...'; spdShowStatus();
+      var res = null;
+      try {
+        var r = await spdPush(cls, manual), notes = spdNotes(r); spdSync.errShown[cls] = false;
+        if (r.empty) spdSync.status[cls] = 'SIPANDA: belum ada siswa yang siap dikirim' + (notes ? ' (' + notes + ')' : '');
+        else spdSync.status[cls] = 'SIPANDA: tersinkron ' + new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' (' + (r.total || lsGet('spdsync:' + cls, {}).n || 0) + ' siswa)' + (notes ? ' • dilewati: ' + notes : '');
+        if (manual || r.added || r.upd || (notes && !r.same)) toast(r.empty ? 'Kelas ' + cls + ': belum ada siswa siap kirim (wajib: nama, NISN 10 digit, JK, agama, NIS)' + (notes ? ' — ' + notes : '') + '.' : 'SIPANDA kelas ' + cls + ': ' + (r.same ? 'sudah sama' : r.added + ' ditambah, ' + r.upd + ' diperbarui') + (notes ? '; dilewati: ' + notes : '') + '.', (r.empty || (notes && manual)) ? 'err' : 'ok');
+        res = r;
+      } catch (e) {
+        var m = e.name === 'AbortError' ? 'koneksi lambat' : (e.message || 'galat');
+        spdSync.status[cls] = 'SIPANDA: gagal sinkron (' + m + ')';
+        if (manual || !spdSync.errShown[cls]) toast('Sinkron ke SIPANDA kelas ' + cls + ' gagal: ' + m, 'err');
+        spdSync.errShown[cls] = true;
+      }
+      spdShowStatus(); return res;
+    }
+    function spdEnqueue(cls, manual) { var p = spdSync.chain.then(function () { return spdRun(cls, manual); }); spdSync.chain = p; return p; }
+    function spdShowStatus() {
+      var el = $('spd-status'); if (!el) return;
+      var m = lsGet('spdsync:' + activeClass, null);
+      el.textContent = spdSync.status[activeClass] || (m ? 'SIPANDA: tersinkron ' + new Date(m.at).toLocaleString('id-ID', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) : 'SIPANDA: belum tersinkron');
+    }
+    function scheduleSipandaSync(cls) {      // dipanggil setiap data siswa kelas berubah
+      if (!currentUser || !canEditStudents(cls)) return;
+      clearTimeout(spdSync.timers[cls]);
+      spdSync.timers[cls] = setTimeout(function () {
+        if (!spdCanAuth(cls)) { spdSync.status[cls] = 'SIPANDA: menunggu login ulang agar bisa sinkron'; spdShowStatus(); return; }
+        spdEnqueue(cls, false);
+      }, 4000);
+    }
+    async function spdAutoAll() {      // saat login: tarik data terbaru dari cloud SIPINTAR, lalu kirim kelas-kelas wali ke SIPANDA
+      if (!currentUser || !SESSION_HASH || currentUser.head || currentUser.admin) return;
+      var t0 = Date.now(); while (syncing && Date.now() - t0 < 15000) await sleep(300);
+      await syncNow(false);
+      currentUser.homeroom.forEach(function (c) { spdEnqueue(c, false); });
+    }
+    function spdManual() {
+      if (!canEditStudents(activeClass)) return;
+      if (!spdCanAuth(activeClass)) { toast('Login ulang di SIPINTAR (masukkan password) agar bisa sinkron ke SIPANDA.', 'err'); return; }
+      spdEnqueue(activeClass, true);
+    }
+    async function spdManualAll() {
+      if (!currentUser || !currentUser.admin) return;
+      if (!SESSION_HASH) { toast('Login ulang di SIPINTAR (masukkan password) agar bisa sinkron ke SIPANDA.', 'err'); return; }
+      var list = ALL_CLASSES.filter(function (c) { return getStudents(c).length; });
+      if (!list.length) { toast('Belum ada data siswa di kelas mana pun.', 'err'); return; }
+      if (!confirm('Kirim data siswa ' + list.length + ' kelas ke SIPANDA?')) return;
+      for (var i = 0; i < list.length; i++) await spdEnqueue(list[i], true);
+    }
 
     window.addEventListener('DOMContentLoaded', function () {
       // bersihkan sisa data contoh versi lama
