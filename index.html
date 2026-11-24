@@ -900,6 +900,25 @@
             <div id="kg-sipanda-status" style="margin-top:10px;font-size:.85rem;color:var(--gold-light);"></div>
           </div>
           <div class="module-card">
+            <div class="module-title-bar">
+              <h2><i class="fa-solid fa-book-open" style="color:var(--gold-accent);"></i> Mata Pelajaran per Kelas — Admin</h2>
+            </div>
+            <div class="info-box"><i class="fa-solid fa-circle-info"></i> Pilih kelas, lalu centang mata pelajaran yang berlaku di kelas tersebut. Mapel yang tidak dicentang disembunyikan dari guru (input nilai, kunci, cetak/scan LJK, rekap). Nilai yang sudah ada tidak dihapus dan muncul kembali bila mapel dicentang lagi. Mapel B. Inggris, Koding, dan PAI tetap memerlukan guru pengampu di menu di atas.</div>
+            <div class="form-grid-2">
+              <div class="form-control-box"><label>Pilih Kelas</label><select id="ks-class" onchange="ksLoad()"></select></div>
+            </div>
+            <div id="ks-editor" style="margin-top:14px;"></div>
+            <label class="kg-chk" style="max-width:420px;justify-content:flex-start;margin:8px 0;"><input type="checkbox" id="ks-grade"> Terapkan juga ke seluruh kelas di jenjang yang sama</label>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px;">
+              <button class="btn-act primary" onclick="ksSave()"><i class="fa-solid fa-floppy-disk"></i> Simpan Mapel Kelas</button>
+              <button class="btn-act glass" onclick="ksReset()"><i class="fa-solid fa-rotate-left"></i> Kembalikan ke Semua Mapel</button>
+            </div>
+          </div>
+          <div class="module-card">
+            <div class="module-title-bar"><h2><i class="fa-solid fa-table-list"></i> Ringkasan Mapel per Kelas</h2></div>
+            <div class="table-responsive"><table class="custom-table" style="min-width:560px;"><thead><tr><th>Kelas</th><th>Mata Pelajaran Aktif</th></tr></thead><tbody id="ks-summary"></tbody></table></div>
+          </div>
+          <div class="module-card">
             <div class="module-title-bar"><h2><i class="fa-solid fa-table-list"></i> Ringkasan Pembagian Kelas</h2></div>
             <div class="table-responsive"><table class="custom-table" style="min-width:760px;"><thead><tr><th>Nama Guru</th><th>Wali Kelas</th><th>Guru PAI</th><th>B. Inggris</th><th>Koding/KKA</th></tr></thead><tbody id="kg-summary"></tbody></table></div>
           </div>
@@ -1638,8 +1657,13 @@ function actExport_(req) {
       if ((u.pai && paiList(u).indexOf(cls) >= 0) || all) out.push(PAI_SUBJECT);
       if (u.english.indexOf(cls) >= 0 || (all && g >= 4)) out.push(ENGLISH_SUBJECT);
       if (u.coding.indexOf(cls) >= 0 || (all && g >= 5)) out.push(CODING_SUBJECT);
-      return out;
+      return out.filter(function (x) { return subjectEnabled(cls, x.code); });
     }
+    // Pengaturan mapel per kelas oleh admin (kunci cloud 'subjconf'). Tanpa pengaturan = semua mapel aktif (bawaan).
+    var SUBJECT_CONF = {};
+    function allSubjectList() { return HOMEROOM_SUBJECTS.concat([PAI_SUBJECT, ENGLISH_SUBJECT, CODING_SUBJECT]); }
+    function subjectEnabled(cls, code) { var c = SUBJECT_CONF[cls]; return !c || c.indexOf(code) >= 0; }
+    function homeroomSubjectsFor(cls) { return HOMEROOM_SUBJECTS.filter(function (m) { return subjectEnabled(cls, m.code); }); }
     // Kepala sekolah: hanya melihat (tidak boleh mengubah nilai, kunci, siswa)
     function isReadOnly() { return !!currentUser && !!currentUser.head; }
     function canEditStudents(cls) { return !!currentUser && isHomeroom(currentUser, cls); }
@@ -1886,6 +1910,7 @@ function actExport_(req) {
       resetCurrentScan(); refreshAll();
     }
     function refreshAll() {
+      var _subs = getSubjectsFor(currentUser, activeClass); if (!_subs.some(function (x) { return x.code === activeSubject; })) activeSubject = _subs.length ? _subs[0].code : '';
       $('header-user-role').innerText = roleText(currentUser, activeClass) + ' • ' + activeClass;
       $('stat-kelas-label').innerText = activeClass;
       buildSubjectUI(); renderStudents(); renderGrades(); renderRecapScopes(); renderRecapTable(); fillScanSelects(); loadKeyForm(); onPrintSubjectChange(); updateDashboard();
@@ -2114,7 +2139,8 @@ function actExport_(req) {
     function hasHomeroomSubjects() { return isHomeroom(currentUser, activeClass) || currentUser.head; }
     function renderRecapScopes() {
       var sel = $('rekap-scope'), prev = sel.value, opts = [];
-      if (hasHomeroomSubjects()) opts.push('<option value="HOMEROOM">Semua Mapel Kelas (' + HOMEROOM_SUBJECTS.length + ' mapel)</option>');
+      var hsN = homeroomSubjectsFor(activeClass).length;
+      if (hasHomeroomSubjects() && hsN) opts.push('<option value="HOMEROOM">Semua Mapel Kelas (' + hsN + ' mapel)</option>');
       getSubjectsFor(currentUser, activeClass).forEach(function (s) { if (HOMEROOM_SUBJECTS.indexOf(s) < 0 && !HOMEROOM_SUBJECTS.some(function (h) { return h.code === s.code; })) opts.push('<option value="' + s.code + '">' + esc(s.name) + '</option>'); });
       sel.innerHTML = opts.join(''); if (prev && sel.querySelector('option[value="' + prev + '"]')) sel.value = prev;
     }
@@ -2124,15 +2150,16 @@ function actExport_(req) {
       var cls = activeClass, scope = $('rekap-scope').value, th = $('thead-recap'), tb = $('tbody-recap');
       if (!scope) { th.innerHTML = ''; tb.innerHTML = '<tr><td style="padding:20px;">Tidak ada mapel.</td></tr>'; return; }
       if (scope === 'HOMEROOM') {
-        $('rekap-title').innerText = 'Rekapitulasi ' + HOMEROOM_SUBJECTS.length + ' Mata Pelajaran Kelas ' + cls;
-        th.innerHTML = '<tr><th>No</th><th>Nama Siswa</th><th>NISN</th><th>NIS</th>' + HOMEROOM_SUBJECTS.map(function (m) { return '<th style="text-align:center;">' + m.short + '</th>'; }).join('') + '<th style="text-align:center;">Jumlah</th><th style="text-align:center;color:var(--gold-light);">Rata-rata</th><th style="text-align:center;">Peringkat</th></tr>';
-        var gs = {}; HOMEROOM_SUBJECTS.forEach(function (m) { gs[m.code] = getGrades(cls, m.code); });
+        var HS = homeroomSubjectsFor(cls);
+        $('rekap-title').innerText = 'Rekapitulasi ' + HS.length + ' Mata Pelajaran Kelas ' + cls;
+        th.innerHTML = '<tr><th>No</th><th>Nama Siswa</th><th>NISN</th><th>NIS</th>' + HS.map(function (m) { return '<th style="text-align:center;">' + m.short + '</th>'; }).join('') + '<th style="text-align:center;">Jumlah</th><th style="text-align:center;color:var(--gold-light);">Rata-rata</th><th style="text-align:center;">Peringkat</th></tr>';
+        var gs = {}; HS.forEach(function (m) { gs[m.code] = getGrades(cls, m.code); });
         var rows = getStudents(cls).map(function (s) {
-          var sum = 0, sc = {}; HOMEROOM_SUBJECTS.forEach(function (m) { var v = gs[m.code][s.nisn] ? gs[m.code][s.nisn].finalScore || 0 : 0; sc[m.code] = v; sum += v; });
-          return { s: s, sc: sc, total: +sum.toFixed(1), avg: +(sum / HOMEROOM_SUBJECTS.length).toFixed(1) };
+          var sum = 0, sc = {}; HS.forEach(function (m) { var v = gs[m.code][s.nisn] ? gs[m.code][s.nisn].finalScore || 0 : 0; sc[m.code] = v; sum += v; });
+          return { s: s, sc: sc, total: +sum.toFixed(1), avg: +(sum / (HS.length||1)).toFixed(1) };
         });
         var ts = rows.map(function (r) { return r.total; }).sort(function (a, b) { return b - a; });
-        tb.innerHTML = rows.map(function (r, i) { return '<tr><td>' + (i + 1) + '</td><td style="font-weight:600;color:#fff;">' + esc(r.s.name) + '</td><td><code>' + r.s.nisn + '</code></td><td>' + esc(formatNis(r.s.nis) || '—') + '</td>' + HOMEROOM_SUBJECTS.map(function (m) { return '<td style="text-align:center;">' + r.sc[m.code] + '</td>'; }).join('') + '<td style="text-align:center;font-weight:700;color:#fff;">' + r.total + '</td><td style="text-align:center;font-weight:800;color:var(--gold-light);">' + r.avg + '</td><td style="text-align:center;"><span class="status-badge badge-done">#' + rankOf(ts, r.total) + '</span></td></tr>'; }).join('') || '<tr><td colspan="14" style="padding:20px;text-align:center;">Belum ada data siswa.</td></tr>';
+        tb.innerHTML = rows.map(function (r, i) { return '<tr><td>' + (i + 1) + '</td><td style="font-weight:600;color:#fff;">' + esc(r.s.name) + '</td><td><code>' + r.s.nisn + '</code></td><td>' + esc(formatNis(r.s.nis) || '—') + '</td>' + HS.map(function (m) { return '<td style="text-align:center;">' + r.sc[m.code] + '</td>'; }).join('') + '<td style="text-align:center;font-weight:700;color:#fff;">' + r.total + '</td><td style="text-align:center;font-weight:800;color:var(--gold-light);">' + r.avg + '</td><td style="text-align:center;"><span class="status-badge badge-done">#' + rankOf(ts, r.total) + '</span></td></tr>'; }).join('') || '<tr><td colspan="14" style="padding:20px;text-align:center;">Belum ada data siswa.</td></tr>';
       } else {
         var sj = subjectByCode(scope), list = studentsForSubject(cls, scope), g = getGrades(cls, scope);
         $('rekap-title').innerText = 'Rekapitulasi ' + sj.name + ' — Kelas ' + cls;
@@ -2759,13 +2786,13 @@ function actExport_(req) {
       sheets.push({ name: 'Siswa', textCols: [3, 4], rows: sis });
       sheets.push({ name: 'Nilai', textCols: [3, 4], rows: nil });
       (u.homeroom || []).forEach(function (cls) {
-        var gs = {}; HOMEROOM_SUBJECTS.forEach(function (m) { gs[m.code] = getGrades(cls, m.code); });
+        var HS = homeroomSubjectsFor(cls), gs = {}; HS.forEach(function (m) { gs[m.code] = getGrades(cls, m.code); });
         var rows = getStudents(cls).map(function (st) {
-          var sum = 0, sc = HOMEROOM_SUBJECTS.map(function (m) { var v = gs[m.code][st.nisn] ? gs[m.code][st.nisn].finalScore || 0 : 0; sum += v; return v; });
-          return { st: st, sc: sc, total: +sum.toFixed(1), avg: +(sum / HOMEROOM_SUBJECTS.length).toFixed(1) };
+          var sum = 0, sc = HS.map(function (m) { var v = gs[m.code][st.nisn] ? gs[m.code][st.nisn].finalScore || 0 : 0; sum += v; return v; });
+          return { st: st, sc: sc, total: +sum.toFixed(1), avg: +(sum / (HS.length||1)).toFixed(1) };
         });
         var tots = rows.map(function (r) { return r.total; }).sort(function (a, b) { return b - a; });
-        var out = [['No', 'Nama', 'NISN', 'NIS'].concat(HOMEROOM_SUBJECTS.map(function (m) { return m.name; }), ['Jumlah', 'Rata-rata', 'Peringkat'])];
+        var out = [['No', 'Nama', 'NISN', 'NIS'].concat(HS.map(function (m) { return m.name; }), ['Jumlah', 'Rata-rata', 'Peringkat'])];
         rows.forEach(function (r, i) { out.push([i + 1, r.st.name, r.st.nisn, formatNis(r.st.nis)].concat(r.sc, [r.total, r.avg, rankOf(tots, r.total)])); });
         sheets.push({ name: 'Rekap ' + cls, textCols: [2, 3], rows: out });
       });
@@ -3025,9 +3052,9 @@ function actExport_(req) {
     var BASE_USERS = {}; USERS.forEach(function (u) { BASE_USERS[u.nip] = { h: u.homeroom.slice(), pai: u.pai, pc: [], en: u.english.slice(), cd: u.coding.slice() }; });
     var userConfSig = '', userConfFetchedAt = 0;
     function applyUserConf() {
-      var conf = dbGet('userconf', {}) || {}, sig = JSON.stringify(conf);
+      var conf = dbGet('userconf', {}) || {}, sc = dbGet('subjconf', {}) || {}, sig = JSON.stringify([conf, sc]);
       if (sig === userConfSig) return false;
-      userConfSig = sig;
+      userConfSig = sig; SUBJECT_CONF = JSON.parse(JSON.stringify(sc));
       USERS.forEach(function (u) {
         if (u.admin) return;
         var b = BASE_USERS[u.nip], c = conf[u.nip] || null;
@@ -3040,7 +3067,7 @@ function actExport_(req) {
     async function fetchUserConf() {
       if (!cloudCfg().url || !navigator.onLine) return;
       if (Date.now() - userConfFetchedAt < 20000) return;
-      var r = await cloudCall({ action: 'get', keys: ['userconf'] }, 6000);
+      var r = await cloudCall({ action: 'get', keys: ['userconf', 'subjconf'] }, 6000);
       userConfFetchedAt = Date.now();
       (r.rows || []).forEach(function (row) { mergeIncoming(row); });
       applyUserConf();
@@ -3061,7 +3088,45 @@ function actExport_(req) {
       var sel = $('kg-user'), prev = sel.value;
       sel.innerHTML = USERS.filter(function (u) { return !u.admin && !u.head; }).map(function (u) { return '<option value="' + esc(u.nip) + '">' + esc(u.name) + '</option>'; }).join('');
       if (prev && sel.querySelector('option[value="' + prev + '"]')) sel.value = prev;
-      kgLoad(); kgSummary();
+      kgLoad(); kgSummary(); ksInit();
+    }
+    function ksInit() {
+      var sel = $('ks-class'), prev = sel.value;
+      sel.innerHTML = ALL_CLASSES.map(function (c) { return '<option value="' + c + '">Kelas ' + c + '</option>'; }).join('');
+      if (prev) sel.value = prev; else if (typeof activeClass !== 'undefined' && activeClass) sel.value = activeClass;
+      ksLoad(); ksSummary();
+    }
+    function ksLoad() {
+      var cls = $('ks-class').value; if (!cls) return;
+      $('ks-editor').innerHTML = '<div class="kg-sec"><div class="kg-tools"><button type="button" class="btn-act glass" onclick="ksBulk(true)">Pilih semua</button><button type="button" class="btn-act glass" onclick="ksBulk(false)">Kosongkan</button></div><div class="kg-grid" style="grid-template-columns:repeat(auto-fill,minmax(210px,1fr));">' +
+        allSubjectList().map(function (m) { return '<label class="kg-chk"><input type="checkbox" data-ks="1" value="' + esc(m.code) + '"' + (subjectEnabled(cls, m.code) ? ' checked' : '') + '> ' + esc(m.name) + '</label>'; }).join('') + '</div></div>';
+    }
+    function ksBulk(on) { document.querySelectorAll('#ks-editor input[data-ks]').forEach(function (i) { i.checked = on; }); }
+    function ksSave() {
+      if (!currentUser || !currentUser.admin) { toast('Khusus admin.', 'err'); return; }
+      var cls = $('ks-class').value, codes = Array.prototype.map.call(document.querySelectorAll('#ks-editor input[data-ks]:checked'), function (i) { return i.value; });
+      if (!codes.length) { toast('Pilih minimal satu mata pelajaran.', 'err'); return; }
+      var targets = $('ks-grade').checked ? ALL_CLASSES.filter(function (c) { return c[0] === cls[0]; }) : [cls];
+      var conf = JSON.parse(JSON.stringify(dbGet('subjconf', {}) || {})), total = allSubjectList().length;
+      targets.forEach(function (c) { if (codes.length === total) delete conf[c]; else conf[c] = codes.slice(); });
+      dbSet('subjconf', conf, 'lww'); userConfSig = ''; applyUserConf();
+      $('ks-grade').checked = false; ksLoad(); ksSummary(); refreshAll();
+      toast('Mapel ' + (targets.length > 1 ? 'jenjang kelas ' + cls[0] : 'kelas ' + cls) + ' disimpan.', 'ok');
+    }
+    function ksReset() {
+      if (!currentUser || !currentUser.admin) { toast('Khusus admin.', 'err'); return; }
+      var cls = $('ks-class').value; if (!cls) return;
+      if (!confirm('Aktifkan kembali semua mata pelajaran untuk Kelas ' + cls + '?')) return;
+      var conf = JSON.parse(JSON.stringify(dbGet('subjconf', {}) || {})); delete conf[cls];
+      dbSet('subjconf', conf, 'lww'); userConfSig = ''; applyUserConf();
+      ksLoad(); ksSummary(); refreshAll(); toast('Kelas ' + cls + ' kembali memakai semua mapel.', 'ok');
+    }
+    function ksSummary() {
+      $('ks-summary').innerHTML = ALL_CLASSES.map(function (c) {
+        var on = allSubjectList().filter(function (m) { return subjectEnabled(c, m.code); });
+        var txt = SUBJECT_CONF[c] ? on.map(function (m) { return m.short; }).join(', ') : 'Semua mapel (bawaan)';
+        return '<tr><td>' + c + (SUBJECT_CONF[c] ? '<span class="kg-badge">diatur admin</span>' : '') + '</td><td>' + esc(txt) + '</td></tr>';
+      }).join('');
     }
     function kgGrid(sec, sel, disabled) {
       return '<div class="kg-grid">' + ALL_CLASSES.map(function (c) { return '<label class="kg-chk"><input type="checkbox" data-sec="' + sec + '" value="' + c + '"' + (sel.indexOf(c) >= 0 ? ' checked' : '') + (disabled ? ' disabled' : '') + '> ' + c + '</label>'; }).join('') + '</div>';
@@ -3413,10 +3478,28 @@ async function api0(a,p={}){
   finally{tm&&clearTimeout(tm)}
   try{j=await r.json()}catch(e){throw new Error('Server tidak memberi respons yang benar. Muat ulang halaman; jika berulang, periksa akses deployment Apps Script.')}
   if(!j.ok){if(/Sesi/.test(j.error)&&a!=='login'){sessionStorage.removeItem('sp');S=null;boot()}throw new Error(j.error)}
-  return j.data}
+  return fxd(a,j.data)}
 function toast(m,bad){const t=document.createElement('div');t.className='toast'+(bad?' bad':'');t.textContent=m;document.body.append(t);setTimeout(()=>t.remove(),4000)}
 async function run(fn,ok){try{await fn();if(ok){toast(ok);DIRTY=false}}catch(e){toast(e.message,1)}}
 const has=c=>S.caps.includes(c),full=()=>has('admin')||has('wali')||has('kepsek'),ro=()=>has('kepsek');
+/* Mapel per kelas: mengikuti pengaturan admin di SIPENA (SUBJECT_CONF), dibaca langsung dari halaman induk */
+const KM={Pancasila:'PANCASILA',Indonesia:'BINDO',Matematika:'MTK',IPAS:'IPAS',Seni:'SENIRUPA',Mulok:'BANJAR',PJOK:'PJOK',PAI:'PAB',Inggris:'BING',Koding:'KKA'},
+KN=[['PAB',/agama|budi pekerti|^pai$/i],['PANCASILA',/pancasila/i],['BINDO',/indonesia/i],['MTK',/matematika/i],['IPAS',/ipas|alam dan sosial/i],['SENIRUPA',/seni/i],['PJOK',/pjok|jasmani/i],['BING',/inggris/i],['BANJAR',/banjar|muatan lokal|mulok/i],['KKA',/koding|kka/i]],
+mapelCfg=k=>{try{const c=window.parent!==window&&window.parent.SUBJECT_CONF;return c&&c[k||(S&&S.kelas)]||null}catch(e){return null}},
+mapelOn=(kode,k)=>{const c=mapelCfg(k);return!c||c.some(x=>KM[x]===kode)},
+kodeByNama=n=>{const r=KN.find(x=>x[1].test(String(n||'')));return r?r[0]:''},
+MS=()=>(S.mapel||[]).filter(m=>mapelOn(m.kode));
+function fxd(a,d){try{
+  if(!d||typeof d!=='object')return d;
+  if(a==='leger'&&Array.isArray(d.mapel)&&Array.isArray(d.rows)&&mapelCfg(d.kelas)){
+    const k=d.kelas,nm=v=>{const n=parseFloat(v);return isNaN(n)?null:n};
+    d.mapel=d.mapel.filter(m=>mapelOn(m.kode,k));
+    d.rows.forEach(o=>{const v=d.mapel.map(m=>nm(o.nilai&&o.nilai[m.kode])).filter(x=>x!=null),j=v.reduce((x,y)=>x+y,0);o.jumlah=j;o.rata=v.length?j/v.length:''})}
+  if(a==='rapor'&&Array.isArray(d.siswa)&&mapelCfg(d.kelas)){
+    const k=d.kelas,on=m=>{const kd=m.kode||kodeByNama(m.mapel);return!kd||mapelOn(kd,k)};
+    d.siswa.forEach(s=>{if(!Array.isArray(s.mapel))return;s.mapel=s.mapel.filter(on);s.mapel.forEach((m,i)=>{m.no=i+1})});
+    if(Array.isArray(d.peringatan))d.peringatan=d.peringatan.filter(w=>on({mapel:w.mapel,kode:w.kode}))}
+}catch(e){}return d}
 const pred=n=>n===''||n==='-'||n==null?'':n>=76?'p-sb':n>=70?'p-b':n>=50?'p-c':'p-k';
 const ICO={"dashboard": "<rect x=\"3\" y=\"3\" width=\"7\" height=\"9\" rx=\"1.5\"/><rect x=\"14\" y=\"3\" width=\"7\" height=\"5\" rx=\"1.5\"/><rect x=\"14\" y=\"12\" width=\"7\" height=\"9\" rx=\"1.5\"/><rect x=\"3\" y=\"16\" width=\"7\" height=\"5\" rx=\"1.5\"/>", "sekolah": "<path d=\"M3 21h18\"/><path d=\"M5 21V9l7-5 7 5v12\"/><path d=\"M9.5 21v-5.5h5V21\"/><circle cx=\"12\" cy=\"10.5\" r=\"1.4\"/>", "siswa": "<path d=\"M2 9l10-5 10 5-10 5z\"/><path d=\"M6 11.5V16c0 1.5 2.7 3 6 3s6-1.5 6-3v-4.5\"/><path d=\"M22 9v6\"/>", "tp": "<circle cx=\"12\" cy=\"12\" r=\"9\"/><circle cx=\"12\" cy=\"12\" r=\"5\"/><circle cx=\"12\" cy=\"12\" r=\"1.2\"/>", "nilai": "<path d=\"M4 20h4L19.5 8.5a2.8 2.8 0 0 0-4-4L4 16z\"/><path d=\"M13.5 6.5l4 4\"/>", "absensi": "<rect x=\"5\" y=\"4\" width=\"14\" height=\"17\" rx=\"2\"/><path d=\"M9 4h6v3H9z\"/><circle cx=\"12\" cy=\"12\" r=\"2\"/><path d=\"M8.5 18c.5-2 2-3 3.5-3s3 1 3.5 3\"/>", "ekskul": "<circle cx=\"12\" cy=\"15\" r=\"5.5\"/><path d=\"M8.5 10.5L6 3h4.2L12 7.5M15.5 10.5L18 3h-4.2\"/><path d=\"M12 12.5v5\"/>", "koku": "<path d=\"M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z\"/>", "leger": "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"/><path d=\"M3 10h18M3 15h18M9 4v16\"/>", "rapor": "<path d=\"M6 3h8l5 5v13H6z\"/><path d=\"M14 3v5h5\"/><path d=\"M9 13h7M9 17h7\"/>", "reset": "<path d=\"M3 12a9 9 0 1 0 3-6.7\"/><path d=\"M3 4v5h5\"/>", "pengaturan": "<circle cx=\"12\" cy=\"12\" r=\"3\"/><circle cx=\"12\" cy=\"12\" r=\"6.5\"/><path d=\"M12 2v3.5M12 18.5V22M2 12h3.5M18.5 12H22M4.9 4.9l2.5 2.5M16.6 16.6l2.5 2.5M4.9 19.1l2.5-2.5M16.6 7.4l2.5-2.5\"/>"},ico=id=>`<i class="ic"><svg viewBox="0 0 24 24" aria-hidden="true">${ICO[id]||''}</svg></i>`;
 const MENU=[['dashboard','Dashboard','fa-gauge-high',1],['sekolah','Data Sekolah','fa-school',full],['siswa','Data Siswa','fa-user-graduate',full],['tp','Tujuan Pembelajaran','fa-bullseye',1],['nilai','Daftar Nilai','fa-pen-to-square',1],['absensi','Absensi','fa-clipboard-user',full],['ekskul','Ekstrakurikuler','fa-medal',full],['koku','Kokurikuler','fa-star',full],['leger','Leger','fa-table-list',full],['rapor','Cetak Rapor','fa-file-lines',full],['reset','Reset','fa-rotate-left',()=>!ro()],['pengaturan','Pengaturan','fa-gear',1]];
@@ -3500,7 +3583,7 @@ const PGK=()=>(S.kelas||'')+'|'+((S.user&&S.user.nama)||'');
 function PGH(){return window._pgK===PGK()&&window._pgH?window._pgH:'<div class="sk" style="width:60%"></div><div class="sk"></div><div class="sk"></div><div class="sk" style="width:70%"></div>'}
 async function pgFill(){
   const box=$('#pgbox');if(!box)return;
-  const ms=S.mapel.filter(m=>m.lihat),own=ms.filter(m=>m.edit),mm=own.length?own:ms,fl=full(),ok=v=>v!==undefined&&v!==null&&String(v).trim()!=='',
+  const ms=MS().filter(m=>m.lihat),own=ms.filter(m=>m.edit),mm=own.length?own:ms,fl=full(),ok=v=>v!==undefined&&v!==null&&String(v).trim()!=='',
   T=async f=>{try{return await f()}catch(e){return null}},
   pc=(f,t)=>t?Math.round(f/t*100):0;
   const [sw,nl,ab,ek,kk]=await Promise.all([T(()=>api('siswa.list')),T(()=>api('nilai.list')),fl?T(()=>api('absensi.list')):null,fl?T(()=>api('ekskul.list')):null,fl?T(()=>api('koku.list')):null]);
@@ -3531,7 +3614,7 @@ V.dashboard=async el=>{
   <div class="kpis">
     <div class="kpi"><i class="fa-solid fa-user-graduate"></i><small>Peserta Didik</small><b>${fmt(s.peserta)}</b></div>
     <div class="kpi"><i class="fa-solid fa-people-roof"></i><small>Rombel</small><b>${s.rombel}</b></div>
-    <div class="kpi"><i class="fa-solid fa-book-open"></i><small>Mata Pelajaran</small><b>${s.mapel}</b></div>
+    <div class="kpi"><i class="fa-solid fa-book-open"></i><small>Mata Pelajaran</small><b>${mapelCfg()?MS().filter(m=>m.lihat).length:s.mapel}</b></div>
     <div class="kpi"><i class="fa-solid fa-chart-column"></i><small>Jumlah Nilai</small><b>${fmt(s.jumlahNilai)}</b></div></div>
   <div class="g2"><div class="card"><div class="ch">Status Input Nilai · ${s.scope==='sekolah'?'Seluruh Sekolah':'Kelas '+esc(s.scope)}</div><div class="cb stat-split"><div class="dn" style="--p:${s.persen}"><span>${s.persen}%</span></div><div>Sudah Diinput<div class="big-ok">${fmt(s.sudah)}</div>Belum Diinput<div class="big-bad">${fmt(s.belum)}</div></div></div></div>
   <div class="card"><div class="ch">Progres Pekerjaan Anda · Kelas ${esc(S.kelas)}</div><div class="cb"><div id="pgbox">${PGH()}</div>${S.passwordDefault?'<span class="warn-txt"><i class="fa-solid fa-triangle-exclamation"></i> Segera ganti password default di menu Pengaturan.</span>':''}</div></div></div>
@@ -3717,7 +3800,7 @@ V.siswa=async el=>{
     if(confirm(`${v.valid} siswa valid. Impor sekarang? (NIS yang sama akan diperbarui)`)){await api('siswa.import',{rows});nav('siswa');toast('Impor berhasil')}})};
 
 V.tp=async el=>{
-  const ms=S.mapel.filter(m=>m.lihat);
+  const ms=MS().filter(m=>m.lihat);
   const tpClean=t=>String(t??'').replace(/\s+/g,' ').replace(/^\s*(?:\d+\s*[.)]|[-•*–])\s*/,'').trim(),
   tpDocx=async f=>{
     if(typeof DecompressionStream==='undefined')throw new Error('Peramban ini belum mendukung pembacaan .docx. Simpan sebagai .xlsx atau .txt lalu unggah.');
@@ -3760,7 +3843,7 @@ V.tp=async el=>{
   $('#m').onchange=$('#ag').onchange=()=>{if(DIRTY&&!confirm('Perubahan TP belum disimpan. Ganti pilihan dan buang perubahan?')){$('#m').value=pm;$('#ag').value=pa;return}DIRTY=false;pm=$('#m').value;pa=$('#ag').value;run(load)};load()};
 
 V.nilai=async el=>{
-  const [sw,nl]=await Promise.all([api('siswa.list'),api('nilai.list')]),ms=S.mapel.filter(m=>m.lihat),D={};
+  const [sw,nl]=await Promise.all([api('siswa.list'),api('nilai.list')]),ms=MS().filter(m=>m.lihat),D={};
   el.innerHTML=`<div class="card"><div class="ch">Daftar Nilai — Kelas ${S.kelas}, Semester ${S.config.semester}</div><div class="cb"><div class="bar">${ms.some(m=>m.kode==='PAB')?`<select id="fa"><option value="">Semua agama</option>${S.config.agama.map(a=>`<option>${a}</option>`).join('')}</select>`:''}${ro()?'':'<span class="tag" id="sst"><i class="fa-solid fa-cloud-arrow-up"></i><span>Otomatis tersimpan</span></span>'}</div><div class="tw"><table id="tb"></table></div><p><small>Nilai akhir 0–100. Kolom abu-abu hanya dapat dilihat (diinput oleh guru terkait).</small></p></div></div>`;
   const draw=()=>{const fa=$('#fa')?$('#fa').value:'';const rows=sw.filter(s=>!fa||s.agama===fa);
     $('#tb').innerHTML=`<tr><th>No</th><th>Nama</th>${ms.map(m=>`<th>${esc(m.nama)}</th>`).join('')}</tr>`+rows.map((s,i)=>`<tr><td>${i+1}</td><td>${esc(s.nama)}<br><small>${esc(s.nis)} · ${esc(s.agama)}</small></td>${ms.map(m=>{const k=s.nis+'|'+m.kode,v=D[k]!==undefined?D[k]:(nl[k]??'');return `<td class="${pred(v)}${m.edit&&!ro()?'':' ro'}"><input type="number" min="0" max="100" data-k="${esc(k)}" value="${v}" ${m.edit&&!ro()?'':'disabled'}></td>`}).join('')}</tr>`).join('')};
