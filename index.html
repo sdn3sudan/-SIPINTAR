@@ -162,6 +162,8 @@
     .banner-headings h2 { font-family: 'Pacifico', cursive; font-size: 2rem; text-shadow: 0 2px 8px rgba(0,0,0,.5); }
     .banner-headings h3 { font-size: 1.5rem; font-weight: 800; font-style: italic; letter-spacing: 1px; }
     .banner-badge-gold { display: inline-block; background: var(--gold-gradient); color: #382400; font-weight: 800; font-size: .85rem; padding: 4px 18px; border-radius: 16px; margin-top: 6px; }
+    .banner-desc { margin: -6px 0 20px; padding: 10px 18px; border-radius: 12px; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.14); color: var(--text-sub); font-size: .92rem; display: flex; align-items: center; gap: 10px; }
+    .banner-desc i { color: var(--gold-accent); }
     .banner-quote-right { max-width: 300px; text-align: right; font-style: italic; color: var(--text-sub); font-size: .95rem; }
     .stats-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-bottom: 22px; }
     .stat-card { border-radius: 20px; padding: 20px 22px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 8px 24px rgba(0,0,0,.25); border: 1.5px solid rgba(255,255,255,.2); }
@@ -505,7 +507,7 @@
     <div class="portal-grid">
       <button type="button" class="portal-card pc-sas" id="card-sas" onclick="enterAppDashboard()">
         <div class="portal-ico"><i class="fa-solid fa-clipboard-check"></i></div>
-        <div class="pc-name">SIPINTAR</div>
+        <div class="pc-name">SIPENA</div>
         <div class="pc-title">Sistem Informasi Penilaian dan Evaluasi Akademik</div>
         <div class="pc-desc">Daftar nilai, rekap nilai, dan Lembar Jawaban Komputer (cetak &amp; scan LJK).</div>
         <div class="pc-go">Buka aplikasi <i class="fa-solid fa-arrow-right"></i></div>
@@ -538,7 +540,7 @@
       <div>
         <div class="sidebar-brand">
           <img data-logo class="sidebar-brand-img" alt="Logo">
-          <div class="sidebar-brand-text"><h1>SIPINTAR</h1><p>SDN 3 SUNGAI DANAU</p></div>
+          <div class="sidebar-brand-text"><h1>SIPENA</h1><p>SDN 3 SUNGAI DANAU</p></div>
         </div>
         <ul class="sidebar-menu">
           <li><a href="javascript:void(0)" onclick="showPortal()"><i class="fa-solid fa-table-cells-large"></i><span>Menu Utama</span></a></li>
@@ -600,13 +602,14 @@
               <img data-logo class="banner-logo-img" alt="Logo">
               <div class="banner-headings">
                 <h2>Selamat Datang di</h2>
-                <h3>SIPINTAR</h3>
+                <h3>SIPENA</h3>
                 <p>Sistem Informasi Penilaian dan Evaluasi Akademik</p>
                 <div class="banner-badge-gold">SD NEGERI 3 SUNGAI DANAU</div>
               </div>
             </div>
             <div class="banner-quote-right">“Bersama Membangun Pendidikan yang Lebih Baik”</div>
           </div>
+          <div class="banner-desc"><i class="fa-solid fa-circle-info"></i> Daftar nilai, rekap nilai, dan Lembar Jawaban Komputer (cetak &amp; scan LJK).</div>
           <div class="stats-grid-4">
             <div class="stat-card blue"><div class="stat-icon-wrap"><i class="fa-solid fa-school-flag"></i></div><div class="stat-content"><div class="stat-number" id="stat-sekolah">0</div><div class="stat-label">Data Sekolah Terisi</div></div></div>
             <div class="stat-card green"><div class="stat-icon-wrap"><i class="fa-solid fa-users"></i></div><div class="stat-content"><div class="stat-number" id="stat-siswa-count">0</div><div class="stat-label" id="stat-siswa-label">Data Siswa</div></div></div>
@@ -1248,7 +1251,7 @@ function actExport_(req) {
       </div>
 
       <footer class="app-footer">
-        <div class="footer-left"><i class="fa-solid fa-shield-halved"></i> <span>SIPINTAR | SD NEGERI 3 SUNGAI DANAU</span></div>
+        <div class="footer-left"><i class="fa-solid fa-shield-halved"></i> <span>SIPENA | SD NEGERI 3 SUNGAI DANAU</span></div>
         <div class="footer-right">“Cerdas, Berprestasi, dan Berkarakter”</div>
       </footer>
     </main>
@@ -1880,7 +1883,7 @@ function actExport_(req) {
       showLoginAlert('Login berhasil!', true);
       SESSION_PASS = pass; SESSION_HASH = inHash; setTimeout(showPortal, 250);
     }
-    function handleLogout() { if (confirm('Keluar dari aplikasi SIPINTAR?')) { stopCamera(); try { sessionStorage.removeItem('sp'); } catch (e) {} SESSION_PASS = ''; SESSION_HASH = ''; localStorage.removeItem(P + 'session'); location.reload(); } }
+    function handleLogout() { if (confirm('Keluar dari aplikasi SIPENA?')) { stopCamera(); try { sessionStorage.removeItem('sp'); } catch (e) {} SESSION_PASS = ''; SESSION_HASH = ''; localStorage.removeItem(P + 'session'); location.reload(); } }
     function checkPersistedSession() {
       var s = lsGet('session', null);
       if (s && USER_MAP[s.nip] && allowedClasses(USER_MAP[s.nip]).indexOf(s.cls) >= 0) { currentUser = USER_MAP[s.nip]; activeClass = s.cls; showPortal(); }
@@ -2325,7 +2328,7 @@ function actExport_(req) {
         for (i = 1; i <= o.essay; i++) { var ln = ''; for (var l = 0; l < lines; l++) ln += '<div class="ln"></div>'; flow += '<div class="ljk-essay-item" style="height:' + per + 'mm;"><b style="font-size:8pt;width:5mm;">' + i + '.</b><div style="flex:1;">' + ln + '</div><div style="width:20mm;border-left:.2mm dashed #777;padding-left:2mm;font-size:7pt;font-weight:bold;display:flex;align-items:center;justify-content:center;">Skor: ___</div></div>'; }
       }
       html += '<div class="abs" style="left:20mm;top:118mm;width:170mm;">' + flow + '</div>';
-      html += '<div class="abs ljk-footer-note" style="left:22mm;width:166mm;top:284mm;"><div><b>Petunjuk:</b> Gunakan pensil 2B, hitamkan bulatan PG dengan penuh. Tulis jawaban isian/essay dengan rapi.</div><div>SIPINTAR</div></div>';
+      html += '<div class="abs ljk-footer-note" style="left:22mm;width:166mm;top:284mm;"><div><b>Petunjuk:</b> Gunakan pensil 2B, hitamkan bulatan PG dengan penuh. Tulis jawaban isian/essay dengan rapi.</div><div>SIPENA</div></div>';
       return html;
     }
     function triggerPrintLjk() {
@@ -2683,7 +2686,7 @@ function actExport_(req) {
       var wb = XLSX.utils.book_new(), cls = activeClass;
       XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(getStudents(cls).map(function (s) { return { Nama: s.name, NISN: s.nisn, NIS: formatNis(s.nis), JK: s.gender, Agama: s.religion }; })), 'Siswa');
       getSubjectsFor(currentUser, cls).forEach(function (sj) { var g = getGrades(cls, sj.code), rows = Object.keys(g).map(function (n) { var x = g[n]; return { NISN: n, Benar: x.correct, Salah: x.wrong, Kosong: x.empty, PG: x.pgScore, Isian: x.isianScore, Essay: x.essayScore, Akhir: x.finalScore }; }); if (rows.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), sj.code.slice(0, 28)); });
-      XLSX.writeFile(wb, 'Cadangan_SIPINTAR_' + cls + '_' + Date.now() + '.xlsx');
+      XLSX.writeFile(wb, 'Cadangan_SIPENA_' + cls + '_' + Date.now() + '.xlsx');
     }
     function executeGranularReset() {
       if (isReadOnly()) { toast('Kepala sekolah tidak memiliki akses reset.', 'err'); return; }
@@ -2870,7 +2873,7 @@ function actExport_(req) {
       }
     }
     async function sipandaAutoLogin() {
-      if (!SESSION_HASH) throw new Error('Silakan login ulang di SIPINTAR');
+      if (!SESSION_HASH) throw new Error('Silakan login ulang di SIPENA');
       var kls = activeClass, data;
       try { data = await sipandaLoginAs(kls); }
       catch (e1) {
@@ -2941,7 +2944,7 @@ function actExport_(req) {
     function spdCanAuth(cls) { return !!(SESSION_HASH || spdCached(cls)); }
     async function spdToken(cls, fresh) {
       var t = fresh ? '' : spdCached(cls); if (t) return t;
-      if (!SESSION_HASH) throw new Error('perlu login ulang di SIPINTAR');
+      if (!SESSION_HASH) throw new Error('perlu login ulang di SIPENA');
       return (await sipandaLoginAs(cls)).token;
     }
     function spdRows(cls) {      // hanya siswa lengkap (nama, NISN 10 digit, JK, agama) dan ber-NIS (SIPANDA mewajibkan NIS)
@@ -3036,12 +3039,12 @@ function actExport_(req) {
     }
     function spdManual() {
       if (!canEditStudents(activeClass)) return;
-      if (!spdCanAuth(activeClass)) { toast('Login ulang di SIPINTAR (masukkan password) agar bisa sinkron ke SIPANDA.', 'err'); return; }
+      if (!spdCanAuth(activeClass)) { toast('Login ulang di SIPENA (masukkan password) agar bisa sinkron ke SIPANDA.', 'err'); return; }
       spdEnqueue(activeClass, true);
     }
     async function spdManualAll() {
       if (!currentUser || !currentUser.admin) return;
-      if (!SESSION_HASH) { toast('Login ulang di SIPINTAR (masukkan password) agar bisa sinkron ke SIPANDA.', 'err'); return; }
+      if (!SESSION_HASH) { toast('Login ulang di SIPENA (masukkan password) agar bisa sinkron ke SIPANDA.', 'err'); return; }
       var list = ALL_CLASSES.filter(function (c) { return getStudents(c).length; });
       if (!list.length) { toast('Belum ada data siswa di kelas mana pun.', 'err'); return; }
       if (!confirm('Kirim data siswa ' + list.length + ' kelas ke SIPANDA?')) return;
@@ -3191,7 +3194,7 @@ function actExport_(req) {
         var msg = 'SIPANDA: ' + r.diubah + ' akun diperbarui' + (r.dilewati && r.dilewati.length ? ' • dilewati: ' + r.dilewati.join(', ') : '') + ' • ' + new Date().toLocaleTimeString('id-ID');
         if (st) st.textContent = '✓ ' + msg; if (manual) toast(msg, 'ok');
       } catch (e) {
-        var m = /Aksi tidak dikenal/.test(e.message) ? 'Code.gs SIPANDA belum diperbarui. Deploy Code.gs SIPANDA versi terbaru, lalu klik "Sinkronkan Semua ke SIPANDA".' : 'Gagal sinkron ke SIPANDA: ' + (e.message || 'galat') + '. Pengaturan di SIPINTAR tetap tersimpan.';
+        var m = /Aksi tidak dikenal/.test(e.message) ? 'Code.gs SIPANDA belum diperbarui. Deploy Code.gs SIPANDA versi terbaru, lalu klik "Sinkronkan Semua ke SIPANDA".' : 'Gagal sinkron ke SIPANDA: ' + (e.message || 'galat') + '. Pengaturan di SIPENA tetap tersimpan.';
         if (st) st.textContent = '✗ ' + m; toast(m, 'err');
       }
     }
@@ -3484,7 +3487,7 @@ async function api0(a,p={}){
 function toast(m,bad){const t=document.createElement('div');t.className='toast'+(bad?' bad':'');t.textContent=m;document.body.append(t);setTimeout(()=>t.remove(),4000)}
 async function run(fn,ok){try{await fn();if(ok){toast(ok);DIRTY=false}}catch(e){toast(e.message,1)}}
 const has=c=>S.caps.includes(c),full=()=>has('admin')||has('wali')||has('kepsek'),ro=()=>has('kepsek');
-/* Mapel per kelas: mengikuti pengaturan admin di SIPINTAR (SUBJECT_CONF), dibaca langsung dari halaman induk */
+/* Mapel per kelas: mengikuti pengaturan admin di SIPENA (SUBJECT_CONF), dibaca langsung dari halaman induk */
 const KM={Pancasila:'PANCASILA',Indonesia:'BINDO',Matematika:'MTK',IPAS:'IPAS',Seni:'SENIRUPA',Mulok:'BANJAR',PJOK:'PJOK',PAI:'PAB',Inggris:'BING',Koding:'KKA'},
 KN=[['PAB',/agama|budi pekerti|^pai$/i],['PANCASILA',/pancasila/i],['BINDO',/indonesia/i],['MTK',/matematika/i],['IPAS',/ipas|alam dan sosial/i],['SENIRUPA',/seni/i],['PJOK',/pjok|jasmani/i],['BING',/inggris/i],['BANJAR',/banjar|muatan lokal|mulok/i],['KKA',/koding|kka/i]],
 mapelCfg=k=>{try{const c=window.parent!==window&&window.parent.SUBJECT_CONF;return c&&c[k||(S&&S.kelas)]||null}catch(e){return null}},
