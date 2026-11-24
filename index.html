@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#0A1F6B">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <title>SIPINTAR — SD Negeri 3 Sungai Danau</title>
+  <title>SIPENA — SD Negeri 3 Sungai Danau</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -298,10 +298,19 @@
     .ljk-essay-item { border: .25mm solid #777; border-radius: 1mm; padding: 1mm 2mm; display: flex; gap: 2mm; margin-bottom: 1.2mm; box-sizing: border-box; }
     .ljk-essay-item .ln { border-bottom: .2mm dotted #666; height: 4.3mm; }
     .ljk-footer-note { font-size: 7pt; color: #444; border-top: .2mm solid #AAA; padding-top: 1mm; display: flex; justify-content: space-between; }
-    .rekap-print { padding: 12mm; color: #000; background: #FFF; font-family: Arial, sans-serif; }
-    .rekap-print table { width: 100%; border-collapse: collapse; font-size: 9pt; }
-    .rekap-print th, .rekap-print td { border: .3mm solid #444; padding: 1.2mm 1.6mm; }
-    .rekap-print th { background: #E8EEFF; }
+    .rekap-print { width: 188mm; max-width: 100%; margin: 0 auto; padding: 0; box-sizing: border-box; color: #000 !important; background: #FFF; font-family: Arial, sans-serif; }
+    .rekap-print * { color: #000 !important; box-sizing: border-box; }
+    .rekap-print h3 { font-size: 12pt; margin: 0 0 1.5mm; text-align: center; text-transform: uppercase; }
+    .rekap-print .rk-sub { font-size: 9.5pt; text-align: center; margin: 0 0 4mm; }
+    .rekap-print table { width: 100%; min-width: 0 !important; border-collapse: collapse; font-size: 9pt; }
+    .rekap-print thead { display: table-header-group; }
+    .rekap-print tr { page-break-inside: avoid; break-inside: avoid; }
+    .rekap-print th, .rekap-print td { border: .25mm solid #000; padding: 1mm 1.2mm; text-align: center; vertical-align: middle; text-transform: none; letter-spacing: 0; }
+    .rekap-print th { background: #E6E6E6; font-weight: 700; white-space: normal; }
+    .rekap-print td { white-space: nowrap; background: #FFF; }
+    .rekap-print td.nm { text-align: left; white-space: normal; }
+    .rekap-print th.nm { text-align: left; }
+    .rekap-print .rk-foot { margin-top: 6mm; font-size: 9pt; }
     @media print {
       * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
       html, body { background: #FFF !important; }
@@ -485,8 +494,8 @@
     <div class="portal-grid">
       <button type="button" class="portal-card pc-sas" id="card-sas" onclick="enterAppDashboard()">
         <div class="portal-ico"><i class="fa-solid fa-clipboard-check"></i></div>
-        <div class="pc-name">SIPINTAR</div>
-        <div class="pc-title">Sistem Penilaian Sumatif Akhir Semester</div>
+        <div class="pc-name">SIPENA</div>
+        <div class="pc-title">Sistem Informasi Penilaian dan Evaluasi Akademik</div>
         <div class="pc-desc">Daftar nilai, rekap nilai, dan Lembar Jawaban Komputer (cetak &amp; scan LJK).</div>
         <div class="pc-go">Buka aplikasi <i class="fa-solid fa-arrow-right"></i></div>
       </button>
@@ -518,7 +527,7 @@
       <div>
         <div class="sidebar-brand">
           <img data-logo class="sidebar-brand-img" alt="Logo">
-          <div class="sidebar-brand-text"><h1>SIPINTAR</h1><p>SDN 3 SUNGAI DANAU</p></div>
+          <div class="sidebar-brand-text"><h1>SIPENA</h1><p>SDN 3 SUNGAI DANAU</p></div>
         </div>
         <ul class="sidebar-menu">
           <li><a href="javascript:void(0)" onclick="showPortal()"><i class="fa-solid fa-table-cells-large"></i><span>Menu Utama</span></a></li>
@@ -579,8 +588,8 @@
               <img data-logo class="banner-logo-img" alt="Logo">
               <div class="banner-headings">
                 <h2>Selamat Datang di</h2>
-                <h3>SIPINTAR</h3>
-                <p>Sistem Informasi Penilaian Terpadu dan Terintegrasi</p>
+                <h3>SIPENA</h3>
+                <p>Sistem Informasi Penilaian dan Evaluasi Akademik</p>
                 <div class="banner-badge-gold">SD NEGERI 3 SUNGAI DANAU</div>
               </div>
             </div>
@@ -1185,7 +1194,7 @@ function actExport_(req) {
       </div>
 
       <footer class="app-footer">
-        <div class="footer-left"><i class="fa-solid fa-shield-halved"></i> <span>SIPINTAR | SD NEGERI 3 SUNGAI DANAU</span></div>
+        <div class="footer-left"><i class="fa-solid fa-shield-halved"></i> <span>SIPENA | SD NEGERI 3 SUNGAI DANAU</span></div>
         <div class="footer-right">“Cerdas, Berprestasi, dan Berkarakter”</div>
       </footer>
     </main>
@@ -1807,7 +1816,7 @@ function actExport_(req) {
       showLoginAlert('Login berhasil!', true);
       SESSION_PASS = pass; SESSION_HASH = inHash; setTimeout(showPortal, 250);
     }
-    function handleLogout() { if (confirm('Keluar dari aplikasi SIPINTAR?')) { stopCamera(); try { sessionStorage.removeItem('sp'); } catch (e) {} SESSION_PASS = ''; SESSION_HASH = ''; localStorage.removeItem(P + 'session'); location.reload(); } }
+    function handleLogout() { if (confirm('Keluar dari aplikasi SIPENA?')) { stopCamera(); try { sessionStorage.removeItem('sp'); } catch (e) {} SESSION_PASS = ''; SESSION_HASH = ''; localStorage.removeItem(P + 'session'); location.reload(); } }
     function checkPersistedSession() {
       var s = lsGet('session', null);
       if (s && USER_MAP[s.nip] && allowedClasses(USER_MAP[s.nip]).indexOf(s.cls) >= 0) { currentUser = USER_MAP[s.nip]; activeClass = s.cls; showPortal(); }
@@ -2096,9 +2105,37 @@ function actExport_(req) {
     }
     function exportRecapToExcel() { var wb = XLSX.utils.table_to_book($('table-recap'), { sheet: 'Rekap' }); XLSX.writeFile(wb, 'Rekap_' + activeClass + '_' + ($('rekap-scope').value || 'nilai') + '.xlsx'); }
     function printHtml(html) { var a = $('print-ljk-area'); a.innerHTML = html; setTimeout(function () { window.print(); }, 300); }
+    function cleanupRecapPage() { var st = document.getElementById('recap-page-style'); if (st) st.remove(); }
+    window.addEventListener('afterprint', cleanupRecapPage);
     function printRecapReport() {
-      var sch = schoolInfo();
-      printHtml('<div class="rekap-print"><h3 style="text-align:center;margin-bottom:2mm;">' + esc($('rekap-title').innerText) + '</h3><p style="text-align:center;font-size:10pt;margin-bottom:5mm;">' + esc(sch.name || '') + (sch.year ? ' — TP. ' + esc(sch.year) : '') + '</p>' + $('table-recap').outerHTML + '<p style="margin-top:8mm;font-size:9pt;">Guru: ' + esc(currentUser.name) + '</p></div>');
+      var sch = schoolInfo(), hr = $('thead-recap').rows[0], rows = $('tbody-recap').rows;
+      if (!hr || !rows.length) { toast('Tidak ada data rekap untuk dicetak.', 'err'); return; }
+      var ncol = hr.cells.length, h = '<table id="rekap-print-tbl"><thead><tr>';
+      for (var i = 0; i < ncol; i++) h += '<th' + (i === 1 ? ' class="nm"' : '') + '>' + esc(hr.cells[i].textContent.trim()) + '</th>';
+      h += '</tr></thead><tbody>';
+      for (var r = 0; r < rows.length; r++) {
+        var cs = rows[r].cells;
+        if (cs.length === 1) { h += '<tr><td colspan="' + ncol + '" style="white-space:normal;">' + esc(cs[0].textContent.trim()) + '</td></tr>'; continue; }
+        h += '<tr>';
+        for (var c = 0; c < cs.length; c++) h += '<td' + (c === 1 ? ' class="nm"' : '') + '>' + esc(cs[c].textContent.trim()) + '</td>';
+        h += '</tr>';
+      }
+      h += '</tbody></table>';
+      var inner = '<h3>' + esc($('rekap-title').innerText) + '</h3><p class="rk-sub">' + esc(sch.name || '') + (sch.year ? ' — TP. ' + esc(sch.year) : '') + '</p>' + h + '<p class="rk-foot">Guru: ' + esc(currentUser.name) + '</p>';
+      // ukur dulu di luar layar, perkecil huruf sampai seluruh kolom muat di lebar kertas
+      var probe = document.createElement('div');
+      probe.className = 'rekap-print'; probe.style.cssText = 'position:fixed;left:-10000px;top:0;visibility:hidden;width:188mm;max-width:none;';
+      probe.innerHTML = inner; document.body.appendChild(probe);
+      var tbl = probe.querySelector('table'), fs = 9.5;
+      for (; fs > 5.5; fs -= 0.25) { tbl.style.fontSize = fs + 'pt'; if (tbl.getBoundingClientRect().width <= probe.clientWidth + 0.5) break; }
+      document.body.removeChild(probe);
+      cleanupRecapPage();
+      var ps = document.createElement('style'); ps.id = 'recap-page-style';
+      ps.textContent = '@page { size: 215mm 330mm; margin: 10mm; }';   // kertas F4 / Folio
+      document.head.appendChild(ps);
+      var area = $('print-ljk-area');
+      area.innerHTML = '<div class="rekap-print">' + inner.replace('<table id="rekap-print-tbl">', '<table id="rekap-print-tbl" style="font-size:' + fs + 'pt;">') + '</div>';
+      setTimeout(function () { window.print(); }, 300);
     }
 
 
@@ -2220,7 +2257,7 @@ function actExport_(req) {
         for (i = 1; i <= o.essay; i++) { var ln = ''; for (var l = 0; l < lines; l++) ln += '<div class="ln"></div>'; flow += '<div class="ljk-essay-item" style="height:' + per + 'mm;"><b style="font-size:8pt;width:5mm;">' + i + '.</b><div style="flex:1;">' + ln + '</div><div style="width:20mm;border-left:.2mm dashed #777;padding-left:2mm;font-size:7pt;font-weight:bold;display:flex;align-items:center;justify-content:center;">Skor: ___</div></div>'; }
       }
       html += '<div class="abs" style="left:20mm;top:118mm;width:170mm;">' + flow + '</div>';
-      html += '<div class="abs ljk-footer-note" style="left:22mm;width:166mm;top:284mm;"><div><b>Petunjuk:</b> Gunakan pensil 2B, hitamkan bulatan PG dengan penuh. Tulis jawaban isian/essay dengan rapi.</div><div>SIPINTAR</div></div>';
+      html += '<div class="abs ljk-footer-note" style="left:22mm;width:166mm;top:284mm;"><div><b>Petunjuk:</b> Gunakan pensil 2B, hitamkan bulatan PG dengan penuh. Tulis jawaban isian/essay dengan rapi.</div><div>SIPENA</div></div>';
       return html;
     }
     function triggerPrintLjk() {
@@ -2231,6 +2268,7 @@ function actExport_(req) {
       var sch = schoolInfo(), students = studentsForSubject(activeClass, subj);
       if (mode === 'personalized' && !students.length) { toast('Data siswa kosong. Pilih mode "LJK Kosong" atau isi data siswa dahulu.', 'err'); return; }
       var list = mode === 'personalized' ? students : [{ name: '____________________________', nisn: '__________', nis: '_______', _blank: true }];
+      cleanupRecapPage();
       var area = $('print-ljk-area'); area.innerHTML = '';
       list.forEach(function (st, idx) {
         var sheet = document.createElement('div'); sheet.className = 'ljk-sheet-a4';
@@ -2577,7 +2615,7 @@ function actExport_(req) {
       var wb = XLSX.utils.book_new(), cls = activeClass;
       XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(getStudents(cls).map(function (s) { return { Nama: s.name, NISN: s.nisn, NIS: formatNis(s.nis), JK: s.gender, Agama: s.religion }; })), 'Siswa');
       getSubjectsFor(currentUser, cls).forEach(function (sj) { var g = getGrades(cls, sj.code), rows = Object.keys(g).map(function (n) { var x = g[n]; return { NISN: n, Benar: x.correct, Salah: x.wrong, Kosong: x.empty, PG: x.pgScore, Isian: x.isianScore, Essay: x.essayScore, Akhir: x.finalScore }; }); if (rows.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), sj.code.slice(0, 28)); });
-      XLSX.writeFile(wb, 'Cadangan_SIPINTAR_' + cls + '_' + Date.now() + '.xlsx');
+      XLSX.writeFile(wb, 'Cadangan_SIPENA_' + cls + '_' + Date.now() + '.xlsx');
     }
     function executeGranularReset() {
       if (isReadOnly()) { toast('Kepala sekolah tidak memiliki akses reset.', 'err'); return; }
@@ -2764,7 +2802,7 @@ function actExport_(req) {
       }
     }
     async function sipandaAutoLogin() {
-      if (!SESSION_HASH) throw new Error('Silakan login ulang di SIPINTAR');
+      if (!SESSION_HASH) throw new Error('Silakan login ulang di SIPENA');
       var kls = activeClass, data;
       try { data = await sipandaLoginAs(kls); }
       catch (e1) {
@@ -2835,7 +2873,7 @@ function actExport_(req) {
     function spdCanAuth(cls) { return !!(SESSION_HASH || spdCached(cls)); }
     async function spdToken(cls, fresh) {
       var t = fresh ? '' : spdCached(cls); if (t) return t;
-      if (!SESSION_HASH) throw new Error('perlu login ulang di SIPINTAR');
+      if (!SESSION_HASH) throw new Error('perlu login ulang di SIPENA');
       return (await sipandaLoginAs(cls)).token;
     }
     function spdRows(cls) {      // hanya siswa lengkap (nama, NISN 10 digit, JK, agama) dan ber-NIS (SIPANDA mewajibkan NIS)
@@ -2930,12 +2968,12 @@ function actExport_(req) {
     }
     function spdManual() {
       if (!canEditStudents(activeClass)) return;
-      if (!spdCanAuth(activeClass)) { toast('Login ulang di SIPINTAR (masukkan password) agar bisa sinkron ke SIPANDA.', 'err'); return; }
+      if (!spdCanAuth(activeClass)) { toast('Login ulang di SIPENA (masukkan password) agar bisa sinkron ke SIPANDA.', 'err'); return; }
       spdEnqueue(activeClass, true);
     }
     async function spdManualAll() {
       if (!currentUser || !currentUser.admin) return;
-      if (!SESSION_HASH) { toast('Login ulang di SIPINTAR (masukkan password) agar bisa sinkron ke SIPANDA.', 'err'); return; }
+      if (!SESSION_HASH) { toast('Login ulang di SIPENA (masukkan password) agar bisa sinkron ke SIPANDA.', 'err'); return; }
       var list = ALL_CLASSES.filter(function (c) { return getStudents(c).length; });
       if (!list.length) { toast('Belum ada data siswa di kelas mana pun.', 'err'); return; }
       if (!confirm('Kirim data siswa ' + list.length + ' kelas ke SIPANDA?')) return;
@@ -3286,7 +3324,7 @@ const V={};
 
 /* Penyimpanan & sinkronisasi antar perangkat */
 (function(){
-  const TRK=['tp','ekskul','koku','sekolah'],REF=['dashboard','tp','nilai','absensi','ekskul','koku','siswa'],SKIP=/^(m|ag|fa|rk|kall|ne)$/;
+  const TRK=['tp','koku','sekolah'],REF=['dashboard','tp','nilai','absensi','ekskul','koku','siswa'],SKIP=/^(m|ag|fa|rk|kall|ne)$/;
   const mark=e=>{const t=e.target;if(!S||!t||!t.closest||!t.closest('#main')||!TRK.includes(CUR)||SKIP.test(t.id||''))return;DIRTY=true};
   document.addEventListener('input',mark,true);document.addEventListener('change',mark,true);
   window.addEventListener('beforeunload',e=>{if(S&&(DIRTY||(window._pend&&window._pend()))){e.preventDefault();e.returnValue=''}});
@@ -3353,9 +3391,18 @@ V.sekolah=async el=>{
 V.ekskul=async el=>{
   const [sw,e]=await Promise.all([api('siswa.list'),api('ekskul.list')]),w=!ro(),dis=w?'':'disabled',KT=['Sangat Baik','Baik','Cukup','Perlu Bimbingan'],dl=[...e.daftar];
   const so=(a,v)=>'<option value="">—</option>'+(!v||a.includes(v)?a:[...a,v]).map(x=>`<option ${x===v?'selected':''}>${esc(x)}</option>`).join('');
-  el.innerHTML=`<div class="card"><div class="ch">Data Ekstrakurikuler — Kelas ${esc(S.kelas)}</div><div class="cb"><div class="bar">${w?'<button class="btn" id="sv">Simpan</button><input id="ne" placeholder="Ekskul baru (mis. Pramuka)"><button class="btn2" id="ae">+ Tambah ke Daftar</button>':''}</div><div class="tw"><table><tr><th>No</th><th>Nama</th><th>Ekskul 1</th><th>Penilaian 1</th><th>Ekskul 2</th><th>Penilaian 2</th></tr>${sw.map((s,i)=>{const it=e.data[s.nis]||[];return `<tr data-n="${esc(s.nis)}"><td>${i+1}</td><td>${esc(s.nama)}</td>${[0,1].map(j=>{const x=it[j]||{};return `<td><select data-f="e" ${dis}>${so(dl,x.ekskul||'')}</select></td><td><select data-f="k" ${dis}>${so(KT,x.keterangan||'')}</select></td>`}).join('')}</tr>`}).join('')}</table></div><p style="margin-top:10px"><small>Siswa tanpa ekskul dibiarkan kosong (—).</small></p></div></div>`;
-  if(w){$('#ae').onclick=()=>{const v=$('#ne').value.trim();if(!v)return;$$('[data-f=e]',el).forEach(s=>s.insertAdjacentHTML('beforeend','<option>'+esc(v)+'</option>'));$('#ne').value='';toast('Ditambahkan. Pilih pada siswa lalu klik Simpan.')};
-  $('#sv').onclick=()=>run(()=>api('ekskul.save',{entries:$$('tr[data-n]',el).map(tr=>{const E=$$('[data-f=e]',tr),K=$$('[data-f=k]',tr);return{nis:tr.dataset.n,items:E.map((x,j)=>({ekskul:x.value,keterangan:K[j].value}))}})}),'Tersimpan')}};
+  el.innerHTML=`<div class="card"><div class="ch">Data Ekstrakurikuler — Kelas ${esc(S.kelas)}</div><div class="cb"><div class="bar">${w?'<span class="tag" id="sst"><i class="fa-solid fa-cloud-arrow-up"></i><span>Otomatis tersimpan</span></span><input id="ne" placeholder="Ekskul baru (mis. Pramuka)"><button class="btn2" id="ae">+ Tambah ke Daftar</button>':''}</div><div class="tw"><table><tr><th>No</th><th>Nama</th><th>Ekskul 1</th><th>Penilaian 1</th><th>Ekskul 2</th><th>Penilaian 2</th></tr>${sw.map((s,i)=>{const it=e.data[s.nis]||[];return `<tr data-n="${esc(s.nis)}"><td>${i+1}</td><td>${esc(s.nama)}</td>${[0,1].map(j=>{const x=it[j]||{};return `<td><select data-f="e" ${dis}>${so(dl,x.ekskul||'')}</select></td><td><select data-f="k" ${dis}>${so(KT,x.keterangan||'')}</select></td>`}).join('')}</tr>`}).join('')}</table></div><p style="margin-top:10px"><small>Siswa tanpa ekskul dibiarkan kosong (—). Perubahan tersimpan otomatis.</small></p></div></div>`;
+  if(w){
+    let tmr,busy=false,pend=false;
+    const st=t=>{const x=$('#sst');if(x)$('span',x).textContent=t};
+    const collect=()=>$$('tr[data-n]',el).map(tr=>{const E=$$('[data-f=e]',tr),K=$$('[data-f=k]',tr);return{nis:tr.dataset.n,items:E.map((x,j)=>({ekskul:x.value,keterangan:K[j].value}))}});
+    const flush=async()=>{if(busy||!pend)return;busy=true;pend=false;st('Menyimpan…');
+      try{await api('ekskul.save',{entries:collect()});st('Tersimpan ✓')}
+      catch(err){pend=true;st('Gagal menyimpan, mencoba lagi…');toast(err.message,1);clearTimeout(tmr);tmr=setTimeout(flush,4000)}
+      busy=false;if(pend&&!/Gagal/.test(($('#sst')||{textContent:''}).textContent)){clearTimeout(tmr);tmr=setTimeout(flush,600)}};
+    window._flush=flush;window._pend=()=>pend||busy;
+    el.onchange=ev=>{const t=ev.target;if(!t||!t.dataset||!t.dataset.f)return;pend=true;st('Menyimpan…');clearTimeout(tmr);tmr=setTimeout(flush,700)};
+    $('#ae').onclick=()=>{const v=$('#ne').value.trim();if(!v)return;$$('[data-f=e]',el).forEach(sl=>sl.insertAdjacentHTML('beforeend','<option>'+esc(v)+'</option>'));$('#ne').value='';toast('Ditambahkan ke daftar. Pilih pada siswa, otomatis tersimpan.')}}};
 
 V.koku=async el=>{
   const [sw,d]=await Promise.all([api('siswa.list'),api('koku.list')]),w=!ro(),dis=w?'':'disabled',op=d.opsi,CP=['Sangat baik','Baik','Cukup baik','Perlu bimbingan'],cl=d.data['*']||{kegiatan:[],dimensi:[],capaian:'Baik'},
