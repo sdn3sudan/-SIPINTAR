@@ -298,6 +298,15 @@
     .ljk-essay-item { border: .25mm solid #777; border-radius: 1mm; padding: 1mm 2mm; display: flex; gap: 2mm; margin-bottom: 1.2mm; box-sizing: border-box; }
     .ljk-essay-item .ln { border-bottom: .2mm dotted #666; height: 4.3mm; }
     .ljk-footer-note { font-size: 7pt; color: #444; border-top: .2mm solid #AAA; padding-top: 1mm; display: flex; justify-content: space-between; }
+    .kg-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; max-width: 460px; }
+    .kg-chk { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 7px 4px; border: 1px solid rgba(255,255,255,.22); border-radius: 8px; background: rgba(255,255,255,.06); cursor: pointer; font-size: .85rem; font-weight: 600; color: #FFF; user-select: none; }
+    .kg-chk input { accent-color: #FFC83D; width: 16px; height: 16px; }
+    .kg-chk:has(input:checked) { background: rgba(255,200,61,.18); border-color: #FFC83D; }
+    .kg-chk:has(input:disabled) { opacity: .4; cursor: not-allowed; }
+    .kg-sec { margin: 0 0 18px; }
+    .kg-sec h4 { margin: 0 0 6px; font-size: .95rem; color: var(--gold-light); }
+    .kg-sec .kg-tools { margin: 0 0 8px; display: flex; gap: 8px; flex-wrap: wrap; }
+    .kg-badge { display: inline-block; font-size: .68rem; padding: 2px 7px; border-radius: 10px; background: rgba(255,200,61,.2); color: #FFD54A; margin-left: 6px; }
     .rekap-print { width: 188mm; max-width: 100%; margin: 0 auto; padding: 0; box-sizing: border-box; color: #000 !important; background: #FFF; font-family: Arial, sans-serif; }
     .rekap-print * { color: #000 !important; box-sizing: border-box; }
     .rekap-print h3 { font-size: 12pt; margin: 0 0 1.5mm; text-align: center; text-transform: uppercase; }
@@ -539,6 +548,7 @@
           <li data-tab="tab-ljk"><a href="javascript:void(0)" onclick="switchTab('tab-ljk')"><i class="fa-solid fa-camera"></i><span>Lembar Jawaban Komputer</span></a></li>
           <li data-tab="tab-reset"><a href="javascript:void(0)" onclick="switchTab('tab-reset')"><i class="fa-solid fa-arrows-rotate"></i><span>Reset</span></a></li>
           <li data-tab="tab-pengaturan"><a href="javascript:void(0)" onclick="switchTab('tab-pengaturan')"><i class="fa-solid fa-gear"></i><span>Pengaturan</span></a></li>
+          <li data-tab="tab-guru" id="menu-guru" style="display:none;"><a href="javascript:void(0)" onclick="switchTab('tab-guru')"><i class="fa-solid fa-user-gear"></i><span>Kelola Guru</span></a></li>
           <li data-tab="tab-cloud" id="menu-cloud" style="display:none;"><a href="javascript:void(0)" onclick="switchTab('tab-cloud')"><i class="fa-solid fa-database"></i><span>Database Cloud</span></a></li>
         </ul>
       </div>
@@ -872,6 +882,29 @@
         </section>
 
         <!-- DATABASE CLOUD (khusus admin) -->
+        <section id="tab-guru" class="tab-section">
+          <div class="module-card">
+            <div class="module-title-bar">
+              <h2><i class="fa-solid fa-user-gear" style="color:var(--gold-accent);"></i> Kelola Guru &amp; Kelas yang Dipegang — Admin</h2>
+            </div>
+            <div class="info-box"><i class="fa-solid fa-circle-info"></i> Pilih guru, lalu centang kelas yang dipegang untuk setiap peran. Untuk <b>Guru PAI</b> Anda bisa membatasi hanya kelas tertentu. Perubahan tersimpan ke database cloud dan otomatis berlaku di semua perangkat guru (guru yang sedang login akan mengikuti dalam beberapa detik).</div>
+            <div class="form-grid-2">
+              <div class="form-control-box"><label>Pilih Guru</label><select id="kg-user" onchange="kgLoad()"></select></div>
+            </div>
+            <div id="kg-editor" style="margin-top:14px;"></div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px;">
+              <button class="btn-act primary" onclick="kgSave()"><i class="fa-solid fa-floppy-disk"></i> Simpan Pengaturan Guru</button>
+              <button class="btn-act glass" onclick="kgReset()"><i class="fa-solid fa-rotate-left"></i> Kembalikan ke Bawaan</button>
+              <button class="btn-act success" onclick="kgPushSipanda(null, true)" title="Kirim pembagian kelas semua guru ke SIPANDA e-Rapor"><i class="fa-solid fa-rotate"></i> Sinkronkan Semua ke SIPANDA</button>
+            </div>
+            <div id="kg-sipanda-status" style="margin-top:10px;font-size:.85rem;color:var(--gold-light);"></div>
+          </div>
+          <div class="module-card">
+            <div class="module-title-bar"><h2><i class="fa-solid fa-table-list"></i> Ringkasan Pembagian Kelas</h2></div>
+            <div class="table-responsive"><table class="custom-table" style="min-width:760px;"><thead><tr><th>Nama Guru</th><th>Wali Kelas</th><th>Guru PAI</th><th>B. Inggris</th><th>Koding/KKA</th></tr></thead><tbody id="kg-summary"></tbody></table></div>
+          </div>
+        </section>
+
         <section id="tab-cloud" class="tab-section">
           <div class="module-card">
             <div class="module-title-bar">
@@ -1590,16 +1623,19 @@ function actExport_(req) {
       for (var i = 0; i < all.length; i++) if (all[i].code === c) return all[i];
       return { code: c, name: c, short: c };
     }
+    // Guru PAI: paiCls kosong = semua kelas (bawaan); bila diisi admin = hanya kelas tersebut
+    function paiList(u) { return u.pai ? (u.paiCls && u.paiCls.length ? u.paiCls : ALL_CLASSES.slice()) : []; }
     function isHomeroom(u, cls) { return u.admin || u.homeroom.indexOf(cls) >= 0; }
     function allowedClasses(u) {
-      if (u.admin || u.pai || u.head) return ALL_CLASSES.slice();
-      return ALL_CLASSES.filter(function (c) { return u.homeroom.indexOf(c) >= 0 || u.english.indexOf(c) >= 0 || u.coding.indexOf(c) >= 0; });
+      if (u.admin || u.head) return ALL_CLASSES.slice();
+      var pc = paiList(u);
+      return ALL_CLASSES.filter(function (c) { return u.homeroom.indexOf(c) >= 0 || u.english.indexOf(c) >= 0 || u.coding.indexOf(c) >= 0 || pc.indexOf(c) >= 0; });
     }
     function getSubjectsFor(u, cls) {
       var out = [], g = +cls[0];
       var all = u.admin || u.head;
       if (isHomeroom(u, cls) || u.head) out = out.concat(HOMEROOM_SUBJECTS);
-      if (u.pai || all) out.push(PAI_SUBJECT);
+      if ((u.pai && paiList(u).indexOf(cls) >= 0) || all) out.push(PAI_SUBJECT);
       if (u.english.indexOf(cls) >= 0 || (all && g >= 4)) out.push(ENGLISH_SUBJECT);
       if (u.coding.indexOf(cls) >= 0 || (all && g >= 5)) out.push(CODING_SUBJECT);
       return out;
@@ -1692,6 +1728,7 @@ function actExport_(req) {
         items.forEach(function (it) { var r = lsGet('d:' + it.key, null); if (r && r.ts === it.ts) delete ob2[it.key]; });
         lsSet('outbox', ob2);
         var changed = false; (res.rows || []).forEach(function (row) { if (mergeIncoming(row)) changed = true; });
+        if (applyUserConf()) { changed = true; onUserConfApplied(); }
         lsSet('lastPull', Math.max(0, (res.serverTime || Date.now()) - 3000)); lsSet('lastSyncAt', Date.now());
         if (manual) toast('Sinkronisasi berhasil.', 'ok');
         if (changed) refreshAfterSync();
@@ -1791,6 +1828,7 @@ function actExport_(req) {
     }
     async function handleLoginSubmit(ev) {
       ev.preventDefault();
+      try { await fetchUserConf(); onNipInput(); } catch (e) { }
       var nip = normalizeNip($('login-nip').value), pass = $('login-pass').value.trim(), cls = $('login-class').value, btn = $('btn-login-submit');
       var u = USER_MAP[nip];
       if (!u) { showLoginAlert('NIP tidak terdaftar.'); return; }
@@ -1834,7 +1872,7 @@ function actExport_(req) {
       $('header-user-name').innerText = currentUser.name;
       fillClassOptions($('class-switcher'), allowedClasses(currentUser)); $('class-switcher').value = activeClass;
       var subs = getSubjectsFor(currentUser, activeClass); activeSubject = subs.length ? subs[0].code : '';
-      loadSchoolForm(); fillCloudForm(); fillSheetForm(); fillGasCode(); $('menu-cloud').style.display = currentUser.admin ? '' : 'none'; $('btn-spd-all').style.display = currentUser.admin ? '' : 'none'; refreshAll(); startClock(); startSyncLoop(); setSyncUI(); syncNow();
+      loadSchoolForm(); fillCloudForm(); fillSheetForm(); fillGasCode(); $('menu-cloud').style.display = currentUser.admin ? '' : 'none'; $('menu-guru').style.display = currentUser.admin ? '' : 'none'; $('btn-spd-all').style.display = currentUser.admin ? '' : 'none'; refreshAll(); startClock(); startSyncLoop(); setSyncUI(); syncNow();
       $('print-ljk-date').value = new Date().toISOString().slice(0, 10);
       if (currentUser.head) {
         ['tab-ljk', 'tab-reset'].forEach(function (t) { var li = document.querySelector('.sidebar-menu li[data-tab="' + t + '"]'); if (li) li.style.display = 'none'; });
@@ -1861,7 +1899,7 @@ function actExport_(req) {
       $('key-class-label').innerText = activeClass; $('stat-nilai-count').innerText = subs.length;
     }
     function switchTab(tabId) {
-      if (tabId === 'tab-cloud' && !(currentUser && currentUser.admin)) { toast('Menu ini khusus admin.', 'err'); return; }
+      if ((tabId === 'tab-cloud' || tabId === 'tab-guru') && !(currentUser && currentUser.admin)) { toast('Menu ini khusus admin.', 'err'); return; }
       if (tabId !== 'tab-ljk') stopCamera();
       document.querySelectorAll('.tab-section').forEach(function (el) { el.classList.remove('active'); });
       document.querySelectorAll('.sidebar-menu li').forEach(function (el) { el.classList.remove('active'); });
@@ -1871,6 +1909,7 @@ function actExport_(req) {
       if (tabId === 'tab-beranda') updateDashboard();
       if (tabId === 'tab-pengaturan') { setSyncUI(); refreshOwnerEmail(); }
       if (tabId === 'tab-cloud') setSyncUI();
+      if (tabId === 'tab-guru') kgInit();
       window.scrollTo(0, 0);
     }
     function toggleSidebarDrawer() { $('app-sidebar').classList.toggle('open'); $('drawer-backdrop').classList.toggle('show'); }
@@ -2980,11 +3019,130 @@ function actExport_(req) {
       for (var i = 0; i < list.length; i++) await spdEnqueue(list[i], true);
     }
 
+    /* ==========================================================================
+       R. KELOLA GURU (admin): pembagian kelas guru, disimpan di cloud (kunci 'userconf')
+       ========================================================================== */
+    var BASE_USERS = {}; USERS.forEach(function (u) { BASE_USERS[u.nip] = { h: u.homeroom.slice(), pai: u.pai, pc: [], en: u.english.slice(), cd: u.coding.slice() }; });
+    var userConfSig = '', userConfFetchedAt = 0;
+    function applyUserConf() {
+      var conf = dbGet('userconf', {}) || {}, sig = JSON.stringify(conf);
+      if (sig === userConfSig) return false;
+      userConfSig = sig;
+      USERS.forEach(function (u) {
+        if (u.admin) return;
+        var b = BASE_USERS[u.nip], c = conf[u.nip] || null;
+        if (u.head) return;
+        var x = c || b;
+        u.homeroom = (x.h || []).slice(); u.pai = !!x.pai; u.paiCls = (x.pc || []).slice(); u.english = (x.en || []).slice(); u.coding = (x.cd || []).slice();
+      });
+      return true;
+    }
+    async function fetchUserConf() {
+      if (!cloudCfg().url || !navigator.onLine) return;
+      if (Date.now() - userConfFetchedAt < 20000) return;
+      var r = await cloudCall({ action: 'get', keys: ['userconf'] }, 6000);
+      userConfFetchedAt = Date.now();
+      (r.rows || []).forEach(function (row) { mergeIncoming(row); });
+      applyUserConf();
+    }
+    function onUserConfApplied() {
+      if ($('login-page').style.display !== 'none' && !currentUser) { onNipInput(); return; }
+      if (!currentUser || currentUser.admin) return;
+      var list = allowedClasses(currentUser);
+      if (!list.length) { toast('Akses kelas Anda dihapus oleh admin. Anda akan keluar.', 'err'); setTimeout(function () { localStorage.removeItem(P + 'session'); location.reload(); }, 2500); return; }
+      if (appBooted) {
+        fillClassOptions($('class-switcher'), list);
+        if (list.indexOf(activeClass) < 0) { toast('Pembagian kelas Anda diubah admin. Pindah ke Kelas ' + list[0] + '.', 'ok'); $('class-switcher').value = list[0]; switchActiveClass(list[0]); }
+        else { $('class-switcher').value = activeClass; refreshAll(); }
+      }
+    }
+    function kgClassText(a) { return a && a.length ? a.join(', ') : '—'; }
+    function kgInit() {
+      var sel = $('kg-user'), prev = sel.value;
+      sel.innerHTML = USERS.filter(function (u) { return !u.admin && !u.head; }).map(function (u) { return '<option value="' + esc(u.nip) + '">' + esc(u.name) + '</option>'; }).join('');
+      if (prev && sel.querySelector('option[value="' + prev + '"]')) sel.value = prev;
+      kgLoad(); kgSummary();
+    }
+    function kgGrid(sec, sel, disabled) {
+      return '<div class="kg-grid">' + ALL_CLASSES.map(function (c) { return '<label class="kg-chk"><input type="checkbox" data-sec="' + sec + '" value="' + c + '"' + (sel.indexOf(c) >= 0 ? ' checked' : '') + (disabled ? ' disabled' : '') + '> ' + c + '</label>'; }).join('') + '</div>';
+    }
+    function kgTools(sec) { return '<div class="kg-tools"><button type="button" class="btn-act glass" onclick="kgBulk(\'' + sec + '\',true)">Pilih semua</button><button type="button" class="btn-act glass" onclick="kgBulk(\'' + sec + '\',false)">Kosongkan</button></div>'; }
+    function kgBulk(sec, on) { document.querySelectorAll('#kg-editor input[data-sec="' + sec + '"]').forEach(function (i) { if (!i.disabled) i.checked = on; }); }
+    function kgLoad() {
+      var u = USER_MAP[$('kg-user').value]; if (!u) { $('kg-editor').innerHTML = ''; return; }
+      var pcs = u.pai ? paiList(u) : [];
+      $('kg-editor').innerHTML =
+        '<div class="kg-sec"><h4>Wali Kelas (guru kelas — semua mapel kelas)</h4>' + kgTools('h') + kgGrid('h', u.homeroom, false) + '</div>' +
+        '<div class="kg-sec"><h4>Guru PAI — hanya siswa beragama Islam</h4>' +
+        '<label class="kg-chk" style="max-width:260px;justify-content:flex-start;margin-bottom:8px;"><input type="checkbox" id="kg-pai"' + (u.pai ? ' checked' : '') + ' onchange="kgPaiToggle()"> Guru PAI</label>' +
+        '<div id="kg-pai-box">' + kgTools('pc') + kgGrid('pc', pcs, !u.pai) + '<small style="display:block;margin-top:6px;color:var(--text-sub);">Centang hanya kelas yang diajar. Jika semua kelas dicentang, guru ini memegang PAI di semua kelas.</small></div></div>' +
+        '<div class="kg-sec"><h4>Guru Bahasa Inggris</h4>' + kgTools('en') + kgGrid('en', u.english, false) + '</div>' +
+        '<div class="kg-sec"><h4>Guru Koding / KKA</h4>' + kgTools('cd') + kgGrid('cd', u.coding, false) + '</div>';
+    }
+    function kgPaiToggle() {
+      var on = $('kg-pai').checked;
+      document.querySelectorAll('#kg-editor input[data-sec="pc"]').forEach(function (i) { i.disabled = !on; if (on && !document.querySelector('#kg-editor input[data-sec="pc"]:checked')) i.checked = true; });
+    }
+    function kgRead(sec) { return Array.prototype.map.call(document.querySelectorAll('#kg-editor input[data-sec="' + sec + '"]:checked'), function (i) { return i.value; }); }
+    function kgSave() {
+      if (!currentUser || !currentUser.admin) { toast('Khusus admin.', 'err'); return; }
+      var nip = $('kg-user').value, u = USER_MAP[nip]; if (!u) return;
+      var h = kgRead('h'), en = kgRead('en'), cd = kgRead('cd'), pai = $('kg-pai').checked, pc = pai ? kgRead('pc') : [];
+      if (pai && !pc.length) { toast('Pilih minimal satu kelas untuk Guru PAI, atau matikan centang Guru PAI.', 'err'); return; }
+      if (pc.length === ALL_CLASSES.length) pc = [];
+      if (!h.length && !pai && !en.length && !cd.length && !confirm(u.name + ' tidak memegang kelas apa pun sehingga tidak bisa login. Lanjutkan?')) return;
+      var dup = [];
+      h.forEach(function (c) { USERS.forEach(function (o) { if (o.nip !== nip && o.homeroom.indexOf(c) >= 0) dup.push(c + ' (' + o.name + ')'); }); });
+      if (dup.length && !confirm('Kelas berikut sudah memiliki wali kelas lain:\n' + dup.join('\n') + '\n\nTetap simpan?')) return;
+      var conf = JSON.parse(JSON.stringify(dbGet('userconf', {}) || {}));
+      conf[nip] = { h: h, pai: pai, pc: pc, en: en, cd: cd };
+      dbSet('userconf', conf, 'lww'); userConfSig = ''; applyUserConf();
+      kgLoad(); kgSummary(); toast('Pengaturan ' + u.name + ' disimpan.', 'ok');
+      kgPushSipanda([nip], false);
+    }
+    function kgReset() {
+      if (!currentUser || !currentUser.admin) { toast('Khusus admin.', 'err'); return; }
+      var nip = $('kg-user').value, u = USER_MAP[nip]; if (!u) return;
+      if (!confirm('Kembalikan pembagian kelas ' + u.name + ' ke pengaturan bawaan?')) return;
+      var conf = JSON.parse(JSON.stringify(dbGet('userconf', {}) || {})); delete conf[nip];
+      dbSet('userconf', conf, 'lww'); userConfSig = ''; applyUserConf();
+      kgLoad(); kgSummary(); toast('Dikembalikan ke bawaan.', 'ok');
+      kgPushSipanda([nip], false);
+    }
+    // Kirim pembagian kelas ke SIPANDA (aksi users.setKelas di Code.gs SIPANDA). nips = null -> semua guru.
+    async function kgPushSipanda(nips, manual) {
+      var st = $('kg-sipanda-status');
+      if (!currentUser || !currentUser.admin) return;
+      if (!SESSION_HASH) { var m0 = 'Belum tersinkron ke SIPANDA: login ulang sebagai admin (masukkan password) lalu klik "Sinkronkan Semua ke SIPANDA".'; if (st) st.textContent = m0; toast(m0, 'err'); return; }
+      var entries = USERS.filter(function (u) { return !u.admin && !u.head && (!nips || nips.indexOf(u.nip) >= 0); }).map(function (u) {
+        return { username: u.nip, wali: u.homeroom, pai: !!u.pai, paiKelas: u.pai && u.paiCls && u.paiCls.length ? u.paiCls : [], inggris: u.english, kka: u.coding };
+      });
+      if (st) st.textContent = 'Menyinkronkan ke SIPANDA…';
+      try {
+        var data = await sipandaLoginAs(activeClass);
+        var r = await sipandaCall('users.setKelas', { entries: entries }, data.token);
+        var msg = 'SIPANDA: ' + r.diubah + ' akun diperbarui' + (r.dilewati && r.dilewati.length ? ' • dilewati: ' + r.dilewati.join(', ') : '') + ' • ' + new Date().toLocaleTimeString('id-ID');
+        if (st) st.textContent = '✓ ' + msg; if (manual) toast(msg, 'ok');
+      } catch (e) {
+        var m = /Aksi tidak dikenal/.test(e.message) ? 'Code.gs SIPANDA belum diperbarui. Deploy Code.gs SIPANDA versi terbaru, lalu klik "Sinkronkan Semua ke SIPANDA".' : 'Gagal sinkron ke SIPANDA: ' + (e.message || 'galat') + '. Pengaturan di SIPENA tetap tersimpan.';
+        if (st) st.textContent = '✗ ' + m; toast(m, 'err');
+      }
+    }
+    function kgSummary() {
+      var conf = dbGet('userconf', {}) || {};
+      $('kg-summary').innerHTML = USERS.filter(function (u) { return !u.admin && !u.head; }).map(function (u) {
+        var pt = u.pai ? (u.paiCls && u.paiCls.length ? u.paiCls.join(', ') : 'Semua kelas') : '—';
+        return '<tr><td>' + esc(u.name) + (conf[u.nip] ? '<span class="kg-badge">diatur admin</span>' : '') + '</td><td>' + esc(kgClassText(u.homeroom)) + '</td><td>' + esc(pt) + '</td><td>' + esc(kgClassText(u.english)) + '</td><td>' + esc(kgClassText(u.coding)) + '</td></tr>';
+      }).join('');
+    }
+
     window.addEventListener('DOMContentLoaded', function () {
       // bersihkan sisa data contoh versi lama
       Object.keys(localStorage).forEach(function (k) { if (k.indexOf('sipintar_') === 0) localStorage.removeItem(k); });
       fillClassOptions($('login-class'), ALL_CLASSES, '-- Pilih Kelas Anda --');
+      applyUserConf();
       checkPersistedSession();
+      fetchUserConf().then(function () { if (!currentUser) onNipInput(); }).catch(function () { });
       document.addEventListener('click', function (e) { if (!e.target.closest('.user-profile-widget')) $('user-dropdown-menu').classList.remove('show'); });
     });
   </script>
