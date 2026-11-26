@@ -237,6 +237,8 @@
     .sub-tabs-header { display: flex; gap: 10px; margin-bottom: 18px; border-bottom: 1px solid rgba(255,255,255,.15); padding-bottom: 10px; overflow-x: auto; }
     .sub-tab-btn { padding: 9px 18px; background: rgba(255,255,255,.08); border: 1px solid var(--glass-border); border-radius: 12px; color: var(--text-sub); font-family: inherit; font-size: .85rem; font-weight: 600; cursor: pointer; white-space: nowrap; }
     .sub-tab-btn.active { background: linear-gradient(135deg,#1646C8,#2E7BFF); color: #FFF; border-color: var(--gold-accent); }
+    .school-locked .form-control-box input, .school-locked .form-control-box select { opacity: .75; cursor: not-allowed; background: rgba(255,255,255,.05); }
+    .school-locked .form-control-box label::after { content: ' \1F512'; font-size: .72rem; }
     .info-box { background: rgba(46,123,255,.15); border: 1px solid var(--blue-glow); border-radius: 14px; padding: 12px 14px; font-size: .85rem; margin-bottom: 14px; line-height: 1.45; }
     .info-box i { color: var(--gold-accent); }
     .info-box.warn { background: rgba(255,165,2,.14); border-color: var(--warning); }
@@ -639,7 +641,7 @@
           <div class="module-card">
             <div class="module-title-bar">
               <h2><i class="fa-solid fa-school"></i> Data Profil Sekolah &amp; Asesmen</h2>
-              <div class="action-btn-group"><button class="btn-act success" onclick="saveSchoolProfile()"><i class="fa-solid fa-floppy-disk"></i> Simpan Data Sekolah</button></div>
+              <div class="action-btn-group"><button class="btn-act success" id="btn-save-school" onclick="saveSchoolProfile()"><i class="fa-solid fa-floppy-disk"></i> Simpan Data Sekolah</button></div>
             </div>
             <div class="info-box" id="school-info-box"><i class="fa-solid fa-circle-info"></i> <span id="school-info-text"></span></div>
             <form id="form-school-profile" onsubmit="return false">
@@ -1474,6 +1476,7 @@
     function lsSet(k, v) { try { localStorage.setItem(P + k, JSON.stringify(v)); return true; } catch (e) { toast('Penyimpanan perangkat penuh.', 'err'); return false; } }
     function dbGet(key, def) { var r = lsGet('d:' + key, null); return r ? r.v : def; }
     function dbSet(key, val, mode) {
+      if (key === 'school:main' && !isAdminUser()) return;   // data sekolah hanya boleh ditulis admin
       lsSet('d:' + key, { v: val, ts: Date.now(), m: mode || 'lww' });
       var ob = lsGet('outbox', {}); ob[key] = 1; lsSet('outbox', ob);
       scheduleSync(1200); setSyncUI();
@@ -1485,6 +1488,11 @@
     }
     function mergeIncoming(row) {
       var loc = lsGet('d:' + row.key, null), changed = false;
+      if (row.key === 'school:main' && !isAdminUser()) {   // guru: data sekolah selalu mengikuti cloud (milik admin)
+        changed = !loc || JSON.stringify(loc.v) !== JSON.stringify(row.value);
+        if (changed) lsSet('d:' + row.key, { v: row.value, ts: row.ts || Date.now(), m: 'lww' });
+        return changed;
+      }
       if (row.mode === 'map') {
         var merged = mergeMaps(loc ? loc.v : {}, row.value || {});
         changed = JSON.stringify(merged) !== JSON.stringify(loc ? loc.v : {});
@@ -1527,6 +1535,7 @@
       syncing = true; syncErr = ''; setSyncUI('syncing');
       try {
         var ob = lsGet('outbox', {}), items = [];
+        if (!isAdminUser() && ob['school:main']) { delete ob['school:main']; lsSet('outbox', ob); }   // guru tidak pernah mengirim data sekolah
         Object.keys(ob).forEach(function (k) { var r = lsGet('d:' + k, null); if (r) items.push({ key: k, value: r.v, ts: r.ts, mode: r.m }); });
         var res = await cloudCall({ action: 'sync', nip: currentUser ? currentUser.nip : '', since: lsGet('lastPull', 0), items: items });
         var ob2 = lsGet('outbox', {});
@@ -1789,6 +1798,7 @@
     function legacySchool() { return currentUser ? (dbGet('school:' + currentUser.nip, {}) || {}) : {}; }
     function schoolBase() { var g = dbGet(SCH_KEY, null); return g || {}; }
     function semesterOf() {
+      var gs = schoolBase().semester; if (gs === '1' || gs === '2') return gs;   // semester dari admin, berlaku untuk semua guru
       if (!currentUser) return '';
       var v = dbGet('semester:' + currentUser.nip, null);
       if (v === '1' || v === '2') return v;
@@ -1797,10 +1807,13 @@
     function schoolInfo() { var d = {}, b = schoolBase(); for (var k in SCH_FIELDS) d[k] = b[k] || ''; d.semester = semesterOf(); return d; }
     function applySchoolLock() {
       var admin = isAdminUser(), hasData = !!(schoolBase().name);
-      for (var k in SCH_FIELDS) { var el = $(SCH_FIELDS[k]); if (el) el.readOnly = !admin; }
+      for (var k in SCH_FIELDS) { var el = $(SCH_FIELDS[k]); if (el) { el.readOnly = !admin; el.tabIndex = admin ? 0 : -1; } }
+      $('sch-semester').disabled = !admin;
+      $('form-school-profile').classList.toggle('school-locked', !admin);
+      $('btn-save-school').style.display = admin ? '' : 'none';
       $('school-info-text').textContent = admin
         ? 'Data sekolah hanya diisi oleh admin, berlaku untuk semua guru, dan otomatis terkunci bagi akun guru. Dipakai pada kop LJK dan laporan. Tersimpan di cloud dan ikut tersinkron ke perangkat lain.'
-        : (hasData ? 'Data sekolah diisi dan dikunci oleh admin, tidak dapat diubah guru. ' : 'Data sekolah belum diisi admin, hubungi admin untuk melengkapinya. ') + 'Anda hanya dapat memilih Semester untuk akun Anda.';
+        : (hasData ? 'Data sekolah diisi dan dikunci oleh admin, tidak dapat diubah guru. ' : 'Data sekolah belum diisi admin, hubungi admin untuk melengkapinya. ') + 'Semester dan seluruh isian pada menu ini dikunci, otomatis mengikuti pengaturan admin.';
     }
     function loadSchoolForm() {
       var admin = isAdminUser(), d = schoolBase();
@@ -1810,17 +1823,11 @@
       applySchoolLock();
     }
     function saveSchoolProfile() {
-      var sem = $('sch-semester').value;
-      if (isAdminUser()) {
-        var d = {}; for (var k in SCH_FIELDS) d[k] = $(SCH_FIELDS[k]).value.trim();
-        dbSet(SCH_KEY, d, 'lww');
-        dbSet('semester:' + currentUser.nip, sem, 'lww');
-        toast('Data sekolah tersimpan dan terkunci untuk guru.', 'ok');
-      } else {
-        // Guru: hanya semester. Isian lain diabaikan walau diubah lewat inspect element.
-        dbSet('semester:' + currentUser.nip, sem, 'lww');
-        toast('Semester tersimpan.', 'ok');
-      }
+      if (!isAdminUser()) { toast('Data sekolah hanya dapat diubah oleh admin.', 'err'); loadSchoolForm(); return; }   // guru: tidak ada yang bisa disimpan, walau diubah lewat inspect element
+      var d = {}; for (var k in SCH_FIELDS) d[k] = $(SCH_FIELDS[k]).value.trim();
+      d.semester = $('sch-semester').value;
+      dbSet(SCH_KEY, d, 'lww');
+      toast('Data sekolah tersimpan, otomatis tersinkron ke semua guru dan terkunci.', 'ok');
       loadSchoolForm(); updateDashboard();
     }
 
