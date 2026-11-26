@@ -641,7 +641,7 @@
               <h2><i class="fa-solid fa-school"></i> Data Profil Sekolah &amp; Asesmen</h2>
               <div class="action-btn-group"><button class="btn-act success" onclick="saveSchoolProfile()"><i class="fa-solid fa-floppy-disk"></i> Simpan Data Sekolah</button></div>
             </div>
-            <div class="info-box"><i class="fa-solid fa-circle-info"></i> Data ini diisi mandiri oleh masing-masing guru dan dipakai pada kop LJK serta laporan Anda. Data tersimpan atas nama akun Anda dan ikut tersinkron ke perangkat lain.</div>
+            <div class="info-box" id="school-info-box"><i class="fa-solid fa-circle-info"></i> <span id="school-info-text"></span></div>
             <form id="form-school-profile" onsubmit="return false">
               <div class="form-grid-2">
                 <div class="form-control-box"><label>Nama Sekolah</label><input type="text" id="sch-name" placeholder="Nama sekolah"></div>
@@ -1689,7 +1689,7 @@
       var _subs = getSubjectsFor(currentUser, activeClass); if (!_subs.some(function (x) { return x.code === activeSubject; })) activeSubject = _subs.length ? _subs[0].code : '';
       $('header-user-role').innerText = roleText(currentUser, activeClass) + ' • ' + activeClass;
       $('stat-kelas-label').innerText = activeClass;
-      buildSubjectUI(); renderStudents(); renderGrades(); renderRecapScopes(); renderRecapTable(); fillScanSelects(); loadKeyForm(); onPrintSubjectChange(); updateDashboard();
+      buildSubjectUI(); renderStudents(); renderGrades(); renderRecapScopes(); renderRecapTable(); fillScanSelects(); loadKeyForm(); onPrintSubjectChange(); if (!isTyping()) loadSchoolForm(); updateDashboard();
     }
     function subjectOptionsHtml(selected) { return getSubjectsFor(currentUser, activeClass).map(function (s) { return '<option value="' + s.code + '"' + (s.code === selected ? ' selected' : '') + '>' + esc(s.name) + '</option>'; }).join(''); }
     function buildSubjectUI() {
@@ -1752,7 +1752,7 @@
       var all = getStudents(cls), vis = scope === 'islam' ? all.filter(isMuslim) : all;
       $('stat-siswa-count').innerText = vis.length;
       $('stat-siswa-label').innerText = scope === 'islam' ? 'Siswa Muslim' : 'Data Siswa';
-      var sp = dbGet('school:' + currentUser.nip, {}); $('stat-sekolah').innerText = sp.name ? 1 : 0;
+      var sp = schoolBase(); $('stat-sekolah').innerText = sp.name ? 1 : 0;
 
       var complete = all.filter(function (s) { return s.name && s.nisn && s.gender && s.religion; }).length;
       var pSis = all.length ? Math.round(complete / all.length * 100) : 0;
@@ -1777,15 +1777,52 @@
     }
 
     /* ==========================================================================
-       G. DATA SEKOLAH (per guru)
+       G. DATA SEKOLAH
+       - Data sekolah (nama, NPSN, alamat, kepala sekolah, tahun pelajaran) satu untuk seluruh sekolah,
+         HANYA diisi admin (kunci cloud 'school:main'), otomatis terkunci untuk guru.
+       - Semester dipilih masing-masing pengguna (kunci 'semester:NIP'); guru hanya bisa mengubah semester.
        ========================================================================== */
-    var SCH_FIELDS = { name: 'sch-name', npsn: 'sch-npsn', street: 'sch-street', village: 'sch-village', district: 'sch-district', regency: 'sch-regency', province: 'sch-province', postal: 'sch-postal', headmaster: 'sch-headmaster', headNip: 'sch-head-nip', year: 'sch-year', semester: 'sch-semester' };
-    function loadSchoolForm() { var d = dbGet('school:' + currentUser.nip, {}); for (var k in SCH_FIELDS) $(SCH_FIELDS[k]).value = d[k] || ''; }
-    function saveSchoolProfile() {
-      var d = {}; for (var k in SCH_FIELDS) d[k] = $(SCH_FIELDS[k]).value.trim();
-      dbSet('school:' + currentUser.nip, d, 'lww'); toast('Data sekolah tersimpan.', 'ok'); updateDashboard();
+    var SCH_FIELDS = { name: 'sch-name', npsn: 'sch-npsn', street: 'sch-street', village: 'sch-village', district: 'sch-district', regency: 'sch-regency', province: 'sch-province', postal: 'sch-postal', headmaster: 'sch-headmaster', headNip: 'sch-head-nip', year: 'sch-year' };
+    var SCH_KEY = 'school:main';
+    function isAdminUser() { return !!(currentUser && currentUser.admin); }
+    // Data lama (sebelum diubah) tersimpan per guru di 'school:NIP' — dipakai hanya sebagai nilai awal.
+    function legacySchool() { return currentUser ? (dbGet('school:' + currentUser.nip, {}) || {}) : {}; }
+    function schoolBase() { var g = dbGet(SCH_KEY, null); return g || {}; }
+    function semesterOf() {
+      if (!currentUser) return '';
+      var v = dbGet('semester:' + currentUser.nip, null);
+      if (v === '1' || v === '2') return v;
+      var l = legacySchool().semester; return (l === '1' || l === '2') ? l : '';
     }
-    function schoolInfo() { return dbGet('school:' + currentUser.nip, {}); }
+    function schoolInfo() { var d = {}, b = schoolBase(); for (var k in SCH_FIELDS) d[k] = b[k] || ''; d.semester = semesterOf(); return d; }
+    function applySchoolLock() {
+      var admin = isAdminUser(), hasData = !!(schoolBase().name);
+      for (var k in SCH_FIELDS) { var el = $(SCH_FIELDS[k]); if (el) el.readOnly = !admin; }
+      $('school-info-text').textContent = admin
+        ? 'Data sekolah hanya diisi oleh admin, berlaku untuk semua guru, dan otomatis terkunci bagi akun guru. Dipakai pada kop LJK dan laporan. Tersimpan di cloud dan ikut tersinkron ke perangkat lain.'
+        : (hasData ? 'Data sekolah diisi dan dikunci oleh admin, tidak dapat diubah guru. ' : 'Data sekolah belum diisi admin, hubungi admin untuk melengkapinya. ') + 'Anda hanya dapat memilih Semester untuk akun Anda.';
+    }
+    function loadSchoolForm() {
+      var admin = isAdminUser(), d = schoolBase();
+      if (admin && !dbGet(SCH_KEY, null)) d = legacySchool();   // admin: usulkan isian lama sebagai nilai awal (belum tersimpan sebelum diklik Simpan)
+      for (var k in SCH_FIELDS) $(SCH_FIELDS[k]).value = d[k] || '';
+      $('sch-semester').value = semesterOf();
+      applySchoolLock();
+    }
+    function saveSchoolProfile() {
+      var sem = $('sch-semester').value;
+      if (isAdminUser()) {
+        var d = {}; for (var k in SCH_FIELDS) d[k] = $(SCH_FIELDS[k]).value.trim();
+        dbSet(SCH_KEY, d, 'lww');
+        dbSet('semester:' + currentUser.nip, sem, 'lww');
+        toast('Data sekolah tersimpan dan terkunci untuk guru.', 'ok');
+      } else {
+        // Guru: hanya semester. Isian lain diabaikan walau diubah lewat inspect element.
+        dbSet('semester:' + currentUser.nip, sem, 'lww');
+        toast('Semester tersimpan.', 'ok');
+      }
+      loadSchoolForm(); updateDashboard();
+    }
 
     /* ==========================================================================
        H. DATA SISWA
