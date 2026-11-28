@@ -371,6 +371,38 @@
     #modal-ready .box { background: #0A1F6B; border: 1.5px solid var(--warning); border-radius: 20px; width: 92%; max-width: 520px; padding: 22px; max-height: 92vh; overflow-y: auto; }
     #modal-ready h3 { font-size: 1.15rem; margin-bottom: 10px; }
     #modal-ready p { font-size: .88rem; line-height: 1.5; margin-bottom: 10px; }
+
+    /* ===== Pratinjau hasil scan (Daftar Nilai) ===== */
+    #modal-preview { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.74); z-index: 330; align-items: center; justify-content: center; padding: 12px; }
+    #modal-preview .box { background: #0A1F6B; border: 1.5px solid var(--glass-border); border-radius: 20px; width: 100%; max-width: 780px; padding: 20px; max-height: 94vh; overflow-y: auto; }
+    .pv-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
+    .pv-head h3 { font-size: 1.1rem; margin-bottom: 4px; }
+    .pv-head .pv-sub { font-size: .78rem; color: var(--text-sub); line-height: 1.5; }
+    .pv-close { background: rgba(255,255,255,.12); border: 1px solid var(--glass-border); color: #fff; width: 36px; height: 36px; border-radius: 10px; cursor: pointer; flex: none; font-size: 1rem; }
+    .pv-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px; }
+    .pv-stat { border-radius: 12px; padding: 8px 4px; text-align: center; background: rgba(255,255,255,.07); border: 1px solid var(--glass-border); }
+    .pv-stat .v { font-size: 1.25rem; font-weight: 800; }
+    .pv-stat .l { font-size: .68rem; color: var(--text-sub); text-transform: uppercase; letter-spacing: .4px; }
+    .pv-sec { font-size: .86rem; font-weight: 700; margin: 14px 0 8px; }
+    .pv-sec i { color: var(--gold-accent); margin-right: 6px; }
+    .pv-imgwrap { background: #000; border: 1px solid var(--glass-border); border-radius: 12px; overflow-x: auto; text-align: center; }
+    .pv-imgwrap img { display: block; width: 100%; min-width: 560px; height: auto; }
+    .pv-imgwrap .pv-noimg { padding: 18px 14px; font-size: .8rem; line-height: 1.55; color: var(--text-sub); background: rgba(255,255,255,.05); text-align: left; }
+    .pv-legend { font-size: .72rem; color: var(--text-sub); margin-top: 6px; }
+    .pv-tbl { width: 100%; border-collapse: collapse; font-size: .84rem; }
+    .pv-tbl th { text-align: center; padding: 8px 6px; background: rgba(255,255,255,.1); color: var(--gold-light); font-size: .74rem; text-transform: uppercase; letter-spacing: .4px; }
+    .pv-tbl td { text-align: center; padding: 7px 6px; border-bottom: 1px solid rgba(255,255,255,.08); }
+    .pv-tbl td.ans-s { color: #FF8A95; font-weight: 800; }
+    .pv-tbl td.ans-k { color: #5CF09A; font-weight: 800; }
+    .pv-tbl .tag { display: inline-block; padding: 2px 9px; border-radius: 20px; font-size: .7rem; font-weight: 700; }
+    .pv-tbl .tag.wrong { background: rgba(255,71,87,.25); border: 1px solid var(--danger); }
+    .pv-tbl .tag.empty { background: rgba(255,165,2,.22); border: 1px solid var(--warning); }
+    .pv-tbl .tag.multi { background: rgba(168,85,247,.25); border: 1px solid #A855F7; }
+    .pv-note { font-size: .76rem; line-height: 1.5; padding: 8px 12px; border-radius: 10px; margin-top: 10px; background: rgba(255,165,2,.14); border: 1px solid var(--warning); color: #FFE3B0; }
+    .pv-allgood { padding: 14px; text-align: center; border-radius: 12px; background: rgba(46,213,115,.15); border: 1px solid var(--success); font-weight: 700; font-size: .88rem; }
+    .pv-all { display: grid; grid-template-columns: repeat(auto-fill, minmax(54px, 1fr)); gap: 5px; }
+    .pv-all .ans-chip { cursor: default; text-align: center; }
+    @media (max-width: 520px) { .pv-stats { grid-template-columns: repeat(2, 1fr); } }
     .ready-block { background: rgba(255,255,255,.07); border: 1px solid var(--glass-border); border-radius: 12px; padding: 10px 12px; margin-bottom: 10px; font-size: .84rem; }
     .ready-block b.t { display: block; margin-bottom: 6px; color: var(--gold-light); }
     .ready-chip { display: inline-block; background: rgba(255,165,2,.18); border: 1px solid var(--warning); border-radius: 999px; padding: 2px 9px; margin: 2px 3px 2px 0; font-size: .74rem; }
@@ -703,12 +735,12 @@
             <div class="sub-tabs-header" id="subject-tabs-container"></div>
             <div id="nilai-banner"></div>
             <div class="table-responsive">
-              <table class="custom-table" style="min-width:880px;">
+              <table class="custom-table" style="min-width:1000px;">
                 <thead><tr>
                   <th style="width:45px;">No</th><th>Nama Siswa</th><th style="width:110px;">NISN</th><th style="width:110px;">NIS</th>
                   <th style="text-align:center;">Benar PG</th><th style="text-align:center;">Salah PG</th><th style="text-align:center;">Kosong</th>
                   <th style="text-align:center;">Nilai PG</th><th style="text-align:center;">Nilai Isian</th><th style="text-align:center;">Nilai Essay</th>
-                  <th style="text-align:center;color:var(--gold-light);">Nilai Akhir</th><th>Waktu</th>
+                  <th style="text-align:center;color:var(--gold-light);">Nilai Akhir</th><th>Waktu</th><th style="text-align:center;width:110px;">Pratinjau</th>
                 </tr></thead>
                 <tbody id="tbody-grades"></tbody>
               </table>
@@ -1061,6 +1093,22 @@
       <h3 id="ready-title"><i class="fa-solid fa-triangle-exclamation" style="color:var(--warning);"></i> Data Belum Lengkap</h3>
       <div id="ready-body"></div>
       <div id="ready-actions" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;"></div>
+    </div>
+  </div>
+
+  <div id="modal-preview" onclick="if(event.target===this)closePreview()">
+    <div class="box">
+      <div class="pv-head">
+        <div>
+          <h3><i class="fa-solid fa-eye" style="color:var(--gold-accent);"></i> Pratinjau Hasil Scan</h3>
+          <div class="pv-sub" id="pv-sub"></div>
+        </div>
+        <button class="pv-close" onclick="closePreview()" title="Tutup"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div id="pv-body"></div>
+      <div style="display:flex;justify-content:flex-end;margin-top:16px;">
+        <button class="btn-act glass" onclick="closePreview()"><i class="fa-solid fa-xmark"></i> Tutup</button>
+      </div>
     </div>
   </div>
 
@@ -1570,7 +1618,7 @@
     function gKey(c, s) { return 'grades:' + c + ':' + s; }
     function getGrades(c, s) { var m = dbGet(gKey(c, s), {}), o = {}; for (var n in m) if (!m[n].deleted) o[n] = m[n]; return o; }
     function putGrade(c, s, nisn, rec) { if (isReadOnly()) return; var m = dbGet(gKey(c, s), {}); rec.ts = Date.now(); m[nisn] = rec; dbSet(gKey(c, s), m, 'map'); }
-    function clearGrades(c, s) { if (isReadOnly()) return; var m = dbGet(gKey(c, s), {}), ts = Date.now(); for (var n in m) m[n] = { deleted: true, ts: ts }; dbSet(gKey(c, s), m, 'map'); }
+    function clearGrades(c, s) { if (isReadOnly()) return; var m = dbGet(gKey(c, s), {}), ts = Date.now(); for (var n in m) m[n] = { deleted: true, ts: ts }; dbSet(gKey(c, s), m, 'map'); try { scanImgClear(c, s); } catch (e) { } }
     function getKey(c, s) { return dbGet('keys:' + c + ':' + s, null); }
     function getQ(c, s) { var k = getKey(c, s); return k && k.q ? k.q : 40; }
     function calcFinal(pg, isi, ess) {
@@ -1936,8 +1984,8 @@
       $('tbody-grades').innerHTML = list.map(function (s, i) {
         var r = g[s.nisn] || { correct: 0, wrong: 0, empty: q, pgScore: 0, isianScore: 0, essayScore: 0, finalScore: 0, time: '' };
         function inp(f, mx) { return '<td style="text-align:center;"><input type="number" min="0" max="' + mx + '" value="' + (r[f] || 0) + '"' + (isReadOnly() ? ' disabled' : '') + ' onchange="updateRowGrade(\'' + s.nisn + '\',\'' + f + '\',this.value)"></td>'; }
-        return '<tr><td>' + (i + 1) + '</td><td style="font-weight:600;color:#fff;">' + esc(s.name) + '</td><td><code>' + s.nisn + '</code></td><td>' + esc(formatNis(s.nis) || '—') + '</td>' + inp('correct', 40) + inp('wrong', 40) + inp('empty', 40) + '<td style="text-align:center;font-weight:700;" id="pg-' + s.nisn + '">' + (r.pgScore || 0) + '</td>' + inp('isianScore', 100) + inp('essayScore', 100) + '<td style="text-align:center;font-weight:800;color:var(--gold-light);" id="fin-' + s.nisn + '">' + (r.finalScore || 0) + '</td><td style="font-size:.74rem;">' + esc(r.time || '-') + '</td></tr>';
-      }).join('') || '<tr><td colspan="12" style="text-align:center;padding:24px;">Belum ada siswa. Data siswa diisi oleh Wali Kelas.</td></tr>';
+        return '<tr><td>' + (i + 1) + '</td><td style="font-weight:600;color:#fff;">' + esc(s.name) + '</td><td><code>' + s.nisn + '</code></td><td>' + esc(formatNis(s.nis) || '—') + '</td>' + inp('correct', 40) + inp('wrong', 40) + inp('empty', 40) + '<td style="text-align:center;font-weight:700;" id="pg-' + s.nisn + '">' + (r.pgScore || 0) + '</td>' + inp('isianScore', 100) + inp('essayScore', 100) + '<td style="text-align:center;font-weight:800;color:var(--gold-light);" id="fin-' + s.nisn + '">' + (r.finalScore || 0) + '</td><td style="font-size:.74rem;">' + esc(r.time || '-') + '</td><td style="text-align:center;">' + (r.answers ? '<button class="btn-act glass" style="padding:6px 12px;font-size:.78rem;" onclick="openPreview(\'' + s.nisn + '\')"><i class="fa-solid fa-eye"></i> Pratinjau</button>' : '<button class="btn-act glass" style="padding:6px 12px;font-size:.78rem;opacity:.4;cursor:not-allowed;" disabled title="Belum ada hasil scan"><i class="fa-solid fa-eye-slash"></i> Pratinjau</button>') + '</td></tr>';
+      }).join('') || '<tr><td colspan="13" style="text-align:center;padding:24px;">Belum ada siswa. Data siswa diisi oleh Wali Kelas.</td></tr>';
     }
     function updateRowGrade(nisn, field, value) {
       if (isReadOnly()) return;
@@ -1952,6 +2000,92 @@
       renderGrades(); renderRecapTable(); updateDashboard();
     }
     function saveCurrentSubjectGrades() { syncNow(true); }
+
+    /* ==========================================================================
+       I-2. PRATINJAU HASIL SCAN (Daftar Nilai)
+       Jawaban siswa ikut tersinkron (field "answers"); gambar hasil scan hanya
+       disimpan di perangkat yang memindai (IndexedDB) agar sinkronisasi tetap ringan.
+       ========================================================================== */
+    var SCANIMG_DB = 'sipena-scanimg', scanImgDbP = null, pvToken = 0;
+    function scanImgOpen() {
+      if (scanImgDbP) return scanImgDbP;
+      scanImgDbP = new Promise(function (res) {
+        try {
+          if (!window.indexedDB) { res(null); return; }
+          var rq = indexedDB.open(SCANIMG_DB, 1);
+          rq.onupgradeneeded = function () { rq.result.createObjectStore('img'); };
+          rq.onsuccess = function () { res(rq.result); };
+          rq.onerror = rq.onblocked = function () { res(null); };
+        } catch (e) { res(null); }
+      });
+      return scanImgDbP;
+    }
+    function scanImgKey(c, s, n) { return c + '|' + s + '|' + n; }
+    async function scanImgPut(c, s, n, data) {
+      var db = await scanImgOpen(); if (!db) return false;
+      return new Promise(function (res) {
+        try { var tx = db.transaction('img', 'readwrite'); tx.objectStore('img').put({ img: data, ts: Date.now() }, scanImgKey(c, s, n)); tx.oncomplete = function () { res(true); }; tx.onerror = tx.onabort = function () { res(false); }; } catch (e) { res(false); }
+      });
+    }
+    async function scanImgGet(c, s, n) {
+      var db = await scanImgOpen(); if (!db) return null;
+      return new Promise(function (res) {
+        try { var rq = db.transaction('img', 'readonly').objectStore('img').get(scanImgKey(c, s, n)); rq.onsuccess = function () { res(rq.result || null); }; rq.onerror = function () { res(null); }; } catch (e) { res(null); }
+      });
+    }
+    async function scanImgClear(c, s) {
+      var db = await scanImgOpen(); if (!db) return false;
+      var pre = c + '|' + s + '|';
+      return new Promise(function (res) {
+        try { var tx = db.transaction('img', 'readwrite'); tx.objectStore('img').delete(IDBKeyRange.bound(pre, pre + '\uffff')); tx.oncomplete = function () { res(true); }; tx.onerror = tx.onabort = function () { res(false); }; } catch (e) { res(false); }
+      });
+    }
+    function scanSnapshot() {
+      try {
+        var cv = $('dewarped-canvas'); if (!cv || !cv.width || !cv.height) return '';
+        var w = Math.min(640, cv.width), h = Math.round(cv.height * w / cv.width), t = document.createElement('canvas');
+        t.width = w; t.height = h; t.getContext('2d').drawImage(cv, 0, 0, w, h);
+        return t.toDataURL('image/jpeg', 0.6);
+      } catch (e) { return ''; }
+    }
+    async function openPreview(nisn) {
+      var cls = activeClass, subj = activeSubject, r = getGrades(cls, subj)[nisn];
+      var s = studentsForSubject(cls, subj).filter(function (x) { return x.nisn === nisn; })[0];
+      if (!r || !r.answers) { toast('Belum ada hasil scan untuk siswa ini.', 'err'); return; }
+      var key = getKey(cls, subj), ka = key && key.a ? key.a : [], hasKey = ka.length > 0, ans = String(r.answers).split('');
+      var c = 0, w = 0, e = 0, rows = [], tagTxt = { wrong: 'Salah', empty: 'Tidak dijawab', multi: 'Jawaban ganda' };
+      ans.forEach(function (a, i) {
+        if (a === '-') { e++; rows.push({ n: i + 1, a: a, k: ka[i], t: 'empty' }); }
+        else if (hasKey && a === ka[i]) c++;
+        else { w++; rows.push({ n: i + 1, a: a, k: ka[i], t: a === '*' ? 'multi' : 'wrong' }); }
+      });
+      var token = ++pvToken, h = '';
+      $('pv-sub').innerHTML = '<b style="color:#fff;font-size:.95rem;">' + esc(s ? s.name : nisn) + '</b><br>NISN: ' + esc(nisn) + ' • ' + esc(subjectByCode(subj).name) + ' • Kelas ' + esc(cls) + (r.time ? ' • ' + esc(r.time) : '');
+      h += '<div class="pv-stats">'
+        + '<div class="pv-stat" style="border-color:var(--success);"><div class="v" style="color:var(--success);">' + (hasKey ? c : (r.correct || 0)) + '</div><div class="l">Benar</div></div>'
+        + '<div class="pv-stat" style="border-color:var(--danger);"><div class="v" style="color:var(--danger);">' + (hasKey ? w : (r.wrong || 0)) + '</div><div class="l">Salah</div></div>'
+        + '<div class="pv-stat" style="border-color:var(--warning);"><div class="v" style="color:var(--warning);">' + (hasKey ? e : (r.empty || 0)) + '</div><div class="l">Kosong</div></div>'
+        + '<div class="pv-stat"><div class="v" style="color:var(--gold-light);">' + (r.finalScore || 0) + '</div><div class="l">Nilai Akhir</div></div></div>';
+      h += '<div class="pv-sec"><i class="fa-solid fa-image"></i>Hasil Scan</div><div class="pv-imgwrap" id="pv-img"><div class="pv-noimg">Memuat gambar…</div></div>'
+        + '<div class="pv-legend">Lingkaran <b style="color:#2ED573;">hijau</b> = jawaban benar, <b style="color:#FF4757;">merah</b> = jawaban salah, <b style="color:#FFA502;">kuning putus-putus</b> = kunci yang seharusnya dipilih (tidak dijawab).</div>';
+      h += '<div class="pv-sec"><i class="fa-solid fa-circle-xmark"></i>Jawaban yang Salah' + (hasKey ? ' (' + rows.length + ' nomor)' : '') + '</div>';
+      if (!hasKey) h += '<div class="pv-note">Kunci jawaban mapel ini belum diisi, sehingga daftar jawaban salah belum dapat ditampilkan. Isi kunci di menu Lembar Jawaban &gt; Kunci Jawaban.</div>';
+      else if (!rows.length) h += '<div class="pv-allgood"><i class="fa-solid fa-circle-check" style="color:var(--success);"></i> Semua jawaban benar.</div>';
+      else h += '<div class="table-responsive"><table class="pv-tbl"><thead><tr><th>No</th><th>Jawaban Siswa</th><th>Kunci Benar</th><th>Keterangan</th></tr></thead><tbody>'
+        + rows.map(function (x) { return '<tr><td>' + x.n + '</td><td class="ans-s">' + (x.t === 'empty' ? '—' : x.t === 'multi' ? 'Ganda' : esc(x.a)) + '</td><td class="ans-k">' + esc(x.k || '?') + '</td><td><span class="tag ' + x.t + '">' + tagTxt[x.t] + '</span></td></tr>'; }).join('')
+        + '</tbody></table></div>';
+      if (hasKey && ka.length !== ans.length) h += '<div class="pv-note">Jumlah kunci (' + ka.length + ') tidak sama dengan jumlah soal pada hasil scan (' + ans.length + ').</div>';
+      if (hasKey && (+r.correct !== c || +r.wrong !== w)) h += '<div class="pv-note">Nilai di tabel berbeda dengan hitungan jawaban hasil scan (nilai diubah manual atau kunci diubah setelah scan). Rincian di atas dihitung dari jawaban terbaca dan kunci saat ini.</div>';
+      h += '<div class="pv-sec"><i class="fa-solid fa-table-cells"></i>Semua Jawaban Terbaca</div><div class="pv-all">'
+        + ans.map(function (a, i) { var cl = a === '-' ? 'empty' : (hasKey && a === ka[i] ? 'ok' : 'bad'); return '<div class="ans-chip ' + cl + '" title="Kunci: ' + esc(ka[i] || '?') + '">' + (i + 1) + ':' + esc(a) + '</div>'; }).join('') + '</div>';
+      $('pv-body').innerHTML = h; $('modal-preview').style.display = 'flex'; $('pv-body').parentNode.scrollTop = 0;
+      var rec = await scanImgGet(cls, subj, nisn);
+      if (token !== pvToken || !$('pv-img')) return;
+      $('pv-img').innerHTML = rec && rec.img ? '<img alt="Hasil scan LJK ' + esc(s ? s.name : nisn) + '" src="' + rec.img + '">'
+        : '<div class="pv-noimg"><i class="fa-solid fa-circle-info" style="color:var(--gold-accent);"></i> Gambar hasil scan tidak tersimpan di perangkat ini (LJK dipindai di perangkat lain, atau dipindai sebelum fitur pratinjau ada). Rincian jawaban tetap ditampilkan di bawah; pindai ulang LJK siswa ini untuk menyimpan gambarnya.</div>';
+    }
+    function closePreview() { pvToken++; $('modal-preview').style.display = 'none'; $('pv-body').innerHTML = ''; }
+    document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape' && $('modal-preview') && $('modal-preview').style.display === 'flex') closePreview(); });
 
     /* ==========================================================================
        J. REKAP
@@ -2284,6 +2418,7 @@
       if (!st.student) { toast('Pilih siswa terlebih dahulu.', 'err'); return false; }
       if (!st.key || !st.key.a || !st.key.a.length) { toast('Isi kunci jawaban mapel ini dahulu.', 'err'); return false; }
       putGrade(st.cls, st.subject, st.student.nisn, { correct: st.correct, wrong: st.wrong, empty: st.empty, total: st.q, pgScore: st.pgScore, isianScore: st.isian, essayScore: st.essay, finalScore: st.finalScore, time: new Date().toLocaleString('id-ID', { hour12: false }), answers: st.answers.join('') });
+      try { var snap = scanSnapshot(); if (snap) scanImgPut(st.cls, st.subject, st.student.nisn, snap); } catch (e) { }
       if (st.cls === activeClass) { renderGrades(); renderRecapTable(); }
       updateDashboard();
       if (!silent) { toast(st.student.name + ': nilai akhir ' + st.finalScore + ' tersimpan.', 'ok'); playSound('save'); }
@@ -2517,7 +2652,7 @@
         saveStudents(cls, []); toast('Data siswa kelas ' + cls + ' dihapus.', 'ok');
       } else if (scope === 'factory') {
         if (!confirm('Bersihkan cache perangkat ini? Data yang belum tersinkron akan hilang.')) return;
-        Object.keys(localStorage).forEach(function (k) { if (k.indexOf(P) === 0 && k !== P + 'cfg') localStorage.removeItem(k); }); location.reload(); return;
+        Object.keys(localStorage).forEach(function (k) { if (k.indexOf(P) === 0 && k !== P + 'cfg') localStorage.removeItem(k); }); try { indexedDB.deleteDatabase(SCANIMG_DB); } catch (e) { } location.reload(); return;
       }
       $('reset-confirm-input').value = ''; refreshAll();
     }
